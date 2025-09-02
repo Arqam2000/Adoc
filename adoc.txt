@@ -1,0 +1,183 @@
+create table Country (
+country_code int auto_increment primary key,
+country_name varchar(200)
+)
+
+
+create table City (
+city_code int auto_increment primary key,
+city_name varchar(200),
+country int references country(country_code)
+)
+
+create table Hospital (
+Hospital_code int auto_increment primary key,
+Hospital_name varchar(200),
+city int references city(city)
+)
+
+create table Specialization(
+Specialization_code int auto_increment primary key,
+Specialization_name varchar(200)
+)
+/
+create table Institue (
+university int auto_increment primary key,
+university_name varchar(200),
+city int references city(city)
+)
+/
+create table degree (
+degree_code int auto_increment primary key,
+degree varchar(200)
+)
+/
+create table Desig(
+Desig int auto_increment primary key,
+DDesig varchar(200)
+)
+/
+create table FAQ(
+FAQ int auto_increment primary key,
+FAQD varchar(500),
+ANSWER varchar(500),
+)
+/
+create table Diseases(
+Disease int auto_increment primary key,
+Diseases varchar(500),
+dpict varbinary,
+Specialization_code int references Specialization(Specialization_code)
+)
+/
+
+create table Symptom(
+Symptom int auto_increment primary key,
+Symptoms varchar(500),
+spict  varbinary
+
+)
+/
+-------------------
+create table Creview (
+cr int auto_increment primary key,
+rdate date, 
+cname  varchar(100),
+designation varchar(200),
+comment varchar(1000),
+crate int
+)
+------------- lam
+
+create table Bappoint (
+Bapoint int auto_increment primary key,
+bdate date,
+NAME varchar(100),
+EMAIL varchar(100),
+PHONE varchar(50)
+done varchar(10),
+drcoment varchar(500),
+NEXT DATE,
+fees number
+)
+
+---- master info------------------
+--- kstatus : 
+good doctor left : GL
+bad doctor left : BL
+bad doctor out : BO
+good doctor Recommend : GRH
+good doctor Recommend medium : GRM
+good doctor Recommend low : GRL
+
+----------------- while taking profile , take data till about 
+
+create table Mdoctor (
+Dr int auto_increment primary key,
+Name varchar(200),
+Email varchar(200),
+password varchar(50),
+Phone varchar(50),
+city int references city(city),
+Specialization_code int references Specialization(Specialization_code),
+picture varbinary,
+about varchar(4000),
+rating int,
+kstatus varchar(10)
+)
+/
+-------- DOCTOR Qualification detail
+
+create table doctorQD (
+Doctord int auto_increment primary key,
+Dr int references Mdoctor(Dr),
+university int references Institue(university),
+degree_code int references degree(degree_code)
+)
+/
+-------- DOCTOR hospital detail and working time
+--- status='Y' working , 'N' Left
+
+create table doctorHD (
+Doctorhd int auto_increment primary key,
+Dr int references Mdoctor(Dr),
+Hospital_code int references Hospital(Hospital_code),
+Desig int references Desig(Desig),
+timein datetime,
+timeout datetime,
+fees int,
+status varchar(2)
+)
+
+-------- videoc='Y' OR 'N'
+----------- doctors timing for video
+/
+create table doctorvD (
+Doctorvd int auto_increment primary key,
+Dr int references Mdoctor(Dr),
+videoc varchar(2),
+timein datetime,
+timeout datetime,
+fees int
+)
+/
+---------- doctor review 
+create table doctorRD (
+DoctorRd int auto_increment primary key,
+Dr int references Mdoctor(Dr),
+Review varchar(500),
+rating int,
+Patient int
+)
+/
+--------- vc ='V' video , 'W'  walkin
+------ doctors booking appointment
+create table Bappoint (
+Bapoint int auto_increment primary key,
+Dr int references Mdoctor(Dr),
+vc varchar(2)
+bdate datetime,
+Patient int references Patient(Patient) ,
+done varchar(10),
+drcoment varchar(500),
+Next datetime,
+fees int,
+disc int,
+rate int
+)
+----------- while booking appoint ----------
+ask new or already visited
+new ='Y' ------- Generate id
+
+new ='N' ------- DONT Generate id , already visited ASK FOR PHONE NO.
+FIND HIM WITH PHONE NO AND SHOW (NAME ,EMAIL)
+
+
+create table Patient(
+Patient int auto_increment primary key,
+Pname varchar(100),
+Pemail varchar(100),
+Pmobile varchar(50),
+city int references city(city),
+
+
