@@ -26,7 +26,7 @@ export const Institute = () => {
 
         axios.get("/api/v1/institutes/get-institutes")
             .then(res => {
-                console.log(res)
+                console.log(res.data)
                 setInstitutes(res.data.institutes)
             })
             .catch(err => {
@@ -41,7 +41,7 @@ export const Institute = () => {
 
         axios.get("/api/v1/cities/get-cities")
             .then(res => {
-                console.log(res)
+                console.log(res.data)
                 setCities(res.data.cities)
             })
             .catch(err => {
