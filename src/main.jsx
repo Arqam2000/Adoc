@@ -17,6 +17,10 @@ import { Specialization } from './pages/Specialization.jsx';
 import { Login } from './pages/Login.jsx';
 import { Degree } from './pages/Degree.jsx';
 import { Institute } from './pages/Institute.jsx';
+import { Designation } from './pages/Designation.jsx';
+import { Disease } from './pages/Disease.jsx';
+import { Symptom } from './pages/Symptom.jsx';
+import { Profile } from './pages/Profile.jsx';
 
 
 let router = createBrowserRouter([
@@ -55,6 +59,22 @@ let router = createBrowserRouter([
       {
         path: "admin/institute",
         Component: Institute
+      },
+      {
+        path: "admin/designation",
+        Component: Designation
+      },
+      {
+        path: "admin/disease",
+        Component: Disease
+      },
+      {
+        path: "admin/symptom",
+        Component: Symptom
+      },
+      {
+        path: "profile",
+        Component: Profile
       },
       {
         path: "login",

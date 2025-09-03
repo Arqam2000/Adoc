@@ -59,7 +59,7 @@ export const Specialization = () => {
 
         const newSpecialization = { ...res.data.data }
 
-        let specializationIndex = specializations.findIndex(specialization => specialization.specialization_code == specialization_code)
+        let specializationIndex = specializations.findIndex(specialization => specialization.Specialization_code == specialization_code)
 
         specializations[specializationIndex] = newSpecialization
         // console.log(newSpecializations)
@@ -83,7 +83,7 @@ export const Specialization = () => {
       try {
         const res = await axios.delete(`/api/v1/specializations/delete-specialization/${specialization_code}`)
 
-        const newSpecializations = specializations.filter(specialization => specialization.specialization_code != specialization_code)
+        const newSpecializations = specializations.filter(specialization => specialization.Specialization_code != specialization_code)
         console.log(newSpecializations)
         setSpecializations(newSpecializations)
         toast.success(res.data.message)
@@ -173,7 +173,7 @@ export const Specialization = () => {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value)
-                setSpecializationsFilter(specializations.filter(specialization => specialization.specialization_name.toLowerCase().includes(e.target.value.toLowerCase())))
+                setSpecializationsFilter(specializations.filter(specialization => specialization.Specialization_name.toLowerCase().includes(e.target.value.toLowerCase())))
                 console.log(specializationsFilter)
               }}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"

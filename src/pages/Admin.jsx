@@ -9,7 +9,7 @@ export const Admin = () => {
     const navigate = useNavigate()
   return (
     <div className='pl-6 flex flex-col gap-2'> 
-        <h1 className='text-3xl font-semibold p-3'>
+        <h1 className='text-xl font-semibold px-2'>
           {/* <Link to="/admin/country" ref={country} onClick={(e) => {
             e.preventDefault()
             console.log(country.current.innerText)
@@ -17,7 +17,7 @@ export const Admin = () => {
           }}>Countries</Link> */}
           <Link to="/admin/country">Countries</Link>
         </h1>
-        <h1 className='text-3xl font-semibold p-3'>
+        <h1 className='text-xl font-semibold px-2'>
           {/* <Link to="/admin/city" ref={city} onClick={(e) => {
             e.preventDefault()
             console.log(city.current.innerText)
@@ -25,7 +25,7 @@ export const Admin = () => {
           }}>Cities</Link> */}
           <Link to="/admin/city">Cities</Link>
         </h1>
-        <h1 className='text-3xl font-semibold p-3'>
+        <h1 className='text-xl font-semibold px-2'>
           {/* <Link to="/admin/hospitals" 
           ref={hospital} onClick={(e) => {
             e.preventDefault()
@@ -36,17 +36,23 @@ export const Admin = () => {
           <Link to="/admin/hospital">Hospitals</Link>
           
         </h1>
-        <h1 className='text-3xl font-semibold p-3'>
+        <h1 className='text-xl font-semibold px-2'>
           <Link to="/admin/specialization">Specializations</Link>
         </h1>
-        <h1 className='text-3xl font-semibold p-3'>
+        <h1 className='text-xl font-semibold px-2'>
           <Link to="/admin/institute">Institute</Link>
         </h1>
-        <h1 className='text-3xl font-semibold p-3'>
+        <h1 className='text-xl font-semibold px-2'>
           <Link to="/admin/degree">Degree</Link>
         </h1>
-        <h1 className='text-3xl font-semibold p-3'>
+        <h1 className='text-xl font-semibold px-2'>
           <Link to="/admin/designation">Designation</Link>
+        </h1>
+        <h1 className='text-xl font-semibold px-2'>
+          <Link to="/admin/disease">Diseases</Link>
+        </h1>
+        <h1 className='text-xl font-semibold px-2'>
+          <Link to="/admin/symptom">Symptoms</Link>
         </h1>
         
     </div>

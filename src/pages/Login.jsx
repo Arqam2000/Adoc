@@ -21,6 +21,7 @@ export const Login = () => {
         .then(res => {
             console.log("response", res.data)
             toast.success(res.data.message)
+            localStorage.setItem("doctor", JSON.stringify(res.data.user))
         })
         .catch(err => {
             console.log("Error:", err)
