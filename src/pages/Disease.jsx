@@ -15,6 +15,7 @@ export const Disease = () => {
     const [search, setSearch] = useState("");
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("");
+    const [diseaseImageUrl, setDiseaseImageUrl] = useState("")
 
     const navigate = useNavigate()
 
@@ -58,10 +59,16 @@ export const Disease = () => {
         } else {
             setLoading(true)
             setError(null)
-            try {
-                const res = await axios.patch(`/api/v1/diseases/edit-disease/${disease_code}`, { disease })
 
-                console.log(res.data)
+            const formData = new FormData()
+            
+            formData.append("disease", disease)
+            
+            formData.append("image", image)
+            try {
+                const res = await axios.patch(`/api/v1/diseases/edit-disease/${disease_code}`, formData)
+
+                console.log("edit response", res.data)
 
                 const newDisease = { ...res.data.data }
 
@@ -100,8 +107,9 @@ export const Disease = () => {
             setLoading(false)
         }
     }
-    const handleLocate = (selectedDisease) => {
+    const handleLocate = (selectedDisease, selectedDiseaseImg) => {
         setDisease(selectedDisease);
+        setDiseaseImageUrl(selectedDiseaseImg)
         setLocate(false);
         setMessage(""); // clear old messages
     };
@@ -135,7 +143,7 @@ export const Disease = () => {
     return (
         <div className='flex flex-col items-center'>
             <ToastContainer />
-            {/* <img src={diseases[diseases.length - 1]?.dpict} /> */}
+            
             <main className="flex-grow flex items-center justify-center w-full px-4 my-5">
                 <div className="w-full max-w-xl bg-white rounded-2xl shadow-lg p-6">
                     <div className="flex flex-col items-center text-center mb-6">
@@ -159,6 +167,10 @@ export const Disease = () => {
                         }}
                         className="w-full bg-white text-black border border-gray-300 rounded-lg px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+
+                    <div className='flex justify-center'>
+                        <img src={diseaseImageUrl} className='w-32 my-2'/>
+                    </div>
 
                     <input
                         type="file"
@@ -220,7 +232,7 @@ export const Disease = () => {
                                             key={idx}
                                             onClick={() => {
                                                 setDiseaseCode(c.disease)
-                                                handleLocate(c.diseases)
+                                                handleLocate(c.diseases, c.dpict)
                                             }}
                                             className="px-3 py-2 cursor-pointer hover:bg-blue-100 rounded-md"
                                         >
@@ -235,7 +247,7 @@ export const Disease = () => {
                                                 key={idx}
                                                 onClick={() => {
                                                     setDiseaseCode(c.disease)
-                                                    handleLocate(c.diseases)
+                                                    handleLocate(c.diseases, c.dpict)
                                                 }}
                                                 className="px-3 py-2 cursor-pointer hover:bg-blue-100 rounded-md"
                                             >

@@ -15,6 +15,7 @@ export const Symptom = () => {
     const [search, setSearch] = useState("");
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("");
+    const [symptomImageUrl, setSymptomImageUrl] = useState("")
 
     const navigate = useNavigate()
 
@@ -60,8 +61,14 @@ export const Symptom = () => {
         } else {
             setLoading(true)
             setError(null)
+
+            const formData = new FormData()
+            
+            formData.append("symptom", symptom)
+            
+            formData.append("image", image)
             try {
-                const res = await axios.patch(`/api/v1/symptoms/edit-symptom/${symptom_code}`, { symptom })
+                const res = await axios.patch(`/api/v1/symptoms/edit-symptom/${symptom_code}`, formData)
 
                 console.log(res.data)
 
@@ -103,8 +110,9 @@ export const Symptom = () => {
         }
     }
 
-    const handleLocate = (selectedSymptom) => {
+    const handleLocate = (selectedSymptom, selectedSymptomImg) => {
         setSymptom(selectedSymptom);
+        setSymptomImageUrl(selectedSymptomImg)
         setLocate(false);
         setMessage(""); // clear old messages
     };
@@ -161,6 +169,10 @@ export const Symptom = () => {
                         }}
                         className="w-full bg-white text-black border border-gray-300 rounded-lg px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+
+                    <div className='flex justify-center'>
+                        <img src={symptomImageUrl} className='w-32 my-2'/>
+                    </div>
 
                     <input
                         type="file"
@@ -222,7 +234,7 @@ export const Symptom = () => {
                                             key={idx}
                                             onClick={() => {
                                                 setSymptomCode(c.symptom)
-                                                handleLocate(c.symptoms)
+                                                handleLocate(c.symptoms, c.spict)
                                             }}
                                             className="px-3 py-2 cursor-pointer hover:bg-blue-100 rounded-md"
                                         >
@@ -237,7 +249,7 @@ export const Symptom = () => {
                                                 key={idx}
                                                 onClick={() => {
                                                     setSymptomCode(c.symptom)
-                                                    handleLocate(c.symptoms)
+                                                    handleLocate(c.symptoms, c.spict)
                                                 }}
                                                 className="px-3 py-2 cursor-pointer hover:bg-blue-100 rounded-md"
                                             >
