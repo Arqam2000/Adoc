@@ -31,21 +31,56 @@ export const Profile = () => {
     selectedImage: ""
   })
   const [rows, setRows] = useState([
-    { field1: "", field2: "" } // initial row
+    {
+      institute: "KU",
+      degree: "Mbbs"
+    } // initial row
   ]);
-  // const [selectedImage, setSelectedImage] = useState(null);
-
-
+  console.log("rows", rows)
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    setPersonalInfo(JSON.parse(localStorage.getItem("personalInfo")))
-    setRows(JSON.parse(localStorage.getItem("rows")))
-    const {institute, degree}= JSON.parse(localStorage.getItem("qualifications"))
 
-    setInstitute(institute)
-    setDegree(degree)
-  } ,[])
+    const savedImage = localStorage.getItem("profileImage");
+    if (savedImage) {
+      setPersonalInfo((prev) => ({ ...prev, selectedImage: savedImage }));
+    }
+    if (JSON.parse(localStorage.getItem("personalInfo"))) {
+      setPersonalInfo(JSON.parse(localStorage.getItem("personalInfo")))
+    }
+    if (JSON.parse(localStorage.getItem("rows"))) {
+      setRows(JSON.parse(localStorage.getItem("rows")))
+    }
+    if (localStorage.getItem("qualifications")) {
+
+      const { institute, degree } = JSON.parse(localStorage.getItem("qualifications"))
+
+      setInstitute(institute)
+      setDegree(degree)
+    }
+
+    setQualifications([
+      {
+        degree_code: 1,
+        degree_name: "MBBS"
+      },
+      {
+        degree_code: 2,
+        degree_name: "Engineering"
+      }
+    ])
+
+    setInstitutes([
+      {
+        university: 1,
+        university_name: "KU"
+      },
+      {
+        university: 2,
+        university_name: "NED"
+      },
+    ])
+  }, [])
 
 
   useEffect(() => {
@@ -251,10 +286,10 @@ export const Profile = () => {
       <div className="flex items-center gap-6 pb-4 p-3 my-5 border w-1/2 box-content">
         <div className='w-[133px] h-[100px] rounded-full border self-start flex items-center justify-center overflow-hidden'>
           <img
-          src={personalInfo.selectedImage}
-          alt="Doctor"
-          className="w-full h-full object-cover"
-        />
+            src={personalInfo?.selectedImage}
+            alt="Doctor"
+            className="w-full h-full object-cover"
+          />
         </div>
         <div className='flex flex-col gap-1'>
           {
@@ -276,7 +311,7 @@ export const Profile = () => {
             </div>
             <div className='grid grid-cols-2 gap-3 mt-2'>
               <div className='flex'>
-                <select name="city" id="city" className="w-full border p-2 py-0 rounded-lg" value={personalInfo.city} onChange={(e) => setPersonalInfo({ ...personalInfo, city: e.target.value })}>
+                <select name="city" id="city" className="w-full border p-2 py-0 rounded-lg" value={personalInfo?.city} onChange={(e) => setPersonalInfo({ ...personalInfo, city: e.target.value })}>
                   <option value="" disabled selected hidden>Select City</option>
                   {
                     cities.map(city => (
@@ -289,7 +324,7 @@ export const Profile = () => {
                 <button className='bg-blue-500 py-1 px-5 rounded cursor-pointer text-white text-base ml-2' onClick={() => handleOpenModal("City")}>+</button>
               </div>
               <div className='flex'>
-                <select name="specialization" id="specialization" className="w-full border p-2 py-0 rounded-lg" value={personalInfo.specialization} onChange={(e) => setPersonalInfo({ ...personalInfo, specialization: e.target.value })}>
+                <select name="specialization" id="specialization" className="w-full border p-2 py-0 rounded-lg" value={personalInfo?.specialization} onChange={(e) => setPersonalInfo({ ...personalInfo, specialization: e.target.value })}>
                   <option value="" disabled selected hidden>Select specialization</option>
                   {
                     specializations.map(specialization => (
@@ -308,7 +343,7 @@ export const Profile = () => {
             <textarea
               name="about"
               placeholder="About yourself"
-              value={personalInfo.about}
+              value={personalInfo?.about}
               onChange={(e) => setPersonalInfo({ ...personalInfo, about: e.target.value })}
               className="w-full border p-2 rounded-lg mt-3"
               rows="3"
@@ -321,9 +356,23 @@ export const Profile = () => {
               // onChange={handleFileChange}
               onChange={(event) => {
                 if (event.target.files && event.target.files[0]) {
+
                   const file = event.target.files[0];
-                  setPersonalInfo({...personalInfo, selectedImage: URL.createObjectURL(file)});
-                  console.log(URL.createObjectURL(file))
+                  if (file) {
+                    const objectUrl = URL.createObjectURL(file);
+
+                    // Update state
+                    setPersonalInfo((prev) => ({
+                      ...prev,
+                      selectedImage: objectUrl,
+                    }));
+
+                    // Save to localStorage (or send to backend)
+                    localStorage.setItem("profileImage", objectUrl);
+
+                    // Cleanup old object URL
+                    return () => URL.revokeObjectURL(objectUrl);
+                  }
                 }
               }}
               name='image'
@@ -349,7 +398,7 @@ export const Profile = () => {
           </div>
 
           {
-            rows.map(row => (
+            rows.map((row, index) => (
               <div className='grid grid-cols-2 gap-2'>
                 {/* <div>
               <h1 className='text-xl font-semibold'>Institute</h1>
@@ -361,9 +410,10 @@ export const Profile = () => {
 
                 <div className='flex'>
                   <select name="Institute" id="Institute" className="w-full border p-2 py-1 rounded-lg" onChange={(e) => {
-                    console.log(e.target.value)
-                    setInstitute(e.target.value)
-                  }} value={institute}>
+                    const newRows = [...rows];
+                    newRows[index]["institute"] = e.target.value;
+                    setRows(newRows);
+                  }} value={row.institute}>
                     <option value="" disabled selected hidden>Select Institute</option>
                     {
                       institutes.map(institute => (
@@ -380,9 +430,10 @@ export const Profile = () => {
 
                 <div className='flex'>
                   <select name="Qualification" id="Qualification" className="w-full border p-2 py-1 rounded-lg" onChange={(e) => {
-                    console.log(e.target.value)
-                    setDegree(e.target.value)
-                  }} value={degree}>
+                    const newRows = [...rows];
+                    newRows[index]["degree"] = e.target.value;
+                    setRows(newRows);
+                  }} value={row.degree}>
                     <option value="" disabled selected hidden>Select degree</option>
                     {
                       qualifications.map(qualification => (
@@ -401,11 +452,11 @@ export const Profile = () => {
           {/* <button className='bg-blue-500 py-0 px-5 rounded cursor-pointer text-white text-base ml-2' onClick={() => handleOpenModal("Qualification")}>+</button> */}
 
           <div className='flex justify-center mt-2'>
-            <button className='bg-blue-500 py-1 px-2 pr-3 rounded cursor-pointer text-white text-base w-fit text-center' onClick={() => setRows([...rows, { field1: "", field2: "" }])}>Add more</button>
+            <button className='bg-blue-500 py-1 px-2 pr-3 rounded cursor-pointer text-white text-base w-fit text-center' onClick={() => setRows([...rows, { institute: "", degree: "" }])}>Add more</button>
             <button className='bg-[#007bff] text-white py-2 px-5 rounded-sm cursor-pointer text-base ml-2' onClick={() => {
               console.log(rows)
               localStorage.setItem("rows", JSON.stringify(rows))
-              localStorage.setItem("qualifications", JSON.stringify({institute, degree}))
+              // localStorage.setItem("qualifications", JSON.stringify({ institute, degree }))
               toast.success("Saved")
             }}>
               Save
