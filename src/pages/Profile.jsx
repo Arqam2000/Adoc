@@ -61,9 +61,9 @@ export const Profile = () => {
       setInstitute(institute)
       setDegree(degree)
     }
-    if (localStorage.getItem("time")) {
-      setSchedule(JSON.parse(localStorage.getItem("time")))
-    }
+    // if (localStorage.getItem("time")) {
+    //   setSchedule(JSON.parse(localStorage.getItem("time")))
+    // }
 
     setQualifications([
       {
@@ -291,8 +291,8 @@ export const Profile = () => {
   const [schedule, setSchedule] = useState(
     days.map((day) => ({
       day,
-      start: "02:30",
-      end: "20:15",
+      start: "",
+      end: "",
     }))
   );
 
@@ -315,8 +315,8 @@ export const Profile = () => {
   return (
     <div className='flex flex-col items-center gap-2'>
       <ToastContainer />
-      <div className="flex items-center gap-6 pb-4 p-3 my-5  w-1/2 box-content">
-        <div className='w-[133px] h-[100px] rounded-full border self-start flex items-center justify-center overflow-hidden'>
+      <div className="flex items-center gap-6 pb-4 p-3 my-5 box-content">
+        <div className='w-[100px] h-[100px] rounded-full border self-start flex items-center justify-center overflow-hidden'>
           <img
             src={personalInfo?.selectedImage}
             alt="Doctor"
@@ -499,8 +499,8 @@ export const Profile = () => {
             <h1 className='text-[17px] font-semibold'>Practice Address and Timings</h1>
             <div className='shadow-md rounded-md p-2 flex flex-col gap-2 bg-white'>
               <h1 className='text-base font-semibold underline cursor-pointer'>Video Consultation</h1>
-              {/* <p className='text-sm'>Online</p>
-              <p className='text-sm'>Rs. 1,000</p> */}
+              <p className='text-sm'>Online</p>
+              <p className='text-sm'>Rs. 1,000</p>
               <h2 className='text-sm font-semibold cursor-pointer'>Select Timings</h2>
 
               {/* <div className='flex justify-between'>
@@ -510,11 +510,35 @@ export const Profile = () => {
                 <div></div>
               </div> */}
 
-              <div className="divide-y   rounded bg-white">
+              <div className="divide-y    rounded bg-white">
+                <div
+                    className="flex justify-between items-center py-2 px-4 border-b-gray-300"
+                  >
+                    {/* Day Name */}
+                    <span className="font-semibold w-16 text-sm">Day</span>
+
+                    {/* Time Inputs */}
+                    <div className="flex items-center gap-20">
+                      <h2 className='text-base font-semibold'>From</h2>
+                      <h2 className='text-base font-semibold'>To</h2>
+                    </div>
+
+                    {/* Display formatted */}
+                    <div className="text-sm w-33 text-center">
+                      <h2 className='text-base font-semibold'>Time</h2>
+                    </div>
+
+                    <div>
+                      <h2 className='text-base font-semibold mr-32'>Fees</h2>
+                    </div>
+                    <div>
+                      <h2 className='text-base font-semibold'>Status</h2>
+                    </div>
+                  </div>
                 {schedule.map((slot, index) => (
                   <div
                     key={index}
-                    className="flex justify-between items-center py-2 px-4 border-b-gray-300"
+                    className="flex justify-between items-center py-2 px-4 border-b-gray-300 gap-10"
                   >
                     {/* Day Name */}
                     <span className="font-bold text-[#004D71] w-16 text-sm">{slot.day}</span>
@@ -540,6 +564,19 @@ export const Profile = () => {
                     <div className="text-gray-700 text-sm w-33 text-right">
                       {formatTime(slot.start)} - {formatTime(slot.end)}
                     </div>
+
+                    <input
+                        type="text"
+                        placeholder='Fees'
+                        onChange={() => {}}
+                        className="border rounded p-1 text-sm focus:ring-2 focus:ring-purple-500 w-12"
+                      />
+                    <input
+                        type="text"
+                        placeholder='Eg: working/not working'
+                        onChange={() => {}}
+                        className="border rounded p-1 text-sm focus:ring-2 focus:ring-purple-500 w-48"
+                      />
                   </div>
                 ))}
               </div>
