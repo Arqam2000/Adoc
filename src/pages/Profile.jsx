@@ -28,7 +28,7 @@ export const Profile = () => {
     city: "",
     specialization: "",
     about: "",
-    selectedImage: ""
+    selectedImage: null
   })
   const [rows, setRows] = useState([
     {
@@ -36,8 +36,9 @@ export const Profile = () => {
       degree: "Mbbs"
     } // initial row
   ]);
-  console.log("rows", rows)
+  // console.log("rows", rows)
   const fileInputRef = useRef(null);
+
 
   useEffect(() => {
 
@@ -57,6 +58,9 @@ export const Profile = () => {
 
       setInstitute(institute)
       setDegree(degree)
+    }
+    if (localStorage.getItem("time")) {
+      setSchedule(JSON.parse(localStorage.getItem("time")))
     }
 
     setQualifications([
@@ -280,6 +284,32 @@ export const Profile = () => {
     fileInputRef.current.click(); // Trigger the hidden file input click
   };
 
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+  const [schedule, setSchedule] = useState(
+    days.map((day) => ({
+      day,
+      start: "02:30",
+      end: "20:15",
+    }))
+  );
+
+  const handleTimeChange = (index, field, value) => {
+    const updated = [...schedule];
+    updated[index][field] = value;
+    setSchedule(updated);
+  };
+
+  // helper function to format time to 12hr with AM/PM
+  const formatTime = (time) => {
+    if (!time) return "";
+    let [h, m] = time.split(":");
+    h = parseInt(h);
+    const suffix = h >= 12 ? "PM" : "AM";
+    h = h % 12 || 12;
+    return `${String(h).padStart(2, "0")}:${m} ${suffix}`;
+  };
+
   return (
     <div className='flex flex-col items-center gap-2'>
       <ToastContainer />
@@ -463,9 +493,71 @@ export const Profile = () => {
             </button>
 
           </div>
+          <div className='flex flex-col gap-2 mt-2'>
+            <h1 className='text-[17px] font-semibold'>Practice Address and Timings</h1>
+            <div className='shadow-md rounded-md p-2 flex flex-col gap-2 bg-white'>
+              <h1 className='text-base font-semibold underline cursor-pointer'>Video Consultation</h1>
+              {/* <p className='text-sm'>Online</p>
+              <p className='text-sm'>Rs. 1,000</p> */}
+              <h2 className='text-sm font-semibold cursor-pointer'>Select Timings</h2>
 
+              {/* <div className='flex justify-between'>
+                <h3>Week</h3>
+                <p>Time</p>
+                <div></div>
+                <div></div>
+              </div> */}
+
+              <div className="divide-y   rounded bg-white">
+                {schedule.map((slot, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center py-2 px-4 border-b-gray-300"
+                  >
+                    {/* Day Name */}
+                    <span className="font-bold text-[#004D71] w-16 text-sm">{slot.day}</span>
+
+                    {/* Time Inputs */}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="time"
+                        value={slot.start}
+                        onChange={(e) => handleTimeChange(index, "start", e.target.value)}
+                        className="border rounded p-1 text-sm focus:ring-2 focus:ring-purple-500"
+                      />
+                      <span>-</span>
+                      <input
+                        type="time"
+                        value={slot.end}
+                        onChange={(e) => handleTimeChange(index, "end", e.target.value)}
+                        className="border rounded p-1 text-sm focus:ring-2 focus:ring-purple-500"
+                      />
+                    </div>
+
+                    {/* Display formatted */}
+                    <div className="text-gray-700 text-sm w-33 text-right">
+                      {formatTime(slot.start)} - {formatTime(slot.end)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => {
+                  console.log(schedule)
+                  localStorage.setItem("time", JSON.stringify(schedule))
+                  toast.success("Saved")
+                }}
+                className="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+              >
+                Save Schedule
+              </button>
+
+            </div>
+          </div>
         </div>
       </div>
+
+
 
       <div className="mt-4 space-y-3 w-1/2 mx-auto">
 
@@ -520,6 +612,9 @@ export const Profile = () => {
           </div>
         )}
       </div>
+
+
+
     </div>
   )
 }
