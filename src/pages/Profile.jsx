@@ -315,7 +315,7 @@ export const Profile = () => {
   return (
     <div className='flex flex-col items-center gap-2'>
       <ToastContainer />
-      <div className="flex items-center gap-6 pb-4 p-3 my-5 border w-1/2 box-content">
+      <div className="flex items-center gap-6 pb-4 p-3 my-5  w-1/2 box-content">
         <div className='w-[133px] h-[100px] rounded-full border self-start flex items-center justify-center overflow-hidden'>
           <img
             src={personalInfo?.selectedImage}
