@@ -42,13 +42,15 @@ export const Profile = () => {
 
   useEffect(() => {
 
+    if (JSON.parse(localStorage.getItem("personalInfo"))) {
+      setPersonalInfo(JSON.parse(localStorage.getItem("personalInfo")))
+    }
+
     const savedImage = localStorage.getItem("profileImage");
     if (savedImage) {
       setPersonalInfo((prev) => ({ ...prev, selectedImage: savedImage }));
     }
-    if (JSON.parse(localStorage.getItem("personalInfo"))) {
-      setPersonalInfo(JSON.parse(localStorage.getItem("personalInfo")))
-    }
+
     if (JSON.parse(localStorage.getItem("rows"))) {
       setRows(JSON.parse(localStorage.getItem("rows")))
     }
@@ -389,19 +391,19 @@ export const Profile = () => {
 
                   const file = event.target.files[0];
                   if (file) {
-                    const objectUrl = URL.createObjectURL(file);
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      const base64String = reader.result;
 
-                    // Update state
-                    setPersonalInfo((prev) => ({
-                      ...prev,
-                      selectedImage: objectUrl,
-                    }));
+                      setPersonalInfo((prev) => ({
+                        ...prev,
+                        selectedImage: base64String,
+                      }));
 
-                    // Save to localStorage (or send to backend)
-                    localStorage.setItem("profileImage", objectUrl);
-
-                    // Cleanup old object URL
-                    return () => URL.revokeObjectURL(objectUrl);
+                      // Save in localStorage
+                      localStorage.setItem("profileImage", base64String);
+                    };
+                    reader.readAsDataURL(file);
                   }
                 }
               }}
