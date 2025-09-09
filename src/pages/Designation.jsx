@@ -5,8 +5,8 @@ import { toast, ToastContainer } from 'react-toastify'
 
 export const Designation = () => {
     const [designation, setDesignation] = useState("")
-    const [designationCode, setDesignationCode] = useState()
     const [designations, setDesignations] = useState([])
+    const [designationCode, setDesignationCode] = useState()
     const [designationsFilter, setDesignationsFilter] = useState([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)

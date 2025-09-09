@@ -1,6 +1,8 @@
 import axios from 'axios'
 import React, { useEffect, useRef, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify';
+import DoctorTiming from '../components/DocHospital';
+import DocExperience from '../components/DocExperience';
 
 export const Profile = () => {
   const [doctor, setDoctor] = useState([])
@@ -36,6 +38,11 @@ export const Profile = () => {
       degree: "Mbbs"
     } // initial row
   ]);
+  const [hospitals, setHospitals] = useState([])
+  const [hospital, setHospital] = useState("")
+  const [designation, setDesignation] = useState("")
+  const [designations, setDesignations] = useState([])
+
   // console.log("rows", rows)
   const fileInputRef = useRef(null);
 
@@ -61,9 +68,12 @@ export const Profile = () => {
       setInstitute(institute)
       setDegree(degree)
     }
-    // if (localStorage.getItem("time")) {
-    //   setSchedule(JSON.parse(localStorage.getItem("time")))
-    // }
+    if (localStorage.getItem("video time")) {
+      setSchedule(JSON.parse(localStorage.getItem("video time")))
+    }
+    if (localStorage.getItem("hospital time")) {
+      setSchedule2(JSON.parse(localStorage.getItem("hospital time")))
+    }
 
     setQualifications([
       {
@@ -249,8 +259,34 @@ export const Profile = () => {
       setDegree(e.target.value)
     } else if (clickedFrom == "Institute") {
       setInstitute(e.target.value)
+    } else if (clickedFrom == "Hospital") {
+      setHospital(e.target.value)
+    } else if (clickedFrom == "Designation") {
+      setDesignation(e.target.value)
     }
   };
+
+  const AddHospital = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const resp = await axios.post("/api/v1/hospitals/add-hospital", { hospital })
+      console.log("response", resp.data)
+      if (resp.data.success) {
+        const newHospital = resp.data.hospital
+        console.log("newHospital", newHospital)
+        setHospitals([...hospitals, { ...newHospital }])
+        toast.success("Saved successfuly")
+      } else {
+        setError(resp.data.message)
+      }
+    } catch (error) {
+      console.log("Error", error)
+      setError(error.response.data.message)
+    }
+    setLoading(false)
+    setHospital("")
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -264,6 +300,14 @@ export const Profile = () => {
       AddQualification()
     } else if (clickedFrom == "Institute") {
       AddInstitute()
+    } else if (clickedFrom == "Hospital") {
+      let i = 0
+      AddHospital()
+      setHospitals([...hospitals, { hospital_code: ++i, hospital_name: hospital }])
+    } else if (clickedFrom == "Designation") {
+      let i = 0
+      setDesignation(e.target.value)
+      setDesignations([...designations, { Desig: ++i, DDesig: designation }])
     }
     setIsOpen(false); // close modal after submit
   };
@@ -295,11 +339,24 @@ export const Profile = () => {
       end: "",
     }))
   );
+  const [schedule2, setSchedule2] = useState(
+    days.map((day) => ({
+      day,
+      start: "",
+      end: "",
+    }))
+  );
 
-  const handleTimeChange = (index, field, value) => {
-    const updated = [...schedule];
-    updated[index][field] = value;
-    setSchedule(updated);
+  const handleTimeChange = (index, field, value, source) => {
+    if (source == "video") {
+      const updated = [...schedule];
+      updated[index][field] = value;
+      setSchedule(updated);
+    } else if (source == "hospital") {
+      const updated = [...schedule2];
+      updated[index][field] = value;
+      setSchedule2(updated);
+    }
   };
 
   // helper function to format time to 12hr with AM/PM
@@ -313,7 +370,7 @@ export const Profile = () => {
   };
 
   return (
-    <div className='flex flex-col items-center gap-2'>
+    <div className='flex flex-col items-center gap-2 bg-gray-100'>
       <ToastContainer />
       <div className="flex items-center gap-6 pb-4 p-3 my-5 box-content">
         <div className='w-[100px] h-[100px] rounded-full border self-start flex items-center justify-center overflow-hidden'>
@@ -323,7 +380,7 @@ export const Profile = () => {
             className="w-full h-full object-cover"
           />
         </div>
-        <div className='flex flex-col gap-1'>
+        <div className='flex flex-col gap-3'>
           {
             doctor?.map(doc => (
 
@@ -432,13 +489,6 @@ export const Profile = () => {
           {
             rows.map((row, index) => (
               <div className='grid grid-cols-2 gap-2'>
-                {/* <div>
-              <h1 className='text-xl font-semibold'>Institute</h1>
-            </div>
-
-            <div>
-              <h1 className='text-xl font-semibold'>Degree</h1>
-            </div> */}
 
                 <div className='flex'>
                   <select name="Institute" id="Institute" className="w-full border p-2 py-1 rounded-lg" onChange={(e) => {
@@ -495,50 +545,53 @@ export const Profile = () => {
             </button>
 
           </div>
+
+          {/* video timings */}
+
           <div className='flex flex-col gap-2 mt-2'>
-            <h1 className='text-[17px] font-semibold'>Practice Address and Timings</h1>
+            <h1 className='text-[17px] font-semibold'>Practice Timings</h1>
             <div className='shadow-md rounded-md p-2 flex flex-col gap-2 bg-white'>
               <h1 className='text-base font-semibold underline cursor-pointer'>Video Consultation</h1>
               <p className='text-sm'>Online</p>
-              <p className='text-sm'>Rs. 1,000</p>
+              <input
+                type="text"
+                placeholder='Your Fees'
+                onChange={() => { }}
+                className="border rounded p-1 text-sm focus:ring-2 focus:ring-purple-500 w-19"
+              />
               <h2 className='text-sm font-semibold cursor-pointer'>Select Timings</h2>
-
-              {/* <div className='flex justify-between'>
-                <h3>Week</h3>
-                <p>Time</p>
-                <div></div>
-                <div></div>
-              </div> */}
 
               <div className="divide-y    rounded bg-white">
                 <div
-                    className="flex justify-between items-center py-2 px-4 border-b-gray-300"
-                  >
-                    {/* Day Name */}
-                    <span className="font-semibold w-16 text-sm">Day</span>
+                  className="flex justify-between items-center py-2 px-4 border-b-gray-300"
+                >
+                  {/* Day Name */}
+                  <span className="font-semibold w-16 text-sm">Day</span>
 
-                    {/* Time Inputs */}
-                    <div className="flex items-center gap-20">
-                      <h2 className='text-base font-semibold'>From</h2>
-                      <h2 className='text-base font-semibold'>To</h2>
-                    </div>
-
-                    {/* Display formatted */}
-                    <div className="text-sm w-33 text-center">
-                      <h2 className='text-base font-semibold'>Time</h2>
-                    </div>
-
-                    <div>
-                      <h2 className='text-base font-semibold mr-32'>Fees</h2>
-                    </div>
-                    <div>
-                      <h2 className='text-base font-semibold'>Status</h2>
-                    </div>
+                  {/* Time Inputs */}
+                  <div className="flex items-center gap-20">
+                    <h2 className='text-base font-semibold'>From</h2>
+                    <h2 className='text-base font-semibold'>To</h2>
                   </div>
+
+                  {/* Display formatted */}
+                  <div className="text-sm w-33 text-center">
+                    <h2 className='text-base font-semibold'>Time</h2>
+                  </div>
+
+                  {/* <div>
+                      <h2 className='text-base font-semibold mr-32'>Fees</h2>
+                    </div> */}
+
+                  {/* Display Status */}
+                  <div>
+                    <h2 className='text-base font-semibold'>Status</h2>
+                  </div>
+                </div>
                 {schedule.map((slot, index) => (
                   <div
                     key={index}
-                    className="flex justify-between items-center py-2 px-4 border-b-gray-300 gap-10"
+                    className="flex justify-between items-center py-2 px-4 border-b-gray-300 gap-2"
                   >
                     {/* Day Name */}
                     <span className="font-bold text-[#004D71] w-16 text-sm">{slot.day}</span>
@@ -548,14 +601,14 @@ export const Profile = () => {
                       <input
                         type="time"
                         value={slot.start}
-                        onChange={(e) => handleTimeChange(index, "start", e.target.value)}
+                        onChange={(e) => handleTimeChange(index, "start", e.target.value, "video")}
                         className="border rounded p-1 text-sm focus:ring-2 focus:ring-purple-500"
                       />
                       <span>-</span>
                       <input
                         type="time"
                         value={slot.end}
-                        onChange={(e) => handleTimeChange(index, "end", e.target.value)}
+                        onChange={(e) => handleTimeChange(index, "end", e.target.value, "video")}
                         className="border rounded p-1 text-sm focus:ring-2 focus:ring-purple-500"
                       />
                     </div>
@@ -565,25 +618,28 @@ export const Profile = () => {
                       {formatTime(slot.start)} - {formatTime(slot.end)}
                     </div>
 
-                    <input
+                    {/* <input
                         type="text"
                         placeholder='Fees'
                         onChange={() => {}}
                         className="border rounded p-1 text-sm focus:ring-2 focus:ring-purple-500 w-12"
-                      />
-                    <input
-                        type="text"
-                        placeholder='Eg: working/not working'
-                        onChange={() => {}}
-                        className="border rounded p-1 text-sm focus:ring-2 focus:ring-purple-500 w-48"
-                      />
+                      /> */}
+                    {/* <input
+                      type="text"
+                      placeholder='Eg: working/not working'
+                      onChange={() => { }}
+                      className="border rounded p-1 text-sm focus:ring-2 focus:ring-purple-500 w-48"
+                    /> */}
+                    {
+                      slot.start && slot.end ? <p>Working</p> : <p>Off</p>
+                    }
                   </div>
                 ))}
               </div>
               <button
                 onClick={() => {
                   console.log(schedule)
-                  localStorage.setItem("time", JSON.stringify(schedule))
+                  localStorage.setItem("video time", JSON.stringify(schedule))
                   toast.success("Saved")
                 }}
                 className="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
@@ -593,8 +649,154 @@ export const Profile = () => {
 
             </div>
           </div>
+
+          {/* hospital timings */}
+
+          <DoctorTiming hospitals={hospitals} designations={designations} setClickedFrom={setClickedFrom} setIsOpen={setIsOpen} />
+
+          {/* <div className='flex flex-col gap-2 mt-2'>
+            <h1 className='text-[17px] font-semibold'>Practice Address and Timings</h1>
+            <div className='shadow-md rounded-md p-2 px-5 flex flex-col gap-4 bg-white'>
+              <h1 className='text-base font-semibold underline cursor-pointer'>Please select your hospital and designation</h1>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div className='flex'>
+                  <select name="Hospital" id="Hospital" className="w-full border p-2 py-1 rounded-lg" onChange={(e) => {
+                    // const newRows = [...rows];
+                    // newRows[index]["degree"] = e.target.value;
+                    // setRows(newRows);
+                  }} >
+                    <option value="" disabled selected hidden>Select hospital</option>
+                    {
+                      hospitals.map(hos => (
+                        <>
+                          <option key={hos.hospital_code} value={hos.hospital_name}>{hos.hospital_name}</option>
+                        </>
+                      ))
+                    }
+                  </select>
+                  <button className='bg-blue-500 py-0 px-5 rounded cursor-pointer text-white text-base ml-2' onClick={() => handleOpenModal("Hospital")}>+</button>
+                </div>
+                <div className='flex'>
+                  <select name="Designation" id="Designation" className="w-full border p-2 py-1 rounded-lg" onChange={(e) => {
+                    // const newRows = [...rows];
+                    // newRows[index]["degree"] = e.target.value;
+                    // setRows(newRows);
+                  }} >
+                    <option value="" disabled selected hidden>Select Designation</option>
+                    {
+                      designations.map(desig => (
+                        <>
+                          <option key={desig.Desig} value={desig.DDesig}>{desig.DDesig}</option>
+                        </>
+                      ))
+                    }
+                  </select>
+                  <button className='bg-blue-500 py-0 px-5 rounded cursor-pointer text-white text-base ml-2' onClick={() => handleOpenModal("Designation")}>+</button>
+                </div>
+              </div>
+
+              {/* <p className='text-sm'>Online</p> 
+              <input
+                type="text"
+                placeholder='Your Fees'
+                onChange={() => { }}
+                className="border rounded p-1 text-sm focus:ring-2 focus:ring-purple-500 w-19"
+              />
+              <h2 className='text-sm font-semibold cursor-pointer'>Select Timings</h2>
+
+              <div className="divide-y    rounded bg-white">
+                <div
+                  className="flex justify-between items-center py-2 px-4 border-b-gray-300"
+                >
+                  {/* Day Name 
+                  <span className="font-semibold w-16 text-sm">Day</span>
+
+                  {/* Time Inputs 
+                  <div className="flex items-center gap-20">
+                    <h2 className='text-base font-semibold'>From</h2>
+                    <h2 className='text-base font-semibold'>To</h2>
+                  </div>
+
+                  {/* Display formatted 
+                  <div className="text-sm w-33 text-center">
+                    <h2 className='text-base font-semibold'>Time</h2>
+                  </div>
+
+                  {/* <div>
+                      <h2 className='text-base font-semibold mr-32'>Fees</h2>
+                    </div> 
+
+                  {/* Display Status 
+                  <div>
+                    <h2 className='text-base font-semibold'>Status</h2>
+                  </div>
+                </div>
+                {schedule2.map((slot, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center py-2 px-4 border-b-gray-300 gap-3"
+                  >
+                    {/* Day Name 
+                    <span className="font-bold text-[#004D71] w-16 text-sm">{slot.day}</span>
+
+                    {/* Time Inputs 
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="time"
+                        value={slot.start}
+                        onChange={(e) => handleTimeChange(index, "start", e.target.value, "hospital")}
+                        className="border rounded p-1 text-sm focus:ring-2 focus:ring-purple-500"
+                      />
+                      <span>-</span>
+                      <input
+                        type="time"
+                        value={slot.end}
+                        onChange={(e) => handleTimeChange(index, "end", e.target.value, "hospital")}
+                        className="border rounded p-1 text-sm focus:ring-2 focus:ring-purple-500"
+                      />
+                    </div>
+
+                    {/* Display formatted }
+                    <div className="text-gray-700 text-sm w-33 text-right">
+                      {formatTime(slot.start)} - {formatTime(slot.end)}
+                    </div>
+
+                    {/* <input
+                        type="text"
+                        placeholder='Fees'
+                        onChange={() => {}}
+                        className="border rounded p-1 text-sm focus:ring-2 focus:ring-purple-500 w-12"
+                      /> }
+                    {/* <input
+                      type="text"
+                      placeholder='Eg: working/not working'
+                      onChange={() => { }}
+                      className="border rounded p-1 text-sm focus:ring-2 focus:ring-purple-500 w-48"
+                    /> }
+                    {
+                      slot.start && slot.end ? <p>Working</p> : <p>Not Working</p>
+                    }
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => {
+                  console.log(schedule2)
+                  localStorage.setItem("hospital time", JSON.stringify(schedule2))
+                  toast.success("Saved")
+                }}
+                className="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+              >
+                Save Schedule
+              </button>
+
+            </div>
+          </div> */}
+          
         </div>
       </div>
+      <DocExperience institutes={institutes} designations={designations} handleOpenModal={handleOpenModal} />
 
 
 
