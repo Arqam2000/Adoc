@@ -11,10 +11,6 @@ const DocExperience = ({ institutes, designations, handleOpenModal }) => {
         }
     ]);
 
-    const [comments, setComments] = useState("")
-    const [fromDate, setFromDate] = useState("")
-    const [tillDate, setTillDate] = useState("")
-
     console.log("rows2", rows2)
 
     useEffect(() => {
