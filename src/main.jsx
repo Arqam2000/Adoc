@@ -21,6 +21,7 @@ import { Designation } from './pages/Designation.jsx';
 import { Disease } from './pages/Disease.jsx';
 import { Symptom } from './pages/Symptom.jsx';
 import { Profile } from './pages/Profile.jsx';
+import DoctorsList from './pages/DoctorsList.jsx';
 
 
 let router = createBrowserRouter([
@@ -80,12 +81,13 @@ let router = createBrowserRouter([
         path: "login",
         Component: Login
       },
-      // {
-      //   path: "admin/:name",
-      //   Component: CityManager
-      // },
       {
-        path: "/register/doctor",
+        path: "doctors",
+        Component: DoctorsList
+      },
+      
+      {
+        path: "register/doctor",
         Component: JoinasDoctor
       },
     ]

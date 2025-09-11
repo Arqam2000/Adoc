@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
 
 export const Login = () => {
@@ -10,6 +10,8 @@ export const Login = () => {
         email: "",
         password: ""
     })
+
+    const navigate = useNavigate()
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -22,6 +24,7 @@ export const Login = () => {
             console.log("response", res.data)
             toast.success(res.data.message)
             localStorage.setItem("doctor", JSON.stringify(res.data.user))
+            navigate("/profile")
         })
         .catch(err => {
             console.log("Error:", err)
