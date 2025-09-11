@@ -53,9 +53,9 @@ const DocExperience = ({ institutes, designations, handleOpenModal }) => {
                                     <option value="" disabled selected hidden>Select Institute</option>
                                     {
                                         institutes.map(institute => (
-                                            <>
-                                                <option key={institute.university} value={institute.university_name}>{institute.university_name}</option>
-                                            </>
+                                            
+                                            <option key={institute.university} value={institute.university_name}>{institute.university_name}</option>
+                                            
                                         ))
                                     }
                                 </select>

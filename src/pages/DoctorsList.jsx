@@ -96,12 +96,12 @@ const DoctorsList = () => {
 
     const location = useLocation()
 
-    const { name } = location.state
+    const { name:specializationName } = location.state
 
-    console.log("name", name)
+    console.log("specializationName", specializationName)
     return (
         <div className='w-5xl mx-auto mt-4'>
-            <h1 className='text-2xl font-semibold my-2'>Best {name}s </h1>
+            <h1 className='text-2xl font-semibold my-2'>Best {specializationName}s </h1>
             <div className='flex gap-2 my-4'>
                 <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full '>Doctors Near Me</button>
                 <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full '>Most Experienced</button>
@@ -115,7 +115,7 @@ const DoctorsList = () => {
 
             <div className='grid grid-cols-3 gap-4  mx-auto p-2 my-2'>
                 {
-                    doctors.map(({ name, specialization, experience, rating, fees }) => <DoctorCard name={name} specialization={specialization} experience={experience} rating={rating} fees={fees} />)
+                    doctors.map(({ name, specialization, experience, rating, fees }) => <DoctorCard name={name} specialization={specialization} experience={experience} rating={rating} fees={fees} specializationName={specializationName}/>)
                 }
 
             </div>

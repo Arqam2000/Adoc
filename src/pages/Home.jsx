@@ -194,7 +194,7 @@ export const Home = () => {
         {/* Grid of Specializations */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-6">
           {specializations.map((spec, index) => (
-            <div key={index} className="flex flex-col items-center" onClick={() => navigate('/doctors', { state: {name: spec.name} })}>
+            <div key={index} className="flex flex-col items-center cursor-pointer" onClick={() => navigate('/doctors', { state: {name: spec.name} })}>
               {/* <Link to='/doctors' > */}
               <div className="w-20 h-20 rounded-full bg-[#e9f2f9] flex items-center justify-center shadow-sm">
                 <img

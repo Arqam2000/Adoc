@@ -369,6 +369,12 @@ export const Profile = () => {
     return `${String(h).padStart(2, "0")}:${m} ${suffix}`;
   };
 
+  const submit = async (e) => {
+    e.preventDefault()
+
+    
+  }
+
   return (
     <div className='flex flex-col items-center gap-2 bg-gray-100'>
       <ToastContainer />
@@ -403,7 +409,7 @@ export const Profile = () => {
                 <select name="city" id="city" className="w-full border p-2 py-0 rounded-lg" value={personalInfo?.city} onChange={(e) => setPersonalInfo({ ...personalInfo, city: e.target.value })}>
                   <option value="" disabled selected hidden>Select City</option>
                   {
-                    cities.map(city => (
+                    cities?.map(city => (
 
                       <option key={city.city_code} value={city.city_name}>{city.city_name}</option>
 
@@ -417,9 +423,9 @@ export const Profile = () => {
                   <option value="" disabled selected hidden>Select specialization</option>
                   {
                     specializations.map(specialization => (
-                      <>
-                        <option key={specialization.Specialization_code} value={specialization.Specialization_name}>{specialization.Specialization_name}</option>
-                      </>
+                      
+                      <option key={specialization.Specialization_code} value={specialization.Specialization_name}>{specialization.Specialization_name}</option>
+                      
                     ))
                   }
                 </select>
@@ -488,7 +494,7 @@ export const Profile = () => {
 
           {
             rows.map((row, index) => (
-              <div className='grid grid-cols-2 gap-2'>
+              <div key={index} className='grid grid-cols-2 gap-2'>
 
                 <div className='flex'>
                   <select name="Institute" id="Institute" className="w-full border p-2 py-1 rounded-lg" onChange={(e) => {
@@ -499,9 +505,9 @@ export const Profile = () => {
                     <option value="" disabled selected hidden>Select Institute</option>
                     {
                       institutes.map(institute => (
-                        <>
-                          <option key={institute.university} value={institute.university_name}>{institute.university_name}</option>
-                        </>
+                        
+                        <option key={institute.university} value={institute.university_name}>{institute.university_name}</option>
+                        
                       ))
                     }
                   </select>
@@ -518,10 +524,10 @@ export const Profile = () => {
                   }} value={row.degree}>
                     <option value="" disabled selected hidden>Select degree</option>
                     {
-                      qualifications.map(qualification => (
-                        <>
-                          <option key={qualification.degree_code} value={qualification.degree_name}>{qualification.degree_name}</option>
-                        </>
+                      qualifications?.map(qualification => (
+                        
+                        <option key={qualification.degree_code} value={qualification.degree_name}>{qualification.degree_name}</option>
+                        
                       ))
                     }
                   </select>
@@ -797,6 +803,8 @@ export const Profile = () => {
         </div>
       </div>
       <DocExperience institutes={institutes} designations={designations} handleOpenModal={handleOpenModal} />
+
+      <button type='submit' className='bg-blue-500 py-1 px-2 pr-3 rounded cursor-pointer text-white text-base w-fit text-center' onClick={submit}>Submit</button>
 
 
 

@@ -1,6 +1,7 @@
 import React from 'react'
 
-const DoctorCard = ({ name, specialization, experience, rating, fees }) => {
+const DoctorCard = ({ name, specialization, experience, rating, fees, specializationName }) => {
+
     return (
         <div className='p-2 rounded-md bg-blue-950 text-white w-xs'>
             <div className='flex gap-3'>
@@ -13,7 +14,7 @@ const DoctorCard = ({ name, specialization, experience, rating, fees }) => {
                 </div>
                 <div className='flex flex-col gap-1'>
                     <h2 className='underline font-semibold'>{name}</h2>
-                    <h2 className='text-xs'>{specialization}</h2>
+                    <h2 className='text-xs'>{specializationName? specializationName: specialization}</h2>
                     <h2 className='text-xs'>{experience}</h2>
                     <p className='text-xs'>{rating}</p>
                 </div>
