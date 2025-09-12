@@ -98,7 +98,6 @@ const DoctorsList = () => {
 
     const { name:specializationName } = location.state
 
-    console.log("specializationName", specializationName)
     return (
         <div className='w-5xl mx-auto mt-4'>
             <h1 className='text-2xl font-semibold my-2'>Best {specializationName}s </h1>
@@ -115,7 +114,9 @@ const DoctorsList = () => {
 
             <div className='grid grid-cols-3 gap-4  mx-auto p-2 my-2'>
                 {
-                    doctors.map(({ name, specialization, experience, rating, fees }) => <DoctorCard name={name} specialization={specialization} experience={experience} rating={rating} fees={fees} specializationName={specializationName}/>)
+                    doctors.map(({ name, specialization, experience, rating, fees }) => (
+                    <DoctorCard name={name} specialization={specialization} experience={experience} rating={rating} fees={fees} specializationName={specializationName}/>
+                ))
                 }
 
             </div>

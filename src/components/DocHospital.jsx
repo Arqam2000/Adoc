@@ -1,30 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen }) => {
-    const [hospitalBlocks, setHospitalBlocks] = useState([
-        {
-            hospital: "",
-            designation: "",
-            fees: "",
-            schedule: [
-                { day: "Mon", start: "", end: "" },
-                { day: "Tue", start: "", end: "" },
-                { day: "Wed", start: "", end: "" },
-                { day: "Thu", start: "", end: "" },
-                { day: "Fri", start: "", end: "" },
-                { day: "Sat", start: "", end: "" },
-                { day: "Sun", start: "", end: "" },
-            ],
-        },
-    ]);
+const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hospitalBlocks, setHospitalBlocks}) => {
+    
 
     const handleOpenModal = (source) => {
         setClickedFrom(source);
         setIsOpen(true);
     };
 
-    console.log("hospital blocks", hospitalBlocks)
+    // console.log("hospital blocks", hospitalBlocks)
 
     useEffect(() => {
         if (JSON.parse(localStorage.getItem("hospitals_schedules"))) {

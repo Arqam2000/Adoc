@@ -75,27 +75,27 @@ export const Profile = () => {
       setSchedule2(JSON.parse(localStorage.getItem("hospital time")))
     }
 
-    setQualifications([
-      {
-        degree_code: 1,
-        degree_name: "MBBS"
-      },
-      {
-        degree_code: 2,
-        degree_name: "Engineering"
-      }
-    ])
+    // setQualifications([
+    //   {
+    //     degree_code: 1,
+    //     degree_name: "MBBS"
+    //   },
+    //   {
+    //     degree_code: 2,
+    //     degree_name: "Engineering"
+    //   }
+    // ])
 
-    setInstitutes([
-      {
-        university: 1,
-        university_name: "KU"
-      },
-      {
-        university: 2,
-        university_name: "NED"
-      },
-    ])
+    // setInstitutes([
+    //   {
+    //     university: 1,
+    //     university_name: "KU"
+    //   },
+    //   {
+    //     university: 2,
+    //     university_name: "NED"
+    //   },
+    // ])
   }, [])
 
 
@@ -193,7 +193,7 @@ export const Profile = () => {
       setError(error.message)
     }
     setLoading(false)
-    setCity("")
+    // setCity("")
   }
 
   const AddSpecialization = async () => {
@@ -235,10 +235,14 @@ export const Profile = () => {
     setLoading(true)
     setError(null)
     console.log("Add institute")
-    const city = cities.find(({ city_name }) => city_name == cityCode)
-    setCityCode(city.city_code)
+    // console.log(city)
+    const getCity = cities.find(({ city_name }) => city_name == personalInfo.city)
+    // console.log(cities)
+    // console.log(getCity)
+    setCityCode(getCity.city_code)
+    const cCode = getCity.city_code
     try {
-      const resp = await axios.post("/api/v1/institutes/add-institute", { institute, cityCode })
+      const resp = await axios.post("/api/v1/institutes/add-institute", { institute, cCode })
       const newInstitute = resp.data.institute
       console.log("new institute", newInstitute)
       setInstitutes([...institutes, { ...newInstitute }])
@@ -369,10 +373,63 @@ export const Profile = () => {
     return `${String(h).padStart(2, "0")}:${m} ${suffix}`;
   };
 
+  const [hospitalBlocks, setHospitalBlocks] = useState([
+    {
+      hospital: "",
+      designation: "",
+      fees: "",
+      schedule: [
+        { day: "Mon", start: "", end: "" },
+        { day: "Tue", start: "", end: "" },
+        { day: "Wed", start: "", end: "" },
+        { day: "Thu", start: "", end: "" },
+        { day: "Fri", start: "", end: "" },
+        { day: "Sat", start: "", end: "" },
+        { day: "Sun", start: "", end: "" },
+      ],
+    },
+  ]);
+
+  const [experience, setExperience] = useState([])
+
   const submit = async (e) => {
     e.preventDefault()
+    console.log(personalInfo)
+    const city = cities.find(city => city.city_name == personalInfo.city)
+    const spec = specializations.find(spec => spec.Specialization_name == personalInfo.specialization)
 
-    
+    console.log(city, spec)
+  
+    setLoading(true)
+    setError(null)
+
+    try {
+      const resp = await axios.post("/api/v1/doctors/edit-doctor", {
+        dr: doctor[0].dr,
+        city_code: city.city_code,
+        specialization_code: spec.Specialization_code,
+        about: personalInfo.about,
+        image: personalInfo.selectedImage,
+        qualifications: rows,
+        videoTimings: schedule,
+        hospitalTimings: hospitalBlocks,
+        experience
+      })
+
+      if (resp.data.success) {
+        toast.success("Info updated successfuly")
+      }
+
+    } catch (error) {
+      console.log("Err:", error)
+    }
+
+
+  }
+
+  const handleRows2fromDocExperience = (rows2) => {
+    console.log("rows2 from profile", rows2)
+    setExperience(rows2)
   }
 
   return (
@@ -423,9 +480,9 @@ export const Profile = () => {
                   <option value="" disabled selected hidden>Select specialization</option>
                   {
                     specializations.map(specialization => (
-                      
+
                       <option key={specialization.Specialization_code} value={specialization.Specialization_name}>{specialization.Specialization_name}</option>
-                      
+
                     ))
                   }
                 </select>
@@ -484,6 +541,7 @@ export const Profile = () => {
             </button>
 
 
+
           </div>
 
           {/* Qualification */}
@@ -505,9 +563,9 @@ export const Profile = () => {
                     <option value="" disabled selected hidden>Select Institute</option>
                     {
                       institutes.map(institute => (
-                        
+
                         <option key={institute.university} value={institute.university_name}>{institute.university_name}</option>
-                        
+
                       ))
                     }
                   </select>
@@ -525,9 +583,9 @@ export const Profile = () => {
                     <option value="" disabled selected hidden>Select degree</option>
                     {
                       qualifications?.map(qualification => (
-                        
+
                         <option key={qualification.degree_code} value={qualification.degree_name}>{qualification.degree_name}</option>
-                        
+
                       ))
                     }
                   </select>
@@ -658,9 +716,97 @@ export const Profile = () => {
 
           {/* hospital timings */}
 
-          <DoctorTiming hospitals={hospitals} designations={designations} setClickedFrom={setClickedFrom} setIsOpen={setIsOpen} />
+          <DoctorTiming hospitals={hospitals} designations={designations} setClickedFrom={setClickedFrom} setIsOpen={setIsOpen} hospitalBlocks={hospitalBlocks} setHospitalBlocks={setHospitalBlocks} />
 
-          {/* <div className='flex flex-col gap-2 mt-2'>
+
+
+        </div>
+      </div>
+      <DocExperience institutes={institutes} designations={designations} handleOpenModal={handleOpenModal} handleRows2fromDocExperience={handleRows2fromDocExperience}/>
+
+      {/* <button type='submit' className='bg-blue-500 py-1 px-2 pr-3 rounded cursor-pointer text-white text-base w-fit text-center' onClick={submit}>Submit</button> */}
+      <button className='bg-[rgb(0,123,255)] text-white py-2 px-5 rounded-sm cursor-pointer text-base ml-2' onClick={submit}>
+        Save to database
+      </button>
+
+
+
+      <div className="mt-4 space-y-3 w-1/2 mx-auto">
+
+        {isOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white rounded-2xl shadow-lg w-96 p-6">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Add {clickedFrom}</h2>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ✖
+                </button>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium">Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    // value={formData.name}
+                    onChange={handleChange}
+                    className="w-full mt-1 px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
+                    required
+                  />
+                </div>
+
+
+
+                {/* Buttons */}
+                <div className="flex justify-end space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(false)}
+                    className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    Save
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
+
+
+
+    </div>
+  )
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{/* <div className='flex flex-col gap-2 mt-2'>
             <h1 className='text-[17px] font-semibold'>Practice Address and Timings</h1>
             <div className='shadow-md rounded-md p-2 px-5 flex flex-col gap-4 bg-white'>
               <h1 className='text-base font-semibold underline cursor-pointer'>Please select your hospital and designation</h1>
@@ -799,71 +945,3 @@ export const Profile = () => {
 
             </div>
           </div> */}
-          
-        </div>
-      </div>
-      <DocExperience institutes={institutes} designations={designations} handleOpenModal={handleOpenModal} />
-
-      <button type='submit' className='bg-blue-500 py-1 px-2 pr-3 rounded cursor-pointer text-white text-base w-fit text-center' onClick={submit}>Submit</button>
-
-
-
-      <div className="mt-4 space-y-3 w-1/2 mx-auto">
-
-        {isOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white rounded-2xl shadow-lg w-96 p-6">
-              {/* Header */}
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Add {clickedFrom}</h2>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  ✖
-                </button>
-              </div>
-
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium">Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    // value={formData.name}
-                    onChange={handleChange}
-                    className="w-full mt-1 px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
-                    required
-                  />
-                </div>
-
-
-
-                {/* Buttons */}
-                <div className="flex justify-end space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsOpen(false)}
-                    className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  >
-                    Save
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-      </div>
-
-
-
-    </div>
-  )
-}

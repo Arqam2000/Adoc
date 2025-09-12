@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
+import { toast } from 'react-toastify';
 
-const DocExperience = ({ institutes, designations, handleOpenModal }) => {
+const DocExperience = ({ institutes, designations, handleOpenModal, handleRows2fromDocExperience}) => {
     const [rows2, setRows2] = useState([
         {
             institute: "",
@@ -11,7 +12,7 @@ const DocExperience = ({ institutes, designations, handleOpenModal }) => {
         }
     ]);
 
-    console.log("rows2", rows2)
+    // console.log("rows2", rows2)
 
     useEffect(() => {
         if (JSON.parse(localStorage.getItem("rows2"))) {
@@ -115,9 +116,11 @@ const DocExperience = ({ institutes, designations, handleOpenModal }) => {
                     localStorage.setItem("rows2", JSON.stringify(rows2))
                     // localStorage.setItem("qualifications", JSON.stringify({ institute, degree }))
                     toast.success("Saved")
+                    handleRows2fromDocExperience(rows2)
                 }}>
                     Save
                 </button>
+                {/* <button onClick={() => handleRows2fromDocExperience(rows2)}>Send data to parent</button> */}
 
             </div>
         </div>

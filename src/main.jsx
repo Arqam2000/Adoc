@@ -22,6 +22,7 @@ import { Disease } from './pages/Disease.jsx';
 import { Symptom } from './pages/Symptom.jsx';
 import { Profile } from './pages/Profile.jsx';
 import DoctorsList from './pages/DoctorsList.jsx';
+import ViewDocProfile from './pages/ViewDocProfile.jsx';
 
 
 let router = createBrowserRouter([
@@ -76,6 +77,10 @@ let router = createBrowserRouter([
       {
         path: "profile",
         Component: Profile
+      },
+      {
+        path: "view-profile",
+        Component: ViewDocProfile
       },
       {
         path: "login",

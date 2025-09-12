@@ -1,6 +1,9 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const DoctorCard = ({ name, specialization, experience, rating, fees, specializationName }) => {
+
+    const navigate = useNavigate()
 
     return (
         <div className='p-2 rounded-md bg-blue-950 text-white w-xs'>
@@ -25,8 +28,11 @@ const DoctorCard = ({ name, specialization, experience, rating, fees, specializa
                 </div> */}
                 <p className='text-sm'>{fees}</p>
             </div>
-            <div>
-                <button>Call Now</button>
+            <div className='flex flex-col gap-2'>
+                <button className='px-2 py-1 rounded bg-green-500 cursor-pointer'>Call Now</button>
+                <button className='px-2 py-1 rounded bg-amber-300 cursor-pointer font-semibold'>Book Appointment</button>
+
+                <button className='px-2 py-1 rounded bg-[#004d70] cursor-pointer' onClick={() => navigate("/view-profile", { state: {name, specializationName, experience, rating, fees} })}>View Profile</button>
             </div>
         </div>
     )

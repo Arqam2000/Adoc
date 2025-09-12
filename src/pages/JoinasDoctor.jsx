@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 
 export const JoinasDoctor = () => {
@@ -13,18 +13,21 @@ export const JoinasDoctor = () => {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
 
+    const navigate = useNavigate()
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         setLoading(true)
         setError(null)
 
         try {
-            const resp = await axios.post("/api/v1/doctor/register", doctor)
+            const resp = await axios.post("/api/v1/doctors/register", doctor)
             console.log("res", resp)
 
             console.log(resp.data.data)
             if (resp.data.data) {
                 toast.success("Registered Successfuly")
+                navigate("/login")
             } else {
                 setError("Please provide valid credentials")
             }

@@ -290,9 +290,9 @@ export const Home = () => {
         </div>
       </div>
 
-      {/* <div className='text-center'>
+      <div className='text-center border text-xl py-2 w-5xl mx-auto mb-4'>
         Advertisement
-      </div> */}
+      </div>
     </div>
   )
 }
