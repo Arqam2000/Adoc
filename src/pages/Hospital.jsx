@@ -1,7 +1,7 @@
 import axios from 'axios'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ToastContainer } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 
 export const Hospital = () => {
   const [hospital, setHospital] = useState("")
@@ -17,7 +17,17 @@ export const Hospital = () => {
   const [messageType, setMessageType] = useState("");
 
   const navigate = useNavigate()
+  console.log("hospitals", hospitals)
 
+  useEffect(() => {
+    axios.get("/api/v1/hospitals/get-hospitals")
+    .then((res) => {
+      setHospitals(res.data.hospitals)
+    })
+    .catch((err) => {
+      console.log("Err while fetching hospitals", err)
+    })
+  }, [])
 
   const AddHospital = async () => {
     setLoading(true)

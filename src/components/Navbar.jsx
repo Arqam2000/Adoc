@@ -12,7 +12,7 @@ export const Navbar = () => {
             <div className='hidden lg:block'>
                 <ul className='flex items-center gap-7'>
                     <li>
-                        <Link to="#" className='flex items-center gap-1'>Doctors <i className="fa text-[14px]"
+                        <Link to="/doctors" className='flex items-center gap-1'>Doctors <i className="fa text-[14px]"
                         >&#xf107;</i>
                         </Link>
                         <ul className='hidden'>

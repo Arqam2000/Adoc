@@ -1,36 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hospitalBlocks, setHospitalBlocks}) => {
-    
+const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hospitalBlocks, setHospitalBlocks, saveHDToDB }) => {
+
+    // console.log("hospitals", hospitals)
 
     const handleOpenModal = (source) => {
         setClickedFrom(source);
         setIsOpen(true);
     };
 
+
     // console.log("hospital blocks", hospitalBlocks)
 
-    useEffect(() => {
-        if (JSON.parse(localStorage.getItem("hospitals_schedules"))) {
-            setHospitalBlocks(JSON.parse(localStorage.getItem("hospitals_schedules")))
-            
-        }
-    }, [])
-
-    //   const hospitals = [
-    //     {
-    //         hospital_code: 1,
-    //         hospital_name: "Agha Khan Hospital"
-    //     }
-    //   ]
-
-    //   const designations = [
-    //     {
-    //         Desig: 1,
-    //         DDesig: "MBBS"
-    //     }
-    //   ]
 
     const formatTime = (time) => {
         if (!time) return "--";
@@ -107,7 +89,7 @@ const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hosp
                                 }
                             >
                                 {
-                                block.hospital? <option value={block.hospital}>{block.hospital}</option>: <option value="" disabled>Select Hospital</option>
+                                    block.hospital ? <option value={block.hospital}>{block.hospital}</option> : <option value="" disabled>Select Hospital</option>
                                 }
                                 {hospitals.map((hos) => (
                                     <option key={hos.hospital_code} value={hos.hospital_name}>
@@ -127,9 +109,9 @@ const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hosp
                                 }
                             >
                                 {
-                                block.designation? <option value={block.designation}>{block.designation}</option>: <option value="" disabled>Select Designation</option>
+                                    block.designation ? <option value={block.designation}>{block.designation}</option> : <option value="" disabled>Select Designation</option>
                                 }
-                                
+
                                 {designations.map((desig) => (
                                     <option key={desig.Desig} value={desig.DDesig}>
                                         {desig.DDesig}
@@ -203,19 +185,55 @@ const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hosp
                         ))}
                     </div>
 
-                    <button
-                        onClick={() => saveHospitalSchedule(blockIndex)}
-                        className="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
-                    >
-                        Save Schedule
-                    </button>
+
                 </div>
             ))}
+            <div className="max-w-md mx-auto flex items-center gap-2">
+                <button
+                    onClick={() => saveHospitalSchedule(blockIndex)}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+                >
+                    Save Schedule
+                </button>
+                <button
+                    onClick={saveHDToDB}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+                >
+                    Save to Database
+                </button>
+                <button
+                    className="bg-red-600 text-white px-4 py-2 rounded-md"
+                    onClick={() => {
+                        localStorage.setItem(
+                            `hospitals_schedules`,
+                            JSON.stringify([
+                                {
+                                    hospital: "",
+                                    designation: "",
+                                    fees: "",
+                                    schedule: [
+                                        { day: "Mon", start: "", end: "" },
+                                        { day: "Tue", start: "", end: "" },
+                                        { day: "Wed", start: "", end: "" },
+                                        { day: "Thu", start: "", end: "" },
+                                        { day: "Fri", start: "", end: "" },
+                                        { day: "Sat", start: "", end: "" },
+                                        { day: "Sun", start: "", end: "" },
+                                    ],
+                                },
+                            ])
+                        );
+                        toast.success("Saved Schedule");
+                    }}
+                >
+                    delete
+                </button>
+            </div>
 
             {/* Add More Hospitals */}
             <button
                 onClick={addMoreHospitals}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded max-w-sm mx-auto"
             >
                 + Add More Hospital
             </button>

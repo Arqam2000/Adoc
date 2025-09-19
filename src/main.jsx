@@ -20,9 +20,10 @@ import { Institute } from './pages/Institute.jsx';
 import { Designation } from './pages/Designation.jsx';
 import { Disease } from './pages/Disease.jsx';
 import { Symptom } from './pages/Symptom.jsx';
-import { Profile } from './pages/Profile.jsx';
+// import { Profile } from './pages/Profile.jsx';
 import DoctorsList from './pages/DoctorsList.jsx';
 import ViewDocProfile from './pages/ViewDocProfile.jsx';
+import { Profile } from './pages/NewProfile.jsx';
 
 
 let router = createBrowserRouter([
@@ -74,6 +75,10 @@ let router = createBrowserRouter([
         path: "admin/symptom",
         Component: Symptom
       },
+      // {
+      //   path: "profile",
+      //   Component: Profile
+      // },
       {
         path: "profile",
         Component: Profile

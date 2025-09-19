@@ -6,7 +6,7 @@ const DoctorCard = ({ name, specialization, experience, rating, fees, specializa
     const navigate = useNavigate()
 
     return (
-        <div className='p-2 rounded-md bg-blue-950 text-white w-xs'>
+        <div className='p-2 rounded-md bg-blue-950 text-white w-sm'>
             <div className='flex gap-3'>
                 <div>
                     <img
@@ -17,7 +17,7 @@ const DoctorCard = ({ name, specialization, experience, rating, fees, specializa
                 </div>
                 <div className='flex flex-col gap-1'>
                     <h2 className='underline font-semibold'>{name}</h2>
-                    <h2 className='text-xs'>{specializationName? specializationName: specialization}</h2>
+                    <h2 className='text-xs'>{specializationName ? specializationName : specialization}</h2>
                     <h2 className='text-xs'>{experience}</h2>
                     <p className='text-xs'>{rating}</p>
                 </div>
@@ -29,10 +29,13 @@ const DoctorCard = ({ name, specialization, experience, rating, fees, specializa
                 <p className='text-sm'>{fees}</p>
             </div>
             <div className='flex flex-col gap-2'>
-                <button className='px-2 py-1 rounded bg-green-500 cursor-pointer'>Call Now</button>
+                <div className='grid grid-cols-2 gap-2'>
+                    <button className='px-2 py-1 rounded bg-green-500 cursor-pointer'>Call Now</button>
+                    <button className='px-2 py-1 rounded bg-green-500 cursor-pointer'>Video Consultation</button>
+                </div>
                 <button className='px-2 py-1 rounded bg-amber-300 cursor-pointer font-semibold'>Book Appointment</button>
 
-                <button className='px-2 py-1 rounded bg-[#004d70] cursor-pointer' onClick={() => navigate("/view-profile", { state: {name, specializationName, experience, rating, fees} })}>View Profile</button>
+                <button className='px-2 py-1 rounded bg-[#004d70] cursor-pointer' onClick={() => navigate("/view-profile", { state: { name, specialization: specializationName || specialization, experience, rating, fees } })}>View Profile</button>
             </div>
         </div>
     )

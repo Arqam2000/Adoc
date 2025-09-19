@@ -24,7 +24,7 @@ export const Login = () => {
             console.log("response", res.data)
             toast.success(res.data.message)
             localStorage.setItem("doctor", JSON.stringify(res.data.user))
-            navigate("/profile")
+            navigate("/view-profile")
         })
         .catch(err => {
             console.log("Error:", err)
