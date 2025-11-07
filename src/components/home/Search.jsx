@@ -1,6 +1,17 @@
 import React from 'react'
+import useCities from '../../hooks/useCities'
+import useSpecializations from '../../hooks/useSpecializations'
+import useHospitals from '../../hooks/useHospitals'
 
 const Search = () => {
+  const {cities} = useCities()
+  const {specializations} = useSpecializations()
+  const {hospitals} = useHospitals()
+
+  console.log("cities from search component", cities)
+  console.log("specializations from search component", specializations)
+  console.log("hospitals from search component", hospitals)
+
     return (
         <div className='text-xl w-7xl mt-4 mx-auto'>
             {/* <div className='text-xl  p-2 flex items-center gap-2'>
@@ -8,21 +19,39 @@ const Search = () => {
         <h2 className='text-base text-[#3A3A3A] font-semibold'>Hello, Guest</h2>
       </div> */}
             <h1 className='font-bold text-lg text-[#3A3A3A] mt-2'>Find the best doctor near you</h1>
-            <div className='w-6xl mx-auto outline outline-[#ADADAD] border-[#ADADAD] px-2 rounded-lg shadow-md grid grid-cols-[1fr_1fr_1fr_1fr_auto] my-7 h-10 items-center'>
+            <div className='w-6xl mx-auto outline outline-[#ADADAD] border-[#ADADAD] px-2 rounded-lg shadow-md grid grid-cols-[1fr_1fr_1fr_1fr_auto] my-7 h-10 items-center bg-white'>
                 <select className='border-r border-r-[#ADADAD] outline-none text-base text-[#495057]'>
                     <option value="City">Enter City</option>
+                    {
+                      cities?.map(city => (
+                        <option key={city.city_code} value={city.city_name}>{city.city_name}</option>
+                      ))
+                    }
                 </select>
                 <select className='border-r border-r-[#ADADAD] outline-none text-base text-[#495057]'>
                     <option value="Specialization">Specialization</option>
+                    {
+                      specializations?.map(spec => (
+                        <option 
+                        key={spec.Specialization_code} 
+                        value={spec.Specialization_name}
+                        >{spec.Specialization_name}</option>
+                      ))
+                    }
                 </select>
                 <select className='border-r border-r-[#ADADAD] outline-none text-base text-[#495057]'>
                     <option value="Doctor">Doctor</option>
                 </select>
                 <select className='outline-none text-base text-[#495057]'>
                     <option value="Hospital">Hospital</option>
+                    {
+                      hospitals?.map(hos => (
+                        <option key={hos.hospital_code} value={hos.hospital_name}>{hos.hospital_name}</option>
+                      ))
+                    }
                 </select>
                 <div className='flex justify-end items-center w-fit justify-self-end px-2 bg-[#f2fafe] font-normal'>
-                    <button className='cursor-pointer'><i class="fa fa-search font-normal"></i></button>
+                    <button className='cursor-pointer'><i className="fa fa-search font-normal"></i></button>
                 </div>
             </div>
         </div>

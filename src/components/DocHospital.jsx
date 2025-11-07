@@ -1,7 +1,9 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import delIcon from "../assets/delete.png"
 
-const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hospitalBlocks, setHospitalBlocks, saveHDToDB }) => {
+const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hospitalBlocks, setHospitalBlocks, saveHDToDB, handleFocus, dr }) => {
 
     // console.log("hospitals", hospitals)
 
@@ -37,6 +39,10 @@ const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hosp
 
 
     const addMoreHospitals = () => {
+        localStorage.setItem(
+            `hospitals_schedules`,
+            JSON.stringify(hospitalBlocks)
+        );
         setHospitalBlocks([
             ...hospitalBlocks,
             {
@@ -65,8 +71,134 @@ const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hosp
         toast.success("Saved Schedule");
     };
 
+    const deleteDoctorHD = async () => {
+        try {
+            const resp = await axios.post("/api/v1/doctors/delete-doctorhd", {
+                dr
+            })
+
+            if (resp.data.success) {
+                localStorage.setItem(
+                    `hospitals_schedules`,
+                    JSON.stringify([
+                        {
+                            hospital: "",
+                            designation: "",
+                            fees: "",
+                            schedule: [
+                                { day: "Mon", start: "", end: "" },
+                                { day: "Tue", start: "", end: "" },
+                                { day: "Wed", start: "", end: "" },
+                                { day: "Thu", start: "", end: "" },
+                                { day: "Fri", start: "", end: "" },
+                                { day: "Sat", start: "", end: "" },
+                                { day: "Sun", start: "", end: "" },
+                            ],
+                        },
+                    ])
+                );
+                toast.success("Deleted successfully")
+            }
+        } catch (error) {
+            toast.error("Error while deleting")
+            console.log("Error while deleting", error)
+        }
+    }
+
+    function areAllObjectPropertiesEmpty(arr) {
+        if (!Array.isArray(arr) || arr.length === 0) {
+            return false; // Not an array or empty array
+        }
+
+        return arr.every(obj => {
+            // Check if the object itself is null or undefined
+            if (obj === null || typeof obj === 'undefined') {
+                return true; // Consider null/undefined objects as having "empty" properties
+            }
+
+            // Get all enumerable property names of the object
+            const keys = Object.keys(obj);
+
+            // If the object has no properties, it's considered "empty"
+            if (keys.length === 0) {
+                return true;
+            }
+
+            // Check if every property value is considered "empty"
+            return keys.every(key => {
+                const value = obj[key];
+                // Define what "empty" means for your properties (e.g., null, undefined, empty string, empty array)
+                return value === null || typeof value === 'undefined' || value === '' || (Array.isArray(value) && value.length === 0);
+            });
+        });
+    }
+
+    const deleteHosRow = async (block) => {
+        try {
+            if (areAllObjectPropertiesEmpty(hospitalBlocks)) {
+                localStorage.setItem("hospitals_schedules", JSON.stringify([
+                    {
+                        hospital: "",
+                        designation: "",
+                        fees: "",
+                        schedule: [
+                            { day: "Mon", start: "", end: "" },
+                            { day: "Tue", start: "", end: "" },
+                            { day: "Wed", start: "", end: "" },
+                            { day: "Thu", start: "", end: "" },
+                            { day: "Fri", start: "", end: "" },
+                            { day: "Sat", start: "", end: "" },
+                            { day: "Sun", start: "", end: "" },
+                        ],
+                    },
+                ]))
+                toast.success("row removed")
+            } else {
+                const hosObj = hospitals.find(hosp => hosp.hospital_name == block.hospital)
+
+                const desigObj = designations.find(desig => desig.DDesig == block.designation)
+
+                const resp = await axios.post(`/api/v1/doctors/delete-doctorhd/${dr}`, {
+                    hospital_code: hosObj.hospital_code,
+                    Desig: desigObj.Desig
+                })
+
+                if (resp.data.success) {
+                    const newArr = hospitalBlocks.filter(row2 => row2.hospital != block.hospital && row2.designation != block.designation)
+
+                    if (newArr.length == 0) {
+                        localStorage.setItem("hospitals_schedules", JSON.stringify([
+                            {
+                                hospital: "",
+                                designation: "",
+                                fees: "",
+                                schedule: [
+                                    { day: "Mon", start: "", end: "" },
+                                    { day: "Tue", start: "", end: "" },
+                                    { day: "Wed", start: "", end: "" },
+                                    { day: "Thu", start: "", end: "" },
+                                    { day: "Fri", start: "", end: "" },
+                                    { day: "Sat", start: "", end: "" },
+                                    { day: "Sun", start: "", end: "" },
+                                ],
+                            },
+                        ]))
+                    } else {
+                        localStorage.setItem("hospitals_schedules", JSON.stringify(newArr))
+                    }
+
+                    toast.success("Deleted Successfuly")
+                }
+            }
+        } catch (error) {
+            toast.error("Error deleting hospital row")
+            console.log("Error deleting hospital row", error)
+        }
+    }
+
     return (
         <div className="flex flex-col gap-4 mt-2">
+            <ToastContainer />
             <h1 className="text-[17px] font-semibold">Practice Address and Timings</h1>
 
             {hospitalBlocks.map((block, blockIndex) => (
@@ -84,6 +216,7 @@ const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hosp
                             <select
                                 className="w-full border p-2 py-1 rounded-lg"
                                 value={block.hospital}
+                                onFocus={handleFocus}
                                 onChange={(e) =>
                                     handleHospitalChange(blockIndex, "hospital", e.target.value)
                                 }
@@ -104,6 +237,7 @@ const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hosp
                             <select
                                 className="w-full border p-2 py-1 rounded-lg"
                                 value={block.designation}
+                                onFocus={handleFocus}
                                 onChange={(e) =>
                                     handleHospitalChange(blockIndex, "designation", e.target.value)
                                 }
@@ -119,6 +253,11 @@ const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hosp
                                 ))}
                             </select>
                             <button className='bg-blue-500 py-0 px-5 rounded cursor-pointer text-white text-base ml-2' onClick={() => handleOpenModal("Designation")}>+</button>
+                            <div className='flex items-end ml-2'>
+                                <button className='flex items-center cursor-pointer mb-2' onClick={() => deleteHosRow(block)}>
+                                    <img src={delIcon} alt="delIcon" width={32} />
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -189,42 +328,21 @@ const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hosp
                 </div>
             ))}
             <div className="max-w-md mx-auto flex items-center gap-2">
-                <button
+                {/* <button
                     onClick={() => saveHospitalSchedule(blockIndex)}
                     className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
                 >
                     Save Schedule
-                </button>
+                </button> */}
                 <button
                     onClick={saveHDToDB}
                     className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
                 >
-                    Save to Database
+                    Save
                 </button>
                 <button
                     className="bg-red-600 text-white px-4 py-2 rounded-md"
-                    onClick={() => {
-                        localStorage.setItem(
-                            `hospitals_schedules`,
-                            JSON.stringify([
-                                {
-                                    hospital: "",
-                                    designation: "",
-                                    fees: "",
-                                    schedule: [
-                                        { day: "Mon", start: "", end: "" },
-                                        { day: "Tue", start: "", end: "" },
-                                        { day: "Wed", start: "", end: "" },
-                                        { day: "Thu", start: "", end: "" },
-                                        { day: "Fri", start: "", end: "" },
-                                        { day: "Sat", start: "", end: "" },
-                                        { day: "Sun", start: "", end: "" },
-                                    ],
-                                },
-                            ])
-                        );
-                        toast.success("Saved Schedule");
-                    }}
+                    onClick={deleteDoctorHD}
                 >
                     delete
                 </button>

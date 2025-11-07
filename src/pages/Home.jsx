@@ -1,55 +1,62 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Search from '../components/home/Search'
-import femaleDoc from "../assets/female-doc.avif"
 import instantDoctor from '../assets/instant-doctorlogo.png'
 import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import useDoctor from '../context/DoctorContext'
+import useExperience from '../hooks/useExperience'
 
 export const Home = () => {
-  const doctors = [
-    {
-      name: "Assoc. Prof. Dr. Muhammad Ilyas",
-      specialty: "Dentist",
-      experience: "22 years experience",
-      rating: "4.9/5",
-      fee: "Rs. 500",
-      image: "https://via.placeholder.com/80", // replace with real image
-    },
-    {
-      name: "Dr. Zafar Ahmed",
-      specialty: "Dermatologist",
-      experience: "27 years experience",
-      rating: "4.9/5",
-      fee: "Rs. 3,000",
-      image: "https://via.placeholder.com/80",
-    },
-    {
-      name: "Prof. Dr. Muhammad Noman Rashid",
-      specialty: "Gastroenterologist",
-      experience: "18 years experience",
-      rating: "4.9/5",
-      fee: "Rs. 2,500",
-      image: "https://via.placeholder.com/80",
-    },
-  ];
+  const [doctors, setDoctors] = useState([])
+  const [doctorExp, setDoctorExp] = useState([])
+  const [reviews, setReviews] = useState()
+  const [hospitals, setHospitals] = useState([])
+  const [videoTimings, setVideoTimings] = useState([])
+  // const doctors = [
+  //   {
+  //     name: "Assoc. Prof. Dr. Muhammad Ilyas",
+  //     specialty: "Dentist",
+  //     experience: "22 years experience",
+  //     rating: "4.9/5",
+  //     fee: "Rs. 500",
+  //     image: "https://via.placeholder.com/80", // replace with real image
+  //   },
+  //   {
+  //     name: "Dr. Zafar Ahmed",
+  //     specialty: "Dermatologist",
+  //     experience: "27 years experience",
+  //     rating: "4.9/5",
+  //     fee: "Rs. 3,000",
+  //     image: "https://via.placeholder.com/80",
+  //   },
+  //   {
+  //     name: "Prof. Dr. Muhammad Noman Rashid",
+  //     specialty: "Gastroenterologist",
+  //     experience: "18 years experience",
+  //     rating: "4.9/5",
+  //     fee: "Rs. 2,500",
+  //     image: "https://via.placeholder.com/80",
+  //   },
+  // ];
 
-  const specializations = [
-    { name: "Dermatologist", image: "https://d1t78adged64l7.cloudfront.net/specialty-icons3/skin-specialist.png?v=1756738618796" },
-    { name: "Gynecologist", image: "https://d1t78adged64l7.cloudfront.net/specialty-icons3/gynecologist.png?v=1756738618796" },
-    { name: "Urologist", image: "https://via.placeholder.com/80" },
-    { name: "Gastroenterologist", image: "https://via.placeholder.com/80" },
-    { name: "Dentist", image: "https://via.placeholder.com/80" },
-    { name: "Obesity Specialist", image: "https://via.placeholder.com/80" },
-    { name: "ENT Specialist", image: "https://via.placeholder.com/80" },
-    { name: "Orthopedic Surgeon", image: "https://via.placeholder.com/80" },
-    { name: "Sexologist", image: "https://via.placeholder.com/80" },
-    { name: "Neurologist", image: "https://via.placeholder.com/80" },
-    { name: "Child Specialist", image: "https://via.placeholder.com/80" },
-    { name: "Pulmonologist", image: "https://via.placeholder.com/80" },
-    { name: "Eye Specialist", image: "https://via.placeholder.com/80" },
-    { name: "General Physician", image: "https://via.placeholder.com/80" },
-  ];
+  // const specializations = [
+  //   { name: "Dermatologist", image: "https://d1t78adged64l7.cloudfront.net/specialty-icons3/skin-specialist.png?v=1756738618796" },
+  //   { name: "Gynecologist", image: "https://d1t78adged64l7.cloudfront.net/specialty-icons3/gynecologist.png?v=1756738618796" },
+  //   { name: "Urologist", image: "https://via.placeholder.com/80" },
+  //   { name: "Gastroenterologist", image: "https://via.placeholder.com/80" },
+  //   { name: "Dentist", image: "https://via.placeholder.com/80" },
+  //   { name: "Obesity Specialist", image: "https://via.placeholder.com/80" },
+  //   { name: "ENT Specialist", image: "https://via.placeholder.com/80" },
+  //   { name: "Orthopedic Surgeon", image: "https://via.placeholder.com/80" },
+  //   { name: "Sexologist", image: "https://via.placeholder.com/80" },
+  //   { name: "Neurologist", image: "https://via.placeholder.com/80" },
+  //   { name: "Child Specialist", image: "https://via.placeholder.com/80" },
+  //   { name: "Pulmonologist", image: "https://via.placeholder.com/80" },
+  //   { name: "Eye Specialist", image: "https://via.placeholder.com/80" },
+  //   { name: "General Physician", image: "https://via.placeholder.com/80" },
+  // ];
 
-  const reviews = [
+  const myreviews = [
     {
       text: "Great platform, very efficient and works really well on both phone and web. I think this is the most easiest way of booking appointments in Pakistan as it has made the whole process much more efficient.",
       name: "Umer Fayyaz",
@@ -84,10 +91,49 @@ export const Home = () => {
 
   const navigate = useNavigate()
 
+  const [experiences] = useExperience(doctorExp, doctors)
+
+  console.log("experiences from home", experiences)
+
   const [current, setCurrent] = useState(0);
+  const [specializations, setSpecializations] = useState([])
   const itemsPerSlide = 3;
 
-  const totalSlides = Math.ceil(reviews.length / itemsPerSlide);
+  const totalSlides = Math.ceil(reviews?.length / itemsPerSlide);
+
+  const { doctorData } = useDoctor()
+
+  console.log("doctorData from home", doctorData)
+
+  const getAllDoctors = async () => {
+    try {
+      const resp = await axios.get("/api/v1/doctors/get-alldoctors")
+
+      if (resp.data.success) {
+        setDoctors(resp.data.data)
+        setDoctorExp(resp.data.doctorexp)
+        setReviews(resp.data.reviews)
+        setHospitals(resp.data.hospitals)
+        setVideoTimings(resp.data.videoTimings)
+      }
+
+    } catch (error) {
+      console.log("Error in getting doctors", error)
+    }
+  }
+
+  useEffect(() => {
+
+    getAllDoctors()
+
+    axios.get("/api/v1/specializations/get-specializations")
+      .then((res) => {
+        setSpecializations(res.data.specializations)
+      })
+      .catch((err) => {
+        console.log("Error fetching specializations", err)
+      })
+  }, [])
 
   const prevSlide = () => {
     setCurrent((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
@@ -107,15 +153,16 @@ export const Home = () => {
         <h1 className='text-lg text-[#3A3A3A] font-bold '>How can we help you today?</h1>
         <div className='flex gap-3 w-6xl mx-auto my-8 cursor-pointer'>
           <div className='w-1/3 shadow-md p-2 rounded-lg bg-[#DFEFEB] pl-5 flex flex-col justify-center items-center'>
-            <div className='w-40'>
+            {/* <div className='w-40'>
               <img src={instantDoctor} alt="instant-doctorlogo.png" />
-            </div>
-            <p className='text-sm text-[#4B4B4B] font-semibold'>Get Instant Relief in a Click</p>
+            </div> */}
+            <h2 className='text-[#014e78] text-base font-bold'>On Call Doctor</h2>
+            <p className='text-sm text-[#4B4B4B] font-semibold'>One Click to Comfort</p>
           </div>
 
           <div className='w-1/3 shadow-md p-2 rounded-lg bg-[#FBE0D0] flex justify-center items-center'>
             <div>
-              <h2 className='text-[#014e78] text-base font-bold'>In-clinic Visit</h2>
+              <h2 className='text-[#014e78] text-base font-bold'>Visit Clinic</h2>
               <p className='text-sm text-[#4B4B4B] font-semibold'>Book Appointment</p>
             </div>
             {/* <div className='w-35 flex justify-end'>
@@ -127,7 +174,7 @@ export const Home = () => {
           <div className='w-1/3 shadow-md p-2 rounded-lg bg-[#DFEFEB] flex justify-center items-center'>
             <div>
               <h2 className='text-[#014e78] text-base font-bold'>Video Consultation</h2>
-              <p className='text-sm text-[#4B4B4B] font-semibold'>PMC Verified Doctors</p>
+              {/* <p className='text-sm text-[#4B4B4B] font-semibold'>PMC Verified Doctors</p> */}
             </div>
           </div>
           <div className='w-1/3 shadow-md p-2 rounded-lg bg-[#FBE0D0] flex justify-center items-center'>
@@ -150,31 +197,40 @@ export const Home = () => {
       <div className="bg-[#f0f8fa] p-4 rounded-lg w-7xl mx-auto my-5">
         <h1 className='text-lg text-[#3A3A3A] font-bold '>Consult Doctors World Wide Free of Cost</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-4">
-          {doctors.map((doc, index) => (
+          {doctors.map((doc, index) => index < 3 && (
             <div
               key={index}
               className="flex flex-col justify-between bg-gradient-to-r from-[#3fa9d0] to-[#167aa8] text-white rounded-lg p-4 shadow-md"
             >
-              <div className="flex items-center gap-3">
+              <Link to={`view-profile/${doc.dr}`} className="flex items-center gap-3">
                 <img
-                  src={doc.image}
+                  src={doc.picture}
                   alt={doc.name}
                   className="w-16 h-16 rounded-full border-2 border-white object-cover"
                 />
-                <div>
+                <div className='flex flex-col gap-1'>
                   <h3 className="font-semibold">{doc.name}</h3>
-                  <p className="text-sm">{doc.specialty}</p>
-                  <p className="text-xs">{doc.experience}</p>
-                </div>
-              </div>
+                  <p className="text-sm">{doc.Specialization_name}</p>
+                  <p className="text-sm">{doc.qualifications}</p>
+                  <div className='flex justify-between'>
+                    <p className="text-xs">{experiences[index]?.years ? experiences[index].years + " years experience" : experiences[index]?.months + " months experience"}</p>
 
-              <div className="flex justify-between items-center mt-3 text-sm">
+                    <div>
+                      <h2 className='text-xs font-semibold'>Satisfaction</h2>
+                      <h2 className='text-xs'>{reviews?.[index].satisfaction_percentage.split(".")[0]}%</h2>
+
+                    </div>
+                  </div>
+                </div>
+              </Link>
+
+              {/* <div className="flex justify-between items-center mt-3 text-sm">
                 <div className="flex items-center gap-1">
                   <span className="text-yellow-400 text-lg">★</span>
                   <span>{doc.rating}</span>
                 </div>
-                {/* <span className="font-semibold">{doc.fee}</span> */}
-              </div>
+                {/* <span className="font-semibold">{doc.fee}</span>
+              </div> */} 
             </div>
           ))}
         </div>
@@ -193,17 +249,17 @@ export const Home = () => {
 
         {/* Grid of Specializations */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-6">
-          {specializations.map((spec, index) => (
-            <div key={index} className="flex flex-col items-center cursor-pointer" onClick={() => navigate('/doctors', { state: {name: spec.name} })}>
+          {specializations.map(({ Specialization_code, Specialization_name, picture }, index) => (
+            <div key={index} className="flex flex-col items-center cursor-pointer" onClick={() => navigate('/doctors', { state: { name: Specialization_name } })}>
               {/* <Link to='/doctors' > */}
               <div className="w-20 h-20 rounded-full bg-[#e9f2f9] flex items-center justify-center shadow-sm">
                 <img
-                  src={spec.image}
-                  alt={spec.name}
-                  className="w-12 h-12 object-contain"
+                  src={picture}
+                  alt={Specialization_name}
+                  className="w-full object-fill"
                 />
               </div>
-              <p className="mt-2 text-sm text-center">{spec.name}</p>
+              <p className="mt-2 text-sm text-center">{Specialization_name}</p>
               {/* </Link> */}
             </div>
           ))}
@@ -211,7 +267,7 @@ export const Home = () => {
       </div>
 
       {/* Reviews */}
-      <div className="py-10 bg-white">
+      <div className="py-10 ">
         {/* Heading */}
         <div className="text-center mb-8">
           <h2 className="text-2xl font-semibold">
@@ -234,7 +290,7 @@ export const Home = () => {
                   key={slideIndex}
                   className="min-w-full grid grid-cols-1 md:grid-cols-3 gap-6 px-4"
                 >
-                  {reviews
+                  {myreviews
                     .slice(
                       slideIndex * itemsPerSlide,
                       slideIndex * itemsPerSlide + itemsPerSlide

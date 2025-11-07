@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
 
@@ -21,18 +21,27 @@ export const Specialization = () => {
 
   useEffect(() => {
     axios.get("/api/v1/specializations/get-specializations")
-    .then(res => setSpecializations(res.data.specializations))
-    .catch(err => {
+      .then(res => setSpecializations(res.data.specializations))
+      .catch(err => {
         console.log("error", err)
         setError(err.message)
-    })
+      })
   }, [])
 
   const AddSpecialization = async () => {
     setLoading(true)
     setError(null)
+
+    const formData = new FormData();
+    formData.append('image', image);
+    formData.append('specialization', specialization)
+    console.log(formData.get("image"))
     try {
-      const resp = await axios.post("/api/v1/specializations/add-specialization", { specialization })
+      const resp = await axios.post("/api/v1/specializations/add-specialization", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
       if (resp.data.success) {
         const newSpecialization = resp.data.specialization
         console.log("newSpecialization", newSpecialization)
@@ -52,8 +61,16 @@ export const Specialization = () => {
     } else {
       setLoading(true)
       setError(null)
+      const formData = new FormData();
+      formData.append('image', image);
+      formData.append('specialization', specialization)
+      formData.append('specialization_code', specialization_code)
       try {
-        const res = await axios.patch(`/api/v1/specializations/edit-specialization/${specialization_code}`, { specialization })
+        const res = await axios.patch(`/api/v1/specializations/edit-specialization/${specialization_code}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
 
         console.log(res.data)
 
@@ -104,6 +121,29 @@ export const Specialization = () => {
     navigate("/admin")
   }
 
+  const fileInputRef = useRef(null);
+  const [isImageSelected, setIsImageSelected] = useState(false)
+  const [image, setImage] = useState()
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    if (selectedFile) {
+      console.log('Selected file name:', selectedFile.name);
+      console.log('Selected file:', selectedFile);
+      setIsImageSelected(true)
+      setImage(selectedFile)
+      // You can now handle the file, e.g., preview it or upload it
+      const preview = URL.createObjectURL(selectedFile);
+      setPreviewUrl(preview);
+    }
+  };
+
+  const handleButtonClick = () => {
+    setIsImageSelected(false)
+    fileInputRef.current.click(); // Trigger the hidden file input click
+  };
+
   return (
     <div className='flex flex-col items-center'>
       <ToastContainer />
@@ -130,6 +170,20 @@ export const Specialization = () => {
             }}
             className="w-full bg-white text-black border border-gray-300 rounded-lg px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+
+          <input
+            type="file"
+            accept="image/*" // Accept only image files
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            name='image'
+          />
+          <button className='bg-[#007bff] text-white py-2 px-5 rounded-sm cursor-pointer text-base'
+            onClick={handleButtonClick}
+          >
+            Upload Image
+          </button>
+          {isImageSelected && <img src={previewUrl} alt="img" width={250} />}
 
           {/* <select name="countries" id="countries" className='w-full outline outline-gray-300 p-2 rounded mt-2'>
             {
@@ -187,8 +241,11 @@ export const Specialization = () => {
                     <div
                       key={idx}
                       onClick={() => {
+                        setError(null)
                         setSpecializationCode(c.Specialization_code)
                         handleLocate(c.Specialization_name)
+                        setPreviewUrl(c.picture)
+                        setIsImageSelected(true)
                       }}
                       className="px-3 py-2 cursor-pointer hover:bg-blue-100 rounded-md"
                     >
@@ -208,7 +265,7 @@ export const Specialization = () => {
                         className="px-3 py-2 cursor-pointer hover:bg-blue-100 rounded-md"
                       >
                         {c.Specialization_name}
-                      </div> 
+                      </div>
                     ))
                   ) : (
                     <p className="text-gray-500 text-sm">No matching specialization found</p>

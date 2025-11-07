@@ -1,7 +1,9 @@
+import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
+import delIcon from "../assets/delete.png"
 
-const DocExperience = ({ hospitals, designations, handleOpenModal, handleRows2fromDocExperience, saveExpToDB}) => {
+const DocExperience = ({ hospitals, designations, handleOpenModal, handleRows2fromDocExperience, saveExpToDB, handleFocus, docExperience, dr }) => {
     const [rows2, setRows2] = useState([
         {
             hospital: "",
@@ -13,6 +15,9 @@ const DocExperience = ({ hospitals, designations, handleOpenModal, handleRows2fr
     ]);
 
     // console.log("rows2", rows2)
+
+    // console.log("hospitals", hospitals)
+    // console.log("designations", designations)
 
     useEffect(() => {
         if (JSON.parse(localStorage.getItem("rows2"))) {
@@ -33,6 +38,109 @@ const DocExperience = ({ hospitals, designations, handleOpenModal, handleRows2fr
         const { name, value } = e.target;
         setExperience((prev) => ({ ...prev, [name]: value }));
     };
+
+    const deleteDoctorExp = async () => {
+        try {
+            const resp = await axios.post("/api/v1/doctors/delete-doctorexp", {
+                dr
+            })
+
+            if (resp.data.success) {
+                localStorage.setItem("rows2", JSON.stringify([
+                    {
+                        hospital: "",
+                        designation: "",
+                        fromDate: "",
+                        tillDate: "",
+                        comments: ""
+                    }
+                ]))
+                toast.success("Deleted successfully")
+            }
+        } catch (error) {
+            toast.error("Error while deleting")
+        }
+    }
+
+    function areAllObjectPropertiesEmpty(arr) {
+        if (!Array.isArray(arr) || arr.length === 0) {
+            return false; // Not an array or empty array
+        }
+
+        return arr.every(obj => {
+            // Check if the object itself is null or undefined
+            if (obj === null || typeof obj === 'undefined') {
+                return true; // Consider null/undefined objects as having "empty" properties
+            }
+
+            // Get all enumerable property names of the object
+            const keys = Object.keys(obj);
+
+            // If the object has no properties, it's considered "empty"
+            if (keys.length === 0) {
+                return true;
+            }
+
+            // Check if every property value is considered "empty"
+            return keys.every(key => {
+                const value = obj[key];
+                // Define what "empty" means for your properties (e.g., null, undefined, empty string, empty array)
+                return value === null || typeof value === 'undefined' || value === '' || (Array.isArray(value) && value.length === 0);
+            });
+        });
+    }
+
+    const deleteExpRow = async (row) => {
+        try {
+
+            if (areAllObjectPropertiesEmpty(rows2)) {
+                localStorage.setItem("rows2", JSON.stringify([
+                    {
+                        hospital: "",
+                        designation: "",
+                        fromDate: "",
+                        tillDate: "",
+                        comments: ""
+                    }
+                ]))
+                toast.success("row removed")
+            } else {
+                const hosObj = hospitals.find(hosp => hosp.hospital_name == row.hospital)
+
+                const desigObj = designations.find(desig => desig.DDesig == row.designation)
+
+                const resp = await axios.post(`/api/v1/doctors/delete-doctorexp/${dr}`, {
+                    hospital_code: hosObj.hospital_code,
+                    Desig: desigObj.Desig
+                })
+
+                if (resp.data.success) {
+                    const newArr = rows2.filter(row2 => row2.hospital != row.hospital && row2.designation != row.designation)
+
+                    if (newArr.length == 0) {
+                        localStorage.setItem("rows2", JSON.stringify([
+                            {
+                                hospital: "",
+                                designation: "",
+                                fromDate: "",
+                                tillDate: "",
+                                comments: ""
+                            }
+                        ]))
+                    } else {
+                        localStorage.setItem("rows2", JSON.stringify(newArr))
+                    }
+
+                    toast.success("Deleted Successfuly")
+                }
+            }
+
+
+        } catch (error) {
+            toast.error("Error deleting experience row")
+            console.log("Error deleting experience row", error)
+        }
+    }
 
     return (
         // <div className='w-full md:max-w-6xl'>
@@ -160,11 +268,12 @@ const DocExperience = ({ hospitals, designations, handleOpenModal, handleRows2fr
 
 
         <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-2xl">
+            <ToastContainer />
             <h2 className="text-xl font-semibold text-gray-800 mb-6">Experience</h2>
 
             {
                 rows2.map((row, index) => (
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
                         {/* Hospital */}
 
                         <div className="flex flex-col">
@@ -172,10 +281,12 @@ const DocExperience = ({ hospitals, designations, handleOpenModal, handleRows2fr
                             <select
                                 name="hospital"
                                 value={row.hospital}
+                                onFocus={handleFocus}
                                 onChange={(e) => {
                                     const newRows = [...rows2];
                                     newRows[index]["hospital"] = e.target.value;
                                     setRows2(newRows)
+                                    handleRows2fromDocExperience(newRows)
                                 }
                                 }
                                 className="border rounded-lg p-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -198,10 +309,12 @@ const DocExperience = ({ hospitals, designations, handleOpenModal, handleRows2fr
                             <select
                                 type="text"
                                 name="designation"
+                                onFocus={handleFocus}
                                 onChange={(e) => {
                                     const newRows = [...rows2];
                                     newRows[index]["designation"] = e.target.value;
                                     setRows2(newRows);
+                                    handleRows2fromDocExperience(newRows)
                                 }} value={row.designation}
                                 placeholder="e.g. Eye Specialist"
                                 className="border rounded-lg p-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -227,6 +340,7 @@ const DocExperience = ({ hospitals, designations, handleOpenModal, handleRows2fr
                                     const newRows = [...rows2];
                                     newRows[index]["fromDate"] = e.target.value
                                     setRows2(newRows)
+                                    handleRows2fromDocExperience(newRows)
                                 }} value={row.fromDate}
                                 className="border rounded-lg p-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             />
@@ -242,6 +356,7 @@ const DocExperience = ({ hospitals, designations, handleOpenModal, handleRows2fr
                                     const newRows = [...rows2];
                                     newRows[index]["tillDate"] = e.target.value
                                     setRows2(newRows)
+                                    handleRows2fromDocExperience(newRows)
                                 }} value={row.tillDate}
                                 className="border rounded-lg p-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             />
@@ -257,10 +372,22 @@ const DocExperience = ({ hospitals, designations, handleOpenModal, handleRows2fr
                                     const newRows = [...rows2];
                                     newRows[index]["comments"] = e.target.value
                                     setRows2(newRows)
+                                    handleRows2fromDocExperience(newRows)
                                 }} value={row.comments}
                                 placeholder="Completed"
                                 className="border rounded-lg p-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             />
+                        </div>
+
+                        <div className='flex items-end'>
+                            <button className='flex items-center cursor-pointer mb-3' onClick={() => deleteExpRow(row)}>
+                                <img src={delIcon} alt="delIcon" />
+                            </button>
+                            <button className='bg-blue-500 py-1 px-5 rounded cursor-pointer text-white text-base ml-2 mb-2' onClick={() => {
+                                localStorage.setItem("rows2", JSON.stringify(rows2))
+                                setRows2([...rows2, { hospital: "", designation: "" }])
+                                handleRows2fromDocExperience([...rows2, { hospital: "", designation: "" }])
+                            }}>+</button>
                         </div>
                     </div>
                 ))
@@ -268,22 +395,26 @@ const DocExperience = ({ hospitals, designations, handleOpenModal, handleRows2fr
 
             {/* Buttons */}
             <div className="flex flex-wrap gap-3 mt-6">
-                <button className="bg-blue-500 text-white px-5 py-2 rounded-xl shadow hover:bg-blue-600 transition" onClick={() => setRows2([...rows2, { hospital: "", designation: "" }])}>
+                {/* <button className="bg-blue-500 text-white px-5 py-2 rounded-xl shadow hover:bg-blue-600 transition" onClick={() => {
+                    localStorage.setItem("rows2", JSON.stringify(rows2))
+                    setRows2([...rows2, { hospital: "", designation: "" }])
+                    handleRows2fromDocExperience([...rows2, { hospital: "", designation: "" }])
+
+                }}>
                     Add More
-                </button>
-                <button className="bg-green-500 text-white px-5 py-2 rounded-xl shadow hover:bg-green-600 transition" onClick={() => {
+                </button> */}
+                {/* <button className="bg-green-500 text-white px-5 py-2 rounded-xl shadow hover:bg-green-600 transition" onClick={() => {
 
                     localStorage.setItem("rows2", JSON.stringify(rows2))
-                    // localStorage.setItem("qualifications", JSON.stringify({ institute, degree }))
                     toast.success("Saved")
                     handleRows2fromDocExperience(rows2)
                 }}>
                     Save
-                </button>
+                </button> */}
                 <button className="bg-green-500 text-white px-5 py-2 rounded-xl shadow hover:bg-green-600 transition" onClick={saveExpToDB}>
-                    Save to Database
+                    Save
                 </button>
-                <button className="bg-red-500 text-white px-5 py-2 rounded-xl shadow hover:bg-red-600 transition">
+                <button className="bg-red-500 text-white px-5 py-2 rounded-xl shadow hover:bg-red-600 transition" onClick={deleteDoctorExp}>
                     Delete
                 </button>
             </div>

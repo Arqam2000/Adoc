@@ -2,105 +2,73 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
+import useHospitals from '../hooks/useHospitals'
+import useCountries from '../hooks/useCountries'
+import useCities from '../hooks/useCities'
 
 export const Hospital = () => {
-  const [hospital, setHospital] = useState("")
-  const [hospitalCode, setHospitalCode] = useState("")
-  const [hospitals, setHospitals] = useState([])
-  const [countries, setCountries] = useState([])
+  
+  // const [hospitals, setHospitals] = useState([])
+
+  const {hospitals, hospital, setHospital, hospitalCode, setHospitalCode, addHospital, getHospitals, editHospital, deleteHospital, error} = useHospitals()
+  const { cities }= useCities()
+  const [selectedCity, setSelectedCity] = useState("")
   const [hospitalsFilter, setHospitalsFilter] = useState([])
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+  
   const [locate, setLocate] = useState(false)
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
 
   const navigate = useNavigate()
+
   console.log("hospitals", hospitals)
 
-  useEffect(() => {
-    axios.get("/api/v1/hospitals/get-hospitals")
-    .then((res) => {
-      setHospitals(res.data.hospitals)
-    })
-    .catch((err) => {
-      console.log("Err while fetching hospitals", err)
-    })
-  }, [])
+  // useEffect(() => {
+  //   axios.get("/api/v1/hospitals/get-hospitals")
+  //   .then((res) => {
+  //     setHospitals(res.data.hospitals)
+  //   })
+  //   .catch((err) => {
+  //     console.log("Err while fetching hospitals", err)
+  //   })
+  // }, [])
 
-  const AddHospital = async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const resp = await axios.post("/api/v1/hospitals/add-hospital", { hospital })
-      console.log("response", resp.data)
-      if (resp.data.success) {
-        const newHospital = resp.data.hospital
-        console.log("newHospital", newHospital)
-        setHospitals([...hospitals, { ...newHospital }])
-        toast.success("Saved successfuly")
-      } else {
-        setError(resp.data.message)
-      }
-    } catch (error) {
-      console.log("Error",error)
-      setError(error.response.data.message)
-    }
-    setLoading(false)
-    setHospital("")
-  }
+  // const AddHospital = async () => {
+  //   setLoading(true)
+  //   setError(null)
+  //   try {
+  //     const resp = await axios.post("/api/v1/hospitals/add-hospital", { hospital })
+  //     console.log("response", resp.data)
+  //     if (resp.data.success) {
+  //       const newHospital = resp.data.hospital
+  //       console.log("newHospital", newHospital)
+  //       setHospitals([...hospitals, { ...newHospital }])
+  //       toast.success("Saved successfuly")
+  //     } else {
+  //       setError(resp.data.message)
+  //     }
+  //   } catch (error) {
+  //     console.log("Error",error)
+  //     setError(error.response.data.message)
+  //   }
+  //   setLoading(false)
+  //   setHospital("")
+  // }
 
-  const editHospital = async () => {
-    if (!hospital_code) {
-      setError("Please select a hospital")
-    } else {
-      setLoading(true)
-      setError(null)
-      try {
-        const res = await axios.patch(`/api/v1/hospitals/edit-hospital/${hospital_code}`, { hospital })
+  
 
-        console.log(res.data)
-
-        const newHospital = { ...res.data.data }
-
-        let hospitalIndex = hospitals.findIndex(hospital => hospital.hospital_code == hospital_code)
-
-        hospitals[hospitalIndex] = newHospital
-        // console.log(newHospitals)
-        setHospitals(hospitals)
-        toast.success(res.data.message)
-        setHospital("")
-        setHospitalCode()
-      } catch (error) {
-        setError(error.message)
-      }
-      setLoading(false)
-    }
-  }
-
-  const deleteHospital = async (hospital_code) => {
-    if (!hospital_code) {
-      setError("Please select a hospital")
-    } else {
-      setLoading(true)
-      setError(null)
-      try {
-        const res = await axios.delete(`/api/v1/hospitals/delete-hospital/${hospital_code}`)
-
-        const newHospitals = hospitals.filter(hospital => hospital.hospital_code != hospital_code)
-        console.log(newHospitals)
-        setHospitals(newHospitals)
-        toast.success(res.data.message)
-        setHospital("")
-      } catch (error) {
-        setError(error.message)
-      }
-      setLoading(false)
-    }
-  }
+  
   const handleLocate = (selectedHospital) => {
+    const hospital = hospitals.find(hos => {
+      return hos.hospital_name === selectedHospital
+    })
+
+    const city = cities.find(city => city.city_code === hospital.city_code)
+    console.log("", city)
     setHospital(selectedHospital);
+    setSelectedCity(city.city_name)
     setLocate(false);
     setMessage(""); // clear old messages
   };
@@ -136,13 +104,14 @@ export const Hospital = () => {
             className="w-full bg-white text-black border border-gray-300 rounded-lg px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          {/* <select name="countries" id="countries" className='w-full outline outline-gray-300 p-2 rounded mt-2'>
+          <select name="countries" id="countries" className='w-full outline outline-gray-300 p-2 rounded mt-2' value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)}>
+            <option value="">Select City</option>
             {
-              countries.map(country => (
-                <option key={country.country_code} value={country.country_name}>{country.country_name}</option>
+              cities.map(country => (
+                <option key={country.city_code} value={country.city_name}>{country.city_name}</option>
               ))
             }
-          </select> */}
+          </select>
 
           {/* Error */}
 
@@ -159,9 +128,12 @@ export const Hospital = () => {
 
           {/* Buttons */}
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-5">
-            <button onClick={AddHospital} className="px-3 py-2 bg-blue-600 text-white text-base rounded-lg hover:bg-blue-700">Add</button>
+            <button onClick={() => {
+              const city = cities.find(city => city.city_name === selectedCity)
+              addHospital(hospital, city.city_code)
+            }} className="px-3 py-2 bg-blue-600 text-white text-base rounded-lg hover:bg-blue-700">Add</button>
             <button onClick={() => setLocate(true)} className="px-3 py-2 bg-green-600 text-white text-base rounded-lg hover:bg-green-700">Locate</button>
-            <button onClick={() => editHospital(hospitalCode)} className="px-3 py-2 bg-yellow-500 text-white text-base rounded-lg hover:bg-yellow-600">Save edit</button>
+            <button onClick={() => editHospital(hospitalCode, hospital)} className="px-3 py-2 bg-yellow-500 text-white text-base rounded-lg hover:bg-yellow-600">Save edit</button>
             <button onClick={() => deleteHospital(hospitalCode)} className="px-3 py-2 bg-red-600 text-white text-base rounded-lg hover:bg-red-700">Delete</button>
             <button onClick={Exit} className="px-3 py-2 bg-red-600 text-white text-base rounded-lg hover:bg-red-700">Exit</button>
           </div>

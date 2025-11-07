@@ -149,6 +149,10 @@ Review varchar(500),
 rating int,
 Patient int
 )
+-----------
+select count(r.Review) rew,sum(rating) rate ,(rate*.01)/rew  satisfaction  from doctorRD where dr=
+
+
 /
 --------- vc ='V' video , 'W'  walkin
 ------ doctors booking appointment

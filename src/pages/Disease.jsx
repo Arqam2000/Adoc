@@ -66,7 +66,11 @@ export const Disease = () => {
             
             formData.append("image", image)
             try {
-                const res = await axios.patch(`/api/v1/diseases/edit-disease/${disease_code}`, formData)
+                const res = await axios.patch(`/api/v1/diseases/edit-disease/${disease_code}`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
 
                 console.log("edit response", res.data)
 

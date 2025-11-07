@@ -24,6 +24,9 @@ import { Symptom } from './pages/Symptom.jsx';
 import DoctorsList from './pages/DoctorsList.jsx';
 import ViewDocProfile from './pages/ViewDocProfile.jsx';
 import { Profile } from './pages/NewProfile.jsx';
+import InclinicAppointment from './components/InclinicAppointment.jsx';
+import { DoctorProvider } from './context/DoctorContext.jsx';
+import Dashboard from './pages/Dashboard.jsx';
 
 
 let router = createBrowserRouter([
@@ -84,7 +87,7 @@ let router = createBrowserRouter([
         Component: Profile
       },
       {
-        path: "view-profile",
+        path: "view-profile/:id",
         Component: ViewDocProfile
       },
       {
@@ -95,10 +98,18 @@ let router = createBrowserRouter([
         path: "doctors",
         Component: DoctorsList
       },
-      
+
       {
         path: "register/doctor",
         Component: JoinasDoctor
+      },
+      {
+        path: "book-appointment",
+        Component: InclinicAppointment
+      },
+      {
+        path: "/dashboard",
+        Component: Dashboard
       },
     ]
   }
@@ -106,6 +117,8 @@ let router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <DoctorProvider >
+      <RouterProvider router={router} />
+    </DoctorProvider>
   </StrictMode>,
 )

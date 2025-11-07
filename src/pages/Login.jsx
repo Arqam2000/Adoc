@@ -2,6 +2,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
+import useDoctor from '../context/DoctorContext'
 
 export const Login = () => {
     const [loading, setLoading] = useState(false)
@@ -13,6 +14,8 @@ export const Login = () => {
 
     const navigate = useNavigate()
 
+    const {setDoctorData} = useDoctor()
+
     const handleSubmit = (e) => {
         e.preventDefault()
 
@@ -23,8 +26,8 @@ export const Login = () => {
         .then(res => {
             console.log("response", res.data)
             toast.success(res.data.message)
-            localStorage.setItem("doctor", JSON.stringify(res.data.user))
-            navigate("/view-profile")
+            localStorage.setItem("doctorId", JSON.stringify(res.data.user.dr))
+            navigate(`/dashboard`)
         })
         .catch(err => {
             console.log("Error:", err)

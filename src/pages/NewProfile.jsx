@@ -6,6 +6,11 @@ import "react-toastify/dist/ReactToastify.css";
 // Subcomponents
 import DoctorTiming from "../components/DocHospital";
 import DocExperience from "../components/DocExperience";
+import useDoctor from "../context/DoctorContext";
+import useCities from "../hooks/useCities";
+import useSpecializations from "../hooks/useSpecializations";
+import useHospitals from "../hooks/useHospitals";
+import BackButton from "../components/BackButton";
 
 export const Profile = () => {
     const [doctor, setDoctor] = useState([]);
@@ -16,17 +21,18 @@ export const Profile = () => {
         selectedImage: null,
     });
 
-    const [cities, setCities] = useState([]);
-    const [specializations, setSpecializations] = useState([]);
+    const {cities} = useCities();
+    const {specializations} = useSpecializations()
+    const {hospitals} = useHospitals()
+
     const [qualifications, setQualifications] = useState([]);
     const [institutes, setInstitutes] = useState([]);
-    const [hospitals, setHospitals] = useState([]);
     const [designations, setDesignations] = useState([]);
     const [rows, setRows] = useState([
         {
-            id: 0, 
-            institute: "", 
-            degree: "" 
+            id: 0,
+            institute: "",
+            degree: ""
         }
     ]);
     const [hospitalBlocks, setHospitalBlocks] = useState([
@@ -55,11 +61,38 @@ export const Profile = () => {
     const [experience, setExperience] = useState([]);
     const [loading, setLoading] = useState(false);
     const [videoFees, setVideoFees] = useState("")
-    const [canDelete, setCanDelete] = useState(false)
-
-    const [selectedRowId, setSelectedRowId] = useState(null);
+    const [docExp, setDocExp] = useState([])
 
     const fileInputRef = useRef(null);
+
+    const { doctorData, fetchDoctorData, setDoctorData } = useDoctor();
+    console.log("doctorData from profile", doctorData)
+
+    // console.log("sorted doctorvd", doctorData?.doctorvd?.sort((a, b) => {
+    //     const indexA = schedule.indexOf(a.day);
+    //     const indexB = schedule.indexOf(b.day);
+    //     return indexA - indexB;
+    // })) 
+
+    useEffect(() => {
+        const newSch = schedule.map((slot, idx) => { // slot = { day: "Mon", start: "", end: "" } 
+            // doctorData?.doctorvd[0] = { day: "tue", timein: "10:00", timeout: "14:00" }, { day: "Tue", timein: "10:00", timeout: "14:00" }
+
+            if (slot.day == doctorData?.doctorvd?.[idx]?.day) {
+                slot.start = doctorData?.doctorvd?.[idx]?.timein || ""
+                slot.end = doctorData?.doctorvd?.[idx]?.timeout || ""
+                return slot
+            }
+            slot.start = ""
+            slot.end = ""
+            return slot
+        })
+        console.log("newSch", newSch)
+
+        setSchedule(newSch)
+        setVideoFees(doctorData?.doctorvd?.[0]?.fees || "")
+    }, [doctorData])
+
 
     // Initial Load
     useEffect(() => {
@@ -88,21 +121,17 @@ export const Profile = () => {
     const fetchInitialData = async () => {
         try {
             setLoading(true);
-            const [citiesRes, specRes, degreeRes, instRes, desigRes, hosRes] = await Promise.all([
-                axios.get("/api/v1/cities/get-cities"),
-                axios.get("/api/v1/specializations/get-specializations"),
+            const [ degreeRes, instRes, desigRes, docRes] = await Promise.all([
                 axios.get("/api/v1/degrees/get-degrees"),
                 axios.get("/api/v1/institutes/get-institutes"),
                 axios.get("/api/v1/designations/get-designations"),
-                axios.get("/api/v1/hospitals/get-hospitals"),
+                // axios.get(`/api/v1/doctors/get-doctor/${doctor?.dr}`),
             ]);
 
-            setCities(citiesRes.data.cities);
-            setSpecializations(specRes.data.specializations);
             setQualifications(degreeRes.data.degrees);
             setInstitutes(instRes.data.institutes);
             setDesignations(desigRes.data.designations)
-            setHospitals(hosRes.data.hospitals)
+            // setDocExp(docRes.data.doctorexp)
         } catch (error) {
             toast.error("Error fetching initial data");
         } finally {
@@ -124,43 +153,29 @@ export const Profile = () => {
         }
     };
 
-    const setDelete = () => {
-        console.log("setDelete Called")
-        setCanDelete(true)
-        submit()
-    }
-
     // Save doctor info to backend
     const submit = async () => {
-        console.log(canDelete)
         try {
-            if (!canDelete) {
-                const city = cities.find((c) => c.city_name === personalInfo.city);
-                const spec = specializations.find(
-                    (s) => s.Specialization_name === personalInfo.specialization
-                );
 
-                const resp = await axios.post("/api/v1/doctors/edit-doctor", {
-                    dr: doctor.dr,
-                    city_code: city?.city_code,
-                    specialization_code: spec?.Specialization_code,
-                    about: personalInfo.about,
-                    image: personalInfo.selectedImage,
-                });
+            const city = cities.find((c) => c.city_name === personalInfo.city);
+            const spec = specializations.find(
+                (s) => s.Specialization_name === personalInfo.specialization
+            );
 
-                if (resp.data.success) toast.success("Profile updated successfully");
-            } else {
-                const resp = await axios.post("/api/v1/doctors/edit-doctor", {
-                    dr: doctor.dr,
-                    canDelete
-                })
+            const resp = await axios.post("/api/v1/doctors/edit-doctor", {
+                dr: doctor.dr,
+                city_code: city?.city_code,
+                specialization_code: spec?.Specialization_code,
+                about: personalInfo.about,
+                image: personalInfo.selectedImage,
+            });
 
-                if (resp.data.success) toast.success("Profile deleted successfully");
+            if (resp.data.success) {
+                // toast.success("Profile updated successfully");
             }
+
         } catch (error) {
             toast.error("Error updating profile");
-        } finally {
-            setCanDelete(false)
         }
     };
 
@@ -169,13 +184,24 @@ export const Profile = () => {
             const resp = await axios.post("/api/v1/doctors/delete-doctor", {
                 dr: doctor.dr
             })
-            if (resp.data.success) toast.success("Profile deleted successfully");
+            if (resp.data.success) {
+
+                localStorage.setItem("personalInfo", JSON.stringify({
+                    city: "",
+                    specialization: "",
+                    about: "",
+                    selectedImage: null,
+                }))
+
+                localStorage.setItem("profileImage", "")
+
+                toast.success("Profile deleted successfully");
+            }
 
         } catch (error) {
             toast.error("Cannot delete the info")
         }
     }
-
 
     const saveQDToDB = async () => {
         const newArr = rows.map(item => {
@@ -194,7 +220,9 @@ export const Profile = () => {
                 qualifications: newArr
             })
 
-            if (resp.data.success) toast.success("Profile updated successfully");
+            if (resp.data.success) {
+                // toast.success("Profile updated successfully");
+            }
         } catch (error) {
             toast.error("Error updating profile");
         }
@@ -202,12 +230,17 @@ export const Profile = () => {
 
     const deleteQualifications = async () => {
         try {
-            axios.post("/api/v1/doctors/delete-doctorqd", {
-                dr: doctor.dr,
-                qualifications
+            const resp = await axios.post("/api/v1/doctors/delete-doctorqd", {
+                dr: doctor.dr
             })
-        } catch (error) {
 
+            if (resp.data.success) {
+                localStorage.setItem("rows", JSON.stringify([{ institute: "", degree: "" }]))
+                toast.success("Deleted")
+            }
+        } catch (error) {
+            toast.error("Error while deleting")
+            console.log("Error while deleting", error)
         }
     }
 
@@ -221,11 +254,14 @@ export const Profile = () => {
                 videoFees,
             })
 
-            if (resp.data.success) toast.success("Profile updated successfully");
+            if (resp.data.success) {
+                // toast.success("Profile updated successfully");
+            }
         } catch (error) {
             toast.error("Error updating profile");
         }
     }
+
     const saveHDToDB = async () => {
         const newHosBlock = hospitalBlocks.map(hos => {
             const hosObj = hospitals.find(hosp => hosp.hospital_name == hos.hospital)
@@ -238,8 +274,6 @@ export const Profile = () => {
                 fees: hos.fees,
                 schedule: hos.schedule
             }
-
-
         })
 
         try {
@@ -249,11 +283,15 @@ export const Profile = () => {
 
             })
 
-            if (resp.data.success) toast.success("Profile updated successfully");
+            if (resp.data.success) {
+                localStorage.setItem("hospitals_schedules", JSON.stringify(hospitalBlocks))
+                // toast.success("Profile updated successfully")
+            }
         } catch (error) {
             toast.error("Error updating profile");
         }
     }
+
     const saveExpToDB = async () => {
         const newExp = experience.map(exp => {
             const hosObj = hospitals.find(hosp => hosp.hospital_name == exp.hospital)
@@ -276,7 +314,10 @@ export const Profile = () => {
 
             })
 
-            if (resp.data.success) toast.success("Profile updated successfully");
+            if (resp.data.success) {
+                localStorage.setItem("rows2", JSON.stringify(experience))
+                // toast.success("Profile updated successfully");
+            }
         } catch (error) {
             toast.error("Error updating profile");
         }
@@ -287,30 +328,146 @@ export const Profile = () => {
         toast.success("Saved")
     }
 
-    console.log("hos blocks from profile", hospitalBlocks)
+    // console.log("hos blocks from profile", hospitalBlocks)
+
+    const deleteDoctorVD = async () => {
+        try {
+            const resp = await axios.post("/api/v1/doctors/delete-doctorvd", {
+                dr: doctor.dr
+            })
+
+            if (resp.data.success) {
+                localStorage.setItem("video time", JSON.stringify(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => ({
+                    day,
+                    start: "",
+                    end: "",
+                }))))
+                localStorage.setItem("video fees", "")
+                toast.success("Deleted")
+            }
+        } catch (error) {
+            toast.error("Error while deleting")
+            console.log("Error while deleting", error)
+        }
+    }
+
+    function hasEmptyProperties(arrayOfObjects) {
+        for (const obj of arrayOfObjects) {
+            for (const key in obj) {
+                if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                    const value = obj[key];
+
+                    // Check for various definitions of "empty"
+                    if (value === null || value === undefined || value === "") {
+                        return true; // Found an empty property
+                    }
+
+                    // Check if it's an empty array
+                    if (Array.isArray(value) && value.length === 0) {
+                        return true; // Found an empty array property
+                    }
+
+                    // Check if it's an empty object (only if it's an object and not null/undefined)
+                    if (typeof value === 'object' && value !== null && Object.keys(value).length === 0) {
+                        return true; // Found an empty object property
+                    }
+                }
+            }
+        }
+        return false; // No empty properties found in any object
+    }
+
+    function hasEmptyPropertiesInObj(obj) {
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                const value = obj[key];
+                if (value === null || value === undefined || value === "") {
+                    return true; // Found an empty property
+                }
+            }
+        }
+        return false; // No empty properties found
+    }
+
+    const handleAllSave = async () => {
+        try {
+            await submit()
+            await saveQDToDB()
+            await saveVDToDB()
+            await saveHDToDB()
+            await saveExpToDB()
+
+            toast.success("Saved successfuly")
+        } catch (error) {
+            toast.error("Cannot save to database")
+            console.log("Error while saving the details", error)
+        }
+    }
+
+    const handleFocus = () => {
+        console.log("onFocus running")
+
+        if (!hasEmptyPropertiesInObj()) {
+            localStorage.setItem("personalInfo", JSON.stringify(personalInfo))
+            // toast.success("Saved")
+        }
+
+        if (videoFees) {
+            console.log("video timing save running", schedule, videoFees)
+
+            localStorage.setItem("video time", JSON.stringify(schedule))
+            localStorage.setItem("video fees", videoFees)
+            // toast.success("Saved")
+        }
+
+
+        const newBlock = hospitalBlocks.filter(block => {
+            if (block.fees != "" && block.hospital != "" && block.designation != "") return block
+
+        })
+
+        // console.log(newBlock.length, newBlock)
+
+        if (newBlock.length > 0) {
+            localStorage.setItem(
+                `hospitals_schedules`,
+                JSON.stringify(hospitalBlocks)
+            );
+            // toast.success("Saved Schedule");
+        }
+
+
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 py-6 px-4">
             <ToastContainer />
             <div className="max-w-96 md:max-w-5xl  mx-auto bg-white p-6 rounded-2xl shadow-lg">
+                <BackButton />
                 {/* Doctor Header */}
-                <div className="flex items-center gap-6 border-b pb-6 mb-6">
-                    <div className="w-24 h-24 rounded-full overflow-hidden border">
-                        <img
-                            src={personalInfo?.selectedImage || "/placeholder.png"}
-                            alt="Doctor"
-                            className="w-full h-full object-cover"
-                        />
-                    </div>
-                    <div>
-                        {/* {doctor?.map((doc) => ( */}
-                        <div key={doctor.dr}>
-                            <h1 className="text-2xl font-bold">{doctor.name}</h1>
-                            <p className="text-sm text-gray-600">{doctor.email}</p>
-                            <p className="text-sm text-gray-600">{doctor.phone}</p>
+                <div className="flex items-center justify-between mr-5 gap-6 border-b pb-6 mb-6">
+                    <div className="flex items-center gap-6">
+                        <div className="w-24 h-24 rounded-full overflow-hidden border">
+                            <img
+                                src={personalInfo?.selectedImage || "/placeholder.png"}
+                                alt="Doctor"
+                                className="w-full h-full object-cover"
+                            />
                         </div>
-                        {/* ))} */}
+                        <div>
+                            {/* {doctor?.map((doc) => ( */}
+                            <div key={doctor.dr}>
+                                <h1 className="text-2xl font-bold">{doctor.name}</h1>
+                                <p className="text-sm text-gray-600">{doctor.email}</p>
+                                <p className="text-sm text-gray-600">{doctor.phone}</p>
+                            </div>
+                            {/* ))} */}
+                        </div>
                     </div>
+                    <div className="">
+                        <button className="py-1 px-3 bg-blue-400 text-white rounded " onClick={handleAllSave}>Save</button>
+                    </div>
+
                 </div>
 
                 {/* Personal Information */}
@@ -379,7 +536,7 @@ export const Profile = () => {
                         >
                             Upload Profile Image
                         </button>
-                        <button
+                        {/* <button
                             className="bg-blue-600 text-white px-4 py-2 rounded-md"
                             onClick={() => {
                                 localStorage.setItem("personalInfo", JSON.stringify(personalInfo))
@@ -387,14 +544,14 @@ export const Profile = () => {
                             }}
                         >
                             Save
-                        </button>
+                        </button> */}
                         {/* Submit */}
                         {/* <div className="text-right mt-6"> */}
                         <button
                             onClick={submit}
                             className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg"
                         >
-                            Save to Database
+                            Save
                         </button>
                         {/* </div> */}
                         <button
@@ -418,6 +575,7 @@ export const Profile = () => {
                                     name="institute"
                                     className="border rounded-lg p-2"
                                     value={row.institute}
+                                    onFocus={handleFocus}
                                     onChange={(e) => {
                                         const updated = [...rows];
                                         updated[idx].institute = e.target.value;
@@ -436,6 +594,7 @@ export const Profile = () => {
                                     name="degree"
                                     className="border rounded-lg p-2"
                                     value={row.degree}
+                                    onFocus={handleFocus}
                                     onChange={(e) => {
                                         const updated = [...rows];
                                         updated[idx].degree = e.target.value;
@@ -456,28 +615,28 @@ export const Profile = () => {
                     <div className="flex gap-2">
                         <button
                             className="bg-blue-500 text-white px-4 py-2 rounded-md"
-                            onClick={() => setRows([...rows, { id: id++,institute: "", degree: "" }])}
+                            onClick={() => {
+                                localStorage.setItem("rows", JSON.stringify(rows))
+                                setRows([...rows, { institute: "", degree: "" }])
+                            }}
                         >
                             Add More
                         </button>
-                        <button
+                        {/* <button
                             className="bg-blue-500 text-white px-4 py-2 rounded-md"
                             onClick={saveQualifications}
                         >
                             save
-                        </button>
+                        </button> */}
                         <button
                             className="bg-blue-500 text-white px-4 py-2 rounded-md"
                             onClick={saveQDToDB}
                         >
-                            save to database
+                            save
                         </button>
                         <button
                             className="bg-red-600 text-white px-4 py-2 rounded-md"
-                            onClick={() => {
-                                localStorage.setItem("rows", JSON.stringify([{ institute: "", degree: "" }]))
-                                toast.success("Deleted")
-                            }}
+                            onClick={deleteQualifications}
                         >
                             delete
                         </button>
@@ -535,7 +694,7 @@ export const Profile = () => {
 
                     </div>
                     <div className="max-w-md mx-auto flex justify-center items-center gap-2 mt-4">
-                        <button
+                        {/* <button
                             onClick={() => {
                                 localStorage.setItem("video time", JSON.stringify(schedule))
                                 localStorage.setItem("video fees", videoFees)
@@ -544,20 +703,16 @@ export const Profile = () => {
                             className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
                         >
                             Save Schedule
-                        </button>
+                        </button> */}
                         <button
                             onClick={saveVDToDB}
                             className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
                         >
-                            Save to Database
+                            Save
                         </button>
                         <button
                             className="bg-red-600 text-white px-4 py-2 rounded-md"
-                            onClick={() => {
-                                localStorage.setItem("video time", "")
-                                localStorage.setItem("video fees", "")
-                                toast.success("Deleted")
-                            }}
+                            onClick={deleteDoctorVD}
                         >
                             delete
                         </button>
@@ -571,6 +726,8 @@ export const Profile = () => {
                     hospitalBlocks={hospitalBlocks}
                     setHospitalBlocks={setHospitalBlocks}
                     saveHDToDB={saveHDToDB}
+                    handleFocus={handleFocus}
+                    dr={doctor.dr}
                 />
 
                 {/* Experience */}
@@ -579,6 +736,9 @@ export const Profile = () => {
                     designations={designations}
                     handleRows2fromDocExperience={(rows2) => setExperience(rows2)}
                     saveExpToDB={saveExpToDB}
+                    handleFocus={handleFocus}
+                    docExperience={docExp}
+                    dr={doctor.dr}
                 />
 
 

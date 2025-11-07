@@ -5,10 +5,10 @@ import { ToastContainer, toast } from 'react-toastify';
 
 export const JoinasDoctor = () => {
     const [doctor, setDoctor] = useState({
-        name: "Zafar Ahmed",
-        email: "zafar@gmail.com",
-        phone: "456762129",
-        password: "12345"
+        name: "",
+        email: "",
+        phone: "",
+        password: ""
     })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
@@ -44,13 +44,13 @@ export const JoinasDoctor = () => {
             <div className='w-[80%] lg:h-[90%] p-3 flex flex-col lg:flex-row  my-3'>
                 <div className='flex flex-col justify-center lg:self-center h-full gap-3 lg:w-1/2'>
                     <div>
-                        <h1 className='text-3xl text-[#373f50] font-semibold'>Welcome to Pakistan's Largest Network of Patients</h1>
+                        <h1 className='text-3xl text-[#373f50] font-semibold'>Welcome to Largest Network of Patients</h1>
 
                     </div>
                     <ul>
                         <li>Create your profile and get instant appointments</li>
                         <li>Setup your online practice clinic</li>
-                        <li>Establish online word of mouth</li>
+                        <li>Consult patients online from anywhere</li>              
                         <li>Manage your schedule efficiently</li>
                     </ul>
                 </div>
@@ -65,7 +65,7 @@ export const JoinasDoctor = () => {
                             error && <p className='text-red-500'>{error}</p>
                         }
                         {/* <input type="button" value={loading ? "Loading..." : "Create Your Profile"} className='bg-[#90fbcd] text-white py-3 px-3 w-[80%] rounded-md'/> */}
-                        <button type='submit' className='bg-[#42d697] text-white py-3 px-3 w-[80%] rounded-md'>{loading ? "Loading..." : "Create Your Profile"}</button>
+                        <button type='submit' className='bg-[#42d697] text-black font-bold py-3 px-3 w-[80%] rounded-md'>{loading ? "Loading..." : "Submit"}</button>
                         <p className=" text-center text-gray-600">
                             Already have an account? {" "}
                             <Link to="/login" className="text-blue-600 font-semibold hover:underline">
