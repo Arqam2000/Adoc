@@ -17,19 +17,58 @@ const DoctorsList = () => {
 
   const [experiences] = useExperience(doctorExp, doctors)
 
-  console.log("experiences from DoctorsList", experiences)
+  // console.log("experiences from DoctorsList", experiences)
 
   const location = useLocation()
 
-  // console.log(location.state)
+  console.log("location.state", location.state)
 
   let specializationName;
+  let cityName;
+  let filteredBySpecialization = [];
+  let filteredByCity = [];
+  let filteredByCityAndSpec = [];
+  let filterByOnCallDoctor = [];
+  let filterByVideoConsultation = [];
+
+  if (location.state?.OnCallDoctor) {
+    filterByOnCallDoctor = doctors?.filter(doc => doc.appointment_type === "Walk in" || doc.appointment_type === "Both")
+
+    console.log("filterByOnCallDoctor ", filterByOnCallDoctor)
+  }
+
+  if (location.state?.videoConsultation) {
+    filterByVideoConsultation = doctors?.filter(doc => doc["is available for free video consultation"] === "Yes")
+
+    console.log("filterByVideoConsultation ", filterByVideoConsultation)
+  }
+
+  if (location.state?.city && location.state?.specialization) {
+    cityName = location.state.city;
+    specializationName = location.state.specialization;
+
+    filteredByCityAndSpec = doctors?.filter(doc => doc.city_name === cityName && doc.Specialization_name === specializationName)
+
+
+    console.log("filteredByCityAndSpec ", filteredByCityAndSpec)
+
+  } 
+  if (location.state?.city) {
+    cityName = location.state?.city;
+    filteredByCity = doctors?.filter(doc => doc.city_name === cityName)
+
+    console.log("filteredByCity ", filteredByCity)
+
+  } 
+  if (location.state?.specialization) {
+    specializationName = location.state?.specialization;
+    filteredBySpecialization = doctors?.filter(doc => doc.Specialization_name === specializationName)
+    console.log("filteredBySpecialization ", filteredBySpecialization)
+
+
+  }
 
   useEffect(() => {
-    if (location.state) {
-      specializationName = location.state.name
-      // console.log("sp name", specializationName)
-    }
 
     getAllDoctors()
 
@@ -57,8 +96,8 @@ const DoctorsList = () => {
     }
   }
   console.log("doctors from DoctorsList", doctors)
-  console.log("doctorExp from DoctorsList", doctorExp)
-  console.log("doctorExp from DoctorsList", JSON.stringify(doctorExp))
+  // console.log("doctorExp from DoctorsList", doctorExp)
+  // console.log("doctorExp from DoctorsList", JSON.stringify(doctorExp))
 
   return (
     <div className='w-7xl mx-auto mt-4'>
@@ -76,24 +115,191 @@ const DoctorsList = () => {
 
 
       <div className='grid lg:grid-cols-3 grid-cols-1 gap-2 mx-auto p-2 my-2'>
+        {/* {
+          filteredByCityAndSpec.length > 0 ? 
+            filteredByCityAndSpec.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
+              <DoctorCard
+                key={dr}
+                dr={dr}
+                picture={picture}
+                name={name}
+                specialization={Specialization_name} pmdc_verification={pmdc_verification}
+                qualifications={qualifications}
+                // experience={experiences[index]?.experience} 
+                experience={experiences[index]}
+                review={reviews?.[index]}
+                fees={fees}
+                // specializationName={specializationName || ""} 
+                hospitals={hospitals?.[index]?.hospitalDetails}
+                videoTimings={videoTimings?.[index]?.videoDetails}
+              />
+            )) : filteredByCity.length === 0 ? filteredBySpecialization?.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
+            <DoctorCard
+              key={dr}
+              dr={dr}
+              picture={picture}
+              name={name}
+              specialization={Specialization_name}
+              pmdc_verification={pmdc_verification}
+              qualifications={qualifications}
+              // experience={experiences[index]?.experience} 
+              experience={experiences[index]}
+              review={reviews?.[index]}
+              fees={fees}
+              // specializationName={specializationName || ""} 
+              hospitals={hospitals?.[index]?.hospitalDetails}
+              videoTimings={videoTimings?.[index]?.videoDetails}
+            />
+          )) : filteredByCity?.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
+            <DoctorCard
+              key={dr}
+              dr={dr}
+              picture={picture}
+              name={name}
+              specialization={Specialization_name}
+              pmdc_verification={pmdc_verification}
+              qualifications={qualifications}
+              // experience={experiences[index]?.experience} 
+              experience={experiences[index]}
+              review={reviews?.[index]}
+              fees={fees}
+              // specializationName={specializationName || ""} 
+              hospitals={hospitals?.[index]?.hospitalDetails}
+              videoTimings={videoTimings?.[index]?.videoDetails}
+            />
+          ))
+        } */}
+
         {
-          doctors?.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
-            <DoctorCard 
-            key={dr} 
-            dr={dr} 
-            picture={picture} 
-            name={name} 
-            specialization={Specialization_name} pmdc_verification={pmdc_verification} 
-            qualifications={qualifications} 
-            // experience={experiences[index]?.experience} 
-            experience={experiences[index]} 
-            review={reviews?.[index]} 
-            fees={fees} 
-            specializationName={specializationName || ""} hospitals={hospitals?.[index]?.hospitalDetails}
-            videoTimings={videoTimings?.[index]?.videoDetails}
+          filterByOnCallDoctor.length > 0 && filterByOnCallDoctor.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
+            <DoctorCard
+              key={dr}
+              dr={dr}
+              picture={picture}
+              name={name}
+              specialization={Specialization_name}
+              pmdc_verification={pmdc_verification}
+              qualifications={qualifications}
+              // experience={experiences[index]?.experience} 
+              experience={experiences[index]}
+              review={reviews?.[index]}
+              fees={fees}
+              // specializationName={specializationName || ""} 
+              hospitals={hospitals?.[index]?.hospitalDetails}
+              videoTimings={videoTimings?.[index]?.videoDetails}
             />
           ))
         }
+
+        {
+          filterByVideoConsultation.length > 0 && filterByVideoConsultation?.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
+            <DoctorCard
+              key={dr}
+              dr={dr}
+              picture={picture}
+              name={name}
+              specialization={Specialization_name}
+              pmdc_verification={pmdc_verification}
+              qualifications={qualifications}
+              // experience={experiences[index]?.experience} 
+              experience={experiences[index]}
+              review={reviews?.[index]}
+              fees={fees}
+              // specializationName={specializationName || ""} 
+              hospitals={hospitals?.[index]?.hospitalDetails}
+              videoTimings={videoTimings?.[index]?.videoDetails}
+            />
+          ))
+        }
+
+        {
+          filteredByCityAndSpec.length > 0 && filteredByCityAndSpec.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
+              <DoctorCard
+                key={dr}
+                dr={dr}
+                picture={picture}
+                name={name}
+                specialization={Specialization_name} pmdc_verification={pmdc_verification}
+                qualifications={qualifications}
+                // experience={experiences[index]?.experience} 
+                experience={experiences[index]}
+                review={reviews?.[index]}
+                fees={fees}
+                // specializationName={specializationName || ""} 
+                hospitals={hospitals?.[index]?.hospitalDetails}
+                videoTimings={videoTimings?.[index]?.videoDetails}
+              />
+            ))
+        }
+
+
+        {
+          filteredByCity.length > 0 && filteredByCity?.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
+            <DoctorCard
+              key={dr}
+              dr={dr}
+              picture={picture}
+              name={name}
+              specialization={Specialization_name}
+              pmdc_verification={pmdc_verification}
+              qualifications={qualifications}
+              // experience={experiences[index]?.experience} 
+              experience={experiences[index]}
+              review={reviews?.[index]}
+              fees={fees}
+              // specializationName={specializationName || ""} 
+              hospitals={hospitals?.[index]?.hospitalDetails}
+              videoTimings={videoTimings?.[index]?.videoDetails}
+            />
+          ))
+        }
+
+        {
+          filteredBySpecialization.length > 0 && filteredBySpecialization?.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
+            <DoctorCard
+              key={dr}
+              dr={dr}
+              picture={picture}
+              name={name}
+              specialization={Specialization_name}
+              pmdc_verification={pmdc_verification}
+              qualifications={qualifications}
+              // experience={experiences[index]?.experience} 
+              experience={experiences[index]}
+              review={reviews?.[index]}
+              fees={fees}
+              // specializationName={specializationName || ""} 
+              hospitals={hospitals?.[index]?.hospitalDetails}
+              videoTimings={videoTimings?.[index]?.videoDetails}
+            />
+          ))
+        }
+
+        {
+          
+          filteredBySpecialization.length === 0 && filteredByCity.length === 0 && filteredByCityAndSpec.length === 0 && filterByOnCallDoctor.length === 0 && filterByVideoConsultation.length === 0 && doctors.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
+            <DoctorCard
+              key={dr}
+              dr={dr}
+              picture={picture}
+              name={name}
+              specialization={Specialization_name}
+              pmdc_verification={pmdc_verification}
+              qualifications={qualifications}
+              // experience={experiences[index]?.experience} 
+              experience={experiences[index]}
+              review={reviews?.[index]}
+              fees={fees}
+              // specializationName={specializationName || ""} 
+              hospitals={hospitals?.[index]?.hospitalDetails}
+              videoTimings={videoTimings?.[index]?.videoDetails}
+            />
+          ))
+        
+        }
+
+        
+        
 
       </div>
     </div>

@@ -3,7 +3,7 @@ import useCities from '../../hooks/useCities'
 import useSpecializations from '../../hooks/useSpecializations'
 import useHospitals from '../../hooks/useHospitals'
 
-const Search = () => {
+const Search = ({city, setCity, specialization, setSpecialization}) => {
   const {cities} = useCities()
   const {specializations} = useSpecializations()
   const {hospitals} = useHospitals()
@@ -20,7 +20,7 @@ const Search = () => {
       </div> */}
             <h1 className='font-bold text-lg text-[#3A3A3A] mt-2'>Find the best doctor near you</h1>
             <div className='w-6xl mx-auto outline outline-[#ADADAD] border-[#ADADAD] px-2 rounded-lg shadow-md grid grid-cols-[1fr_1fr_1fr_1fr_auto] my-7 h-10 items-center bg-white'>
-                <select className='border-r border-r-[#ADADAD] outline-none text-base text-[#495057]'>
+                <select className='border-r border-r-[#ADADAD] outline-none text-base text-[#495057]' value={city} onChange={(e) => setCity(e.target.value)}>
                     <option value="City">Enter City</option>
                     {
                       cities?.map(city => (
@@ -28,8 +28,8 @@ const Search = () => {
                       ))
                     }
                 </select>
-                <select className='border-r border-r-[#ADADAD] outline-none text-base text-[#495057]'>
-                    <option value="Specialization">Specialization</option>
+                <select className='border-r border-r-[#ADADAD] outline-none text-base text-[#495057]' value={specialization} onChange={(e) => setSpecialization(e.target.value)}>
+                    <option value="Specialization">Enter Specialization</option>
                     {
                       specializations?.map(spec => (
                         <option 

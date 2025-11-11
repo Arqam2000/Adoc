@@ -21,7 +21,7 @@ const DoctorCard = ({
 
   const navigate = useNavigate()
 
-  console.log("experience in DoctorCard", experience)
+  // console.log("experience in DoctorCard", experience)
 
   const calculateAvailability = () => {
     // JS getDay(): 0=Sun, 1=Mon, ..., 6=Sat
@@ -113,7 +113,8 @@ const DoctorCard = ({
         <div className='flex flex-col gap-2'>
           <h2 className='underline font-semibold'>{name}</h2>
           <h2 className='underline font-semibold'>PMDC {pmdc_verification?.charAt(0).toUpperCase() + pmdc_verification?.slice(1)}</h2>
-          <h2 className='text-xs'>{specializationName ? specializationName : specialization}</h2>
+          {/* <h2 className='text-xs'>{specializationName ? specializationName : specialization}</h2> */}
+          <h2 className='text-xs'>{specialization}</h2>
           <h2 className='text-xs'>{qualifications}</h2>
           <div className='flex justify-between mb-3'>
             <div>
