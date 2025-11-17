@@ -4,7 +4,8 @@ import { Link, useNavigate } from 'react-router-dom'
 const DoctorCard = ({ 
   dr, 
   picture, 
-  name, 
+  name,
+  phone, 
   specialization, 
   experience, 
   review, 
@@ -100,6 +101,12 @@ const DoctorCard = ({
     calculateAvailability()
   }, [hospitals])
 
+
+  const handleCall = () => {
+    const formattedPhoneNumber = `+${phone?.replace(/\D/g, '')}`; 
+    window.open(`https://wa.me/${formattedPhoneNumber}`, '_blank');
+  }
+
   return (
     <div className='p-2 rounded-md bg-white w-sm text-black shadow-md flex flex-col justify-center'>
       <div className='flex gap-3'>
@@ -193,7 +200,7 @@ const DoctorCard = ({
       </div>
       <div className='flex flex-col gap-2'>
         <div className='grid grid-cols-3 gap-2'>
-          <button className='px-2 py-1 rounded bg-green-500 cursor-pointer text-white'>Call Now</button>
+          <button className='px-2 py-1 rounded bg-green-500 cursor-pointer text-white' onClick={handleCall}>Call Now</button>
           <button className='px-2 py-1 rounded bg-green-500 cursor-pointer text-white' onClick={() => {
             navigate("/book-appointment", { state: { videoTimings: videoAvailability, mode: "video" } })
 

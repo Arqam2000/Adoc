@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
 import useDoctor from '../context/DoctorContext'
 
@@ -13,6 +13,10 @@ export const Login = () => {
     })
 
     const navigate = useNavigate()
+    const location = useLocation()
+
+    console.log("location", location)
+    console.log("state", location.state)
 
     const {setDoctorData} = useDoctor()
 
@@ -22,6 +26,7 @@ export const Login = () => {
         setLoading(true)
         setError(null)
 
+      if(location.pathname === "/login") {
         axios.post("/api/v1/doctors/login", {...user})
         .then(res => {
             console.log("response", res.data)
@@ -35,6 +40,22 @@ export const Login = () => {
             setError(err.response.data.message)
         })
         .finally(() => setLoading(false))
+
+      } else if(location.pathname === "/login/patient") {
+        axios.post("/api/v1/patients/login", {...user})
+        .then(res => {
+            console.log("response", res.data)
+            toast.success(res.data.message)
+            localStorage.setItem("patientId", JSON.stringify(res.data.patient.patient))
+            navigate(`/`)
+        })
+        .catch(err => {
+            console.log("Error:", err)
+            toast.error(err.response?.data?.message)
+            setError(err.response?.data?.message)
+        })
+        .finally(() => setLoading(false))
+      }
     }
     // useEffect(() => {
         
@@ -46,7 +67,7 @@ export const Login = () => {
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-6">
                 <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
                     <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-                        Welcome Back
+                        {location.pathname === "/login" ? "Welcome Back Doctor" : "Welcome Back Patient"}
                     </h2>
                     <p className="text-center text-gray-500 mb-8">
                         Please login to your account
@@ -100,7 +121,7 @@ export const Login = () => {
 
                     <p className="mt-6 text-center text-gray-600">
                         Don’t have an account? {" "}
-                        <Link to="/register/doctor" className="text-blue-600 font-semibold hover:underline">
+                        <Link to="/register/patient" className="text-blue-600 font-semibold hover:underline">
                             Sign Up
                         </Link>
                     </p>

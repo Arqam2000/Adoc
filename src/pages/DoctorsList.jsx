@@ -171,12 +171,13 @@ const DoctorsList = () => {
         } */}
 
         {
-          filterByOnCallDoctor.length > 0 && filterByOnCallDoctor.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
+          filterByOnCallDoctor.length > 0 && filterByOnCallDoctor.map(({ dr, name, phone, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
             <DoctorCard
               key={dr}
               dr={dr}
               picture={picture}
               name={name}
+              phone={phone}
               specialization={Specialization_name}
               pmdc_verification={pmdc_verification}
               qualifications={qualifications}
@@ -192,12 +193,13 @@ const DoctorsList = () => {
         }
 
         {
-          filterByVideoConsultation.length > 0 && filterByVideoConsultation?.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
+          filterByVideoConsultation.length > 0 && filterByVideoConsultation?.map(({ dr, name, phone, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
             <DoctorCard
               key={dr}
               dr={dr}
               picture={picture}
               name={name}
+              phone={phone}
               specialization={Specialization_name}
               pmdc_verification={pmdc_verification}
               qualifications={qualifications}
@@ -213,12 +215,13 @@ const DoctorsList = () => {
         }
 
         {
-          filteredByCityAndSpec.length > 0 && filteredByCityAndSpec.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
+          filteredByCityAndSpec.length > 0 && filteredByCityAndSpec.map(({ dr, name, phone, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
               <DoctorCard
                 key={dr}
                 dr={dr}
                 picture={picture}
                 name={name}
+                phone={phone}
                 specialization={Specialization_name} pmdc_verification={pmdc_verification}
                 qualifications={qualifications}
                 // experience={experiences[index]?.experience} 
@@ -234,12 +237,13 @@ const DoctorsList = () => {
 
 
         {
-          filteredByCity.length > 0 && filteredByCity?.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
+          filteredByCity.length > 0 && filteredByCity?.map(({ dr, name, phone, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
             <DoctorCard
               key={dr}
               dr={dr}
               picture={picture}
               name={name}
+              phone={phone}
               specialization={Specialization_name}
               pmdc_verification={pmdc_verification}
               qualifications={qualifications}
@@ -255,12 +259,13 @@ const DoctorsList = () => {
         }
 
         {
-          filteredBySpecialization.length > 0 && filteredBySpecialization?.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
+          filteredBySpecialization.length > 0 && filteredBySpecialization?.map(({ dr, name, phone, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
             <DoctorCard
               key={dr}
               dr={dr}
               picture={picture}
               name={name}
+              phone={phone}
               specialization={Specialization_name}
               pmdc_verification={pmdc_verification}
               qualifications={qualifications}
@@ -277,12 +282,13 @@ const DoctorsList = () => {
 
         {
           
-          filteredBySpecialization.length === 0 && filteredByCity.length === 0 && filteredByCityAndSpec.length === 0 && filterByOnCallDoctor.length === 0 && filterByVideoConsultation.length === 0 && doctors.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
+          filteredBySpecialization.length === 0 && filteredByCity.length === 0 && filteredByCityAndSpec.length === 0 && filterByOnCallDoctor.length === 0 && filterByVideoConsultation.length === 0 && doctors.map(({ dr, name, phone, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
             <DoctorCard
               key={dr}
               dr={dr}
               picture={picture}
               name={name}
+              phone={phone}
               specialization={Specialization_name}
               pmdc_verification={pmdc_verification}
               qualifications={qualifications}

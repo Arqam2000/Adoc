@@ -14,10 +14,13 @@ import { Link, useNavigate } from "react-router-dom";
 import useExperience from "../hooks/useExperience";
 import { toast, ToastContainer } from "react-toastify";
 import BackButton from "../components/BackButton";
+import VideoConsultation from "./VideoConsultation";
 
 export default function Dashboard() {
   const [appointments, setAppointments] = useState([]);
   const [remarks, setRemarks] = useState([]);
+  const [patientData, setPatientData] = useState({});
+  const [patientsWaiting, setPatientsWaiting] = useState(null);
 
   const { doctorData, setDoctorData, fetchDoctorData } = useDoctor();
   const navigate = useNavigate();
@@ -28,26 +31,69 @@ export default function Dashboard() {
 
   console.log("Doctor Data on Dashboard:", doctorData);
 
-  console.log("experiences from Dashboard", experiences)
+  // console.log("experiences from Dashboard", experiences)
+
+  const patientId = JSON.parse(localStorage.getItem("patientId"));
 
   useEffect(() => {
     const doctorId = JSON.parse(localStorage.getItem("doctorId"))
-    fetchDoctorData(doctorId);
+
+    if (!patientId && !doctorId) {
+      navigate("/login")
+    }
+    if (doctorId) {
+      fetchDoctorData(doctorId);
+    } else {
+      axios.get(`/api/v1/patients/${patientId}`)
+        .then(res => {
+          console.log("Patient data:", res.data.patient);
+          setPatientData(res.data.patient);
+        })
+        .catch(err => {
+          console.error("Error fetching patient data:", err);
+        })
+    }
 
     const storedRemarks = JSON.parse(localStorage.getItem("remarks")) || [];
     setRemarks(storedRemarks);
+
+
   }, [])
 
   useEffect(() => {
-    // fetch appointments
-    axios.get(`/api/v1/appointments/book/${doctorData?.doctor.dr}`)
-      .then(res => {
-        console.log("Appointments data:", res.data.appointments);
-        setAppointments(res.data.appointments);
+    console.log(patientId)
+
+    if (!patientId) {
+      axios.get(`/api/v1/appointments/book/${doctorData?.doctor?.dr}`)
+        .then(res => {
+          console.log("Appointments data:", res.data.appointments);
+          setAppointments(res.data.appointments);
+        })
+        .catch(err => {
+          console.log("Error fetching appointments:", err);
+        });
+    } else {
+      // axios.get(`/api/v1/patients/${patientId}`)
+      // .then(res => {
+      //   console.log("Patient data:", res.data.patient);
+      //   setDoctorData({patient: res.data.patient});
+      // })
+      // .catch(err => {
+      //   console.error("Error fetching patient data:", err);
+      // })
+      axios.post(`/api/v1/appointments/book/patient/${patientId}`, {
+
+        date: new Date()
       })
-      .catch(err => {
-        console.log("Error fetching appointments:", err);
-      });
+        .then(res => {
+          console.log("Appointments data:", res.data.appointments);
+          setAppointments([...res.data.appointments]);
+          setPatientsWaiting(res.data.patients_waiting)
+        })
+        .catch(err => {
+          console.log("Error fetching appointments:", err);
+        });
+    }
 
     window.scrollTo({
       top: 0,
@@ -57,7 +103,58 @@ export default function Dashboard() {
 
   }, [doctorData])
 
-  console.log("doctorExp from Dashboard", doctorData?.doctorexp)
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const patientId = JSON.parse(localStorage.getItem("patientId"));
+  //       console.log("patientId:", patientId);
+
+  //       if (!patientId) {
+  //         // fetch appointments of doctor only
+  //         const res = await axios.get(`/api/v1/appointments/book/${doctorData?.doctor?.dr}`);
+  //         console.log("Appointments data:", res.data.appointments);
+  //         setAppointments(res.data.appointments);
+  //       } else {
+  //         // fetch patient details
+  //         const patientRes = await axios.get(`/api/v1/patients/${patientId}`);
+  //         console.log("Patient data:", patientRes.data.patient);
+
+  //         setDoctorData(prev => ({
+  //           ...prev,
+  //           patient: patientRes.data.patient
+  //         }));
+
+  //         // fetch appointments for patient + by doctor
+  //         const apptRes = await axios.post(`/api/v1/appointments/book/patient/${patientId}`, {
+  //           date: new Date()
+  //         });
+
+  //         console.log("Appointments data:", apptRes.data.appointments);
+
+  //         setAppointments([
+  //           ...apptRes.data.appointments,
+  //           ...apptRes.data.appointmentsByDoctor
+  //         ]);
+  //         setAppointmentsByDoctor(apptRes.data.appointmentsByDoctor);
+  //       }
+
+  //       // Scroll
+  //       window.scrollTo({ top: 0, behavior: "smooth" });
+
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+
+  //   if (doctorData?.doctor?.dr) {
+  //     fetchData();
+  //   }
+  // }, [doctorData?.doctor?.dr]);
+
+
+  console.log("appointments", appointments)
+
+  // console.log("doctorExp from Dashboard", doctorData?.doctorexp)
 
   // Filter appointments into categories
   const {
@@ -84,11 +181,16 @@ export default function Dashboard() {
       if (apt.vc !== "no") {
         if (isToday(date)) {
           video.push({
+            bappoint: apt.bappoint,
             patient: `${apt.pname}`, // replace with actual patient name if available
             // time: format(date, "hh:mm a"),
+            doctor: apt.name,
+            dr_status: apt.dr_status || "open",
             time: format(date, "PPpp"),
+            phone: apt.pmobile,
             fees: apt.fees,
-            status: apt.done === "yes" ? "Completed" : (apt.done === null ? "Pending" : "Missed"),
+            // status: apt.done === "yes" ? "Completed" : (apt.done === null ? "Pending" : "Missed"),
+            status: apt.status === null ? "Pending" : apt.status,
 
           });
         } else if (isAfter(date, today)) {
@@ -100,9 +202,11 @@ export default function Dashboard() {
         } else {
           videoHistory.push({
             patient: `${apt.pname}`,
+            doctor: apt.name,
             time: format(date, "PPpp"),
             fees: apt.fees,
-            status: apt.done === "yes" ? "Completed" : "Missed",
+            // status: apt.done === "yes" ? "Completed" : "Missed",
+            status: apt.status,
             remarks: apt.drcoment || "",
           });
         }
@@ -123,15 +227,17 @@ export default function Dashboard() {
             patient: `${apt.pname}`,
             time: format(date, "PPpp"),
             fees: apt.fees,
-            status: apt.done === "yes" ? "Completed" : (apt.done === null ? "Pending" : "Missed"),
+            // status: apt.done === "yes" ? "Completed" : (apt.done === null ? "Pending" : "Missed"),
+            status: apt.status,
           });
         } else if (isBefore(date, today)) {
           history.push({
             hospital: `${apt.hospital_name}`,
             patient: `${apt.pname}`,
+            doctor: apt.name,
             time: format(date, "PPpp"),
             fees: apt.fees,
-            visited: apt.done === "yes" ? "Yes" : "No",
+            visited: apt.status !== "pending" && apt.status !== "missed" ? "Yes" : "No",
             remarks: apt.drcoment || "",
           });
         }
@@ -148,6 +254,8 @@ export default function Dashboard() {
     };
   }, [appointments]);
 
+  console.log("video consultations", videoConsultations)
+
   const logout = async () => {
     try {
       const resp = await axios.post("/api/v1/doctors/logout", {})
@@ -155,14 +263,18 @@ export default function Dashboard() {
       if (resp.data.success) {
         localStorage.removeItem("doctor");
         localStorage.removeItem("doctorId");
-        setDoctorData(null);
+        setDoctorData({});
         // setIsLoggedIn(0);
         toast.success(resp.data.message);
         navigate("/login");
       }
     } catch (error) {
       console.error("Logout error:", error);
-      toast.error("Logout failed. Please try again.");
+      // toast.error("Logout failed. Please try again.");
+      localStorage.removeItem("patientId");
+      // setIsLoggedIn(0);
+      setPatientData({});
+      navigate("/login");
     }
   }
 
@@ -185,9 +297,9 @@ export default function Dashboard() {
           <a href="#appointments" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
             <Calendar size={18} /> Appointments
           </a>
-          <a href="#video" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+          <Link to="/dashboard/video-consultation" state={{ historyVideo, videoConsultations, }} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
             <Video size={18} /> Video Consultations
-          </a>
+          </Link>
           <a href="#history" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
             <History size={18} /> History
           </a>
@@ -207,25 +319,29 @@ export default function Dashboard() {
       <main className="flex-1 p-8 space-y-8 overflow-y-auto">
         {/* Profile Card */}
         <BackButton />
-        <section id="profile" className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-xl font-semibold mb-4 border-b pb-2">Profile</h2>
-          <div className="flex items-center justify-between">
-            <div className="space-y-1 flex gap-3 items-center">
-              <div>
-                <img
-                  src={doctorData?.doctor?.picture}
-                  alt="Doctor"
-                  className="w-30 h-30 rounded-full object-cover border-4 border-green-500 shadow-md"
-                />
-              </div>
-              <div>
-                <p className="font-medium text-gray-800 text-lg">{doctorData?.doctor?.name}</p>
-                <p className="text-gray-500 text-sm">{doctorData?.doctor?.Specialization_name} | {doctorData?.doctor?.qualifications}</p>
-                <p className="text-gray-500 text-sm">{(experiences[0]?.years) ? `${experiences[0].years} years` : `${experiences[0]?.months} months`} of experience</p>
-                <p className="text-gray-500 text-sm">{doctorData?.doctor?.city_name}, {doctorData?.doctor?.country_name}</p>
-              </div>
-            </div>
-            {/* <div className="flex gap-3">
+        {
+          Object.keys(doctorData).length > 0 ? (
+            <section id="profile" className="bg-white rounded-xl shadow p-6">
+              <h2 className="text-xl font-semibold mb-4 border-b pb-2">Profile</h2>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1 flex gap-3 items-center">
+                  <div>
+                    <img
+                      src={doctorData?.doctor?.picture}
+                      alt="Doctor"
+                      className="w-30 h-30 rounded-full object-cover border-4 border-green-500 shadow-md"
+                    />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-800 text-lg">{doctorData?.doctor?.name}</p>
+
+                    {/* <p className="font-medium text-gray-800 text-lg">{doctorData?.patient?.pemail}</p> */}
+                    <p className="text-gray-500 text-sm">{doctorData?.doctor?.Specialization_name} | {doctorData?.doctor?.qualifications}</p>
+                    <p className="text-gray-500 text-sm">{(experiences[0]?.years) ? `${experiences[0].years} years` : `${experiences[0]?.months} months`} of experience</p>
+                    <p className="text-gray-500 text-sm">{doctorData?.doctor?.city_name}, {doctorData?.doctor?.country_name}</p>
+                  </div>
+                </div>
+                {/* <div className="flex gap-3">
                             <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
                                 View Profile
                             </button>
@@ -233,8 +349,30 @@ export default function Dashboard() {
                                 Edit Profile
                             </button>
                         </div> */}
-          </div>
-        </section>
+              </div>
+            </section>
+          ) : (
+            <section id="profile" className="bg-white rounded-xl shadow p-6">
+              <h2 className="text-xl font-semibold mb-4 border-b pb-2">Profile</h2>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1 flex gap-3 items-center">
+                  {/* <div>
+                    <img
+                      src={doctorData?.doctor?.picture}
+                      alt="Doctor"
+                      className="w-30 h-30 rounded-full object-cover border-4 border-green-500 shadow-md"
+                    />
+                  </div> */}
+                  <div>
+                    <p className="font-medium text-gray-800 text-lg">Name: <span>{patientData?.pname}</span></p>
+                    <p className="font-medium text-gray-800 text-lg">Phone: <span className="text-gray-800 text-base">{patientData?.pmobile}</span></p>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )
+        }
+
 
         {/* Appointment Status */}
         <section id="appointments" className="space-y-6">
@@ -276,6 +414,14 @@ export default function Dashboard() {
                   <thead>
                     <tr className="text-gray-600 border-b">
                       <th className="pb-2">Patient</th>
+                      {Object.keys(patientData).length > 0 &&
+                        <>
+                          <th className="pb-2">Doctor</th>
+                          <th className="pb-2">call</th>
+                          <th className="pb-2">Patients in Queue</th>
+                          <th className="pb-2">Doctor Status</th>
+                        </>
+                      }
                       <th className="pb-2">Time</th>
                       <th className="pb-2">Fees</th>
                       <th className="pb-2">status</th>
@@ -285,6 +431,15 @@ export default function Dashboard() {
                     {videoConsultations.map((vc, idx) => (
                       <tr key={idx} className="border-b text-sm">
                         <td className="py-2">{vc.patient}</td>
+                        {
+                          Object.keys(patientData).length > 0 &&
+                          <>
+                          <td className="py-2">{vc.doctor}</td>
+                          <td className="py-2"><button className="bg-blue-500 py-1 px-2 rounded text-white cursor-pointer">Call Doctor</button></td>
+                          <td className="py-2">{patientsWaiting}</td>
+                          <td className="py-2">{vc.dr_status}</td>
+                          </>
+                        }
                         <td className="py-2">{vc.time}</td>
                         <td className="py-2">{vc.fees}</td>
                         <td className="py-2">{vc.status}</td>
@@ -397,6 +552,7 @@ export default function Dashboard() {
                   <tr className="text-gray-600 border-b">
                     <th className="pb-2">Hospital</th>
                     <th className="pb-2">Patient</th>
+                    {Object.keys(patientData).length > 0 && <th className="pb-2">Doctor</th>}
                     <th className="pb-2">Time</th>
                     <th className="pb-2">Fees</th>
                     <th className="pb-2">Visited</th>
@@ -407,9 +563,10 @@ export default function Dashboard() {
                   {historyAppointments.map((apt, idx) => (
 
                     <tr key={idx} className="border-b text-sm">
-                      {console.log("historyAppointments", historyAppointments)}
+                      {/* {console.log("historyAppointments", historyAppointments)} */}
                       <td className="py-2">{apt.hospital}</td>
                       <td className="py-2">{apt.patient}</td>
+                      {Object.keys(patientData).length > 0 && <td className="py-2">{apt.doctor}</td>}
                       <td className="py-2">{apt.time}</td>
                       <td className="py-2">{apt.fees}</td>
                       <td className="py-2">{apt.visited}</td>
@@ -420,7 +577,7 @@ export default function Dashboard() {
                           setRemarks(newRemarks);
 
                           localStorage.setItem("remarks", JSON.stringify(newRemarks));
-                        }}/>
+                        }} />
                         <i className="fas fa-edit cursor-pointer" onClick={() => {
                           inputRefs.current[idx].disabled = !(inputRefs.current[idx].disabled);
                           inputRefs.current[idx].focus();
@@ -444,6 +601,7 @@ export default function Dashboard() {
                 <thead>
                   <tr className="text-gray-600 border-b">
                     <th className="pb-2">Patient</th>
+                    {Object.keys(patientData).length > 0 && <th className="pb-2">Doctor</th>}
                     <th className="pb-2">Time</th>
                     <th className="pb-2">Fees</th>
                     <th className="pb-2">Status</th>
@@ -454,6 +612,7 @@ export default function Dashboard() {
                   {historyVideo.map((vc, idx) => (
                     <tr key={idx} className="border-b text-sm">
                       <td className="py-2">{vc.patient}</td>
+                      {Object.keys(patientData).length > 0 && <td className="py-2">{vc.doctor}</td>}
                       <td className="py-2">{vc.time}</td>
                       <td className="py-2">{vc.fees}</td>
                       <td className="py-2">{vc.status}</td>
@@ -466,6 +625,8 @@ export default function Dashboard() {
               <p className="text-gray-500">No past video consultations.</p>
             )}
           </div>
+
+          {/* <VideoConsultation historyVideo={historyVideo} /> */}
         </section>
 
         {/* Reviews Section */}

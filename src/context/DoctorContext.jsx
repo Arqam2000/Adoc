@@ -53,7 +53,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 export const DoctorContext = createContext(null);
 
 export const DoctorProvider = ({ children }) => {
-  const [doctorData, setDoctorData] = useState(null);
+  const [doctorData, setDoctorData] = useState({});
   const [loading, setLoading] = useState(true);
 
   const fetchDoctorData = async (doctorId, abortController) => {

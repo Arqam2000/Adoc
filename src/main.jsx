@@ -27,6 +27,8 @@ import { Profile } from './pages/NewProfile.jsx';
 import InclinicAppointment from './components/InclinicAppointment.jsx';
 import { DoctorProvider } from './context/DoctorContext.jsx';
 import Dashboard from './pages/Dashboard.jsx';
+import VideoConsultation from './pages/VideoConsultation.jsx';
+import PatientSignup from './pages/PatientSignup.jsx';
 
 
 let router = createBrowserRouter([
@@ -95,6 +97,10 @@ let router = createBrowserRouter([
         Component: Login
       },
       {
+        path: "login/patient",
+        Component: Login
+      },
+      {
         path: "doctors",
         Component: DoctorsList
       },
@@ -104,12 +110,20 @@ let router = createBrowserRouter([
         Component: JoinasDoctor
       },
       {
+        path: "register/patient",
+        Component: PatientSignup
+      },
+      {
         path: "book-appointment",
         Component: InclinicAppointment
       },
       {
         path: "/dashboard",
         Component: Dashboard
+      },
+      {
+        path: "/dashboard/video-consultation",
+        Component: VideoConsultation
       },
     ]
   }
