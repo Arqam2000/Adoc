@@ -29,6 +29,9 @@ import { DoctorProvider } from './context/DoctorContext.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import VideoConsultation from './pages/VideoConsultation.jsx';
 import PatientSignup from './pages/PatientSignup.jsx';
+import PatientPortal from './components/patient_portal_react_tailwind.jsx';
+import PatientEditProfile from './pages/PatientEditProfile.jsx';
+import ChangePassword from './pages/ChangePassword.jsx';
 
 
 let router = createBrowserRouter([
@@ -124,6 +127,18 @@ let router = createBrowserRouter([
       {
         path: "/dashboard/video-consultation",
         Component: VideoConsultation
+      },
+      {
+        path: "/dashboard/patient-portal",
+        Component: PatientPortal
+      },
+      {
+        path: "/patient/edit-profile",
+        Component: PatientEditProfile
+      },
+      {
+        path: "/patient/change-password",
+        Component: ChangePassword
       },
     ]
   }

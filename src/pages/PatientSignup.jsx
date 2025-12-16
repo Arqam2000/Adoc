@@ -11,7 +11,9 @@ const PatientSignup = () => {
     name: "",
     email: "",
     phone: "",
-    password: ""
+    password: "",
+    bloodGroup: "",
+    gender: ""
   })
 
   const navigate = useNavigate()
@@ -44,7 +46,7 @@ const PatientSignup = () => {
     <div>
       <ToastContainer />
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-6">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
+        <div className="bg-white rounded-2xl shadow-2xl w-full lg:max-w-md lg:p-8 p-3">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
             Welcome Back
           </h2>
@@ -96,9 +98,25 @@ const PatientSignup = () => {
                 onChange={(e) => setUser({ ...user, password: e.target.value })}
               />
             </div>
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">Blood Group</label>
+              <input
+                type="text"
+                placeholder="Enter your blood group"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={user.bloodGroup}
+                onChange={(e) => setUser({ ...user, bloodGroup: e.target.value })}
+              />
+            </div>
+
+            <div className='flex gap-3'>
+              <label>Gender</label>
+              <label ><input type="radio" name="gender" id="gender" value="Male" onChange={e => setUser({...user, gender: e.target.value})}/> Male</label>
+              <label ><input type="radio" name="gender" id="gender" value="Female" onChange={e => setUser({...user, gender: e.target.value})}/> Female</label>
+            </div>
 
 
-            <div className="flex items-center justify-between text-sm text-gray-600">
+            <div className="flex flex-col md:flex-row md:items-center justify-between text-sm text-gray-600 gap-2">
               <label className="flex items-center space-x-2">
                 <input type="checkbox" className="rounded" />
                 <span>Remember me</span>

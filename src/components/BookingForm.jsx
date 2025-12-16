@@ -1,10 +1,11 @@
 import axios from "axios";
-import { useActionState, useEffect, useState, useTransition } from "react";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-phone-number-input/style.css';
 import "react-calendar/dist/Calendar.css";
 import { useNavigate } from "react-router-dom";
 import BackButton from "./BackButton";
+import { ConfirmBox } from "./ConfirmBox";
 
 export default function BookingForm({
   mode = "clinic", // "clinic" or "video"
@@ -20,8 +21,27 @@ export default function BookingForm({
   const [selectedTime, setSelectedTime] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [alreadyBooked, setAlreadyBooked] = useState(false);
+  const [patient, setPatient] = useState({});
+  const [bookedAppointments, setBookedAppointments] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [actionType, setActionType] = useState(null);
 
   const navigate = useNavigate()
+
+  const formRef = useRef(null);
+
+  const patientId = JSON.parse(localStorage.getItem("patientId"));
+
+  useEffect(() => {
+    axios.get(`/api/v1/patients/${patientId}`)
+      .then(res => {
+        setPatient(res.data.patient)
+        setPatientName(res.data.patient.pname)
+        setPhone(res.data.patient.pmobile)
+      }).catch(err => {
+        toast.error("Cannot fetch patient")
+      })
+  }, [])
 
 
   // 🔹 Auto-fetch patient info by phone
@@ -94,7 +114,7 @@ export default function BookingForm({
         payload.vc = "yes"; // Indicate video consultation
       }
 
-      const res = await axios.post("/api/v1/appointments/book", payload);
+      const res = await axios.post("/api/v1/appointments/book", { ...payload, actionType });
 
       toast.success("Appointment booked successfully!");
       onBook?.(res.data);
@@ -110,7 +130,7 @@ export default function BookingForm({
 
 
   let hospitalMaps = [];
-  
+
   if (mode == "clinic") {
     hospitalMaps = [
       {
@@ -124,7 +144,7 @@ export default function BookingForm({
             allowFullScreen
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-            className="w-full h-full"
+            className="w-1/2 h-full"
           />
         ),
       },
@@ -139,7 +159,7 @@ export default function BookingForm({
             allowFullScreen
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-            className="w-full h-full"
+            className="w-1/2 h-full"
           />
         ),
       },
@@ -154,7 +174,7 @@ export default function BookingForm({
             allowFullScreen
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-            className="w-full h-full"
+            className="w-1/2 h-full"
           />
         ),
       },
@@ -169,7 +189,7 @@ export default function BookingForm({
             allowFullScreen
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-            className="w-full h-full"
+            className="w-1/2 h-full"
           />
         ),
       },
@@ -197,6 +217,7 @@ export default function BookingForm({
   const handleDateChange = (e) => {
     setAlreadyBooked(false)
     const dateValue = e.target.value;
+    console.log("selected date", dateValue)
     const dateObj = new Date(dateValue);
     const weekday = dateObj.getDay();
 
@@ -220,11 +241,13 @@ export default function BookingForm({
       (a) => dayMap[a.day] === new Date(selectedDate).getDay()
     );
 
+  console.log("slotForDay", slotForDay)
+
   const slotForHosDay =
     selectedDate &&
     availableSlots.find((d) => dayMap[d.day] === new Date(selectedDate).getDay());
 
-
+  console.log("slotForHosDay", slotForHosDay)
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(selectedTime);
 
   // Update the debounced term after a delay
@@ -243,18 +266,27 @@ export default function BookingForm({
   useEffect(() => {
     if (debouncedSearchTerm) {
       const fetchResults = async () => {
-        const response = await axios.get(`/api/v1/appointments/search?query=${selectedDate}:${debouncedSearchTerm}`);
-        
-        if (response.status === 200) {
-          setAlreadyBooked(true);
+        try {
+          const response = await axios.post(`/api/v1/appointments/search?query=${selectedDate}:${debouncedSearchTerm}`, {
+            dr: availability[0].dr
+          });
+
+          if (response.status === 200) {
+
+            setAlreadyBooked(true);
+          } else if (response.status === 202) {
+            setBookedAppointments(response.data.appointments)
+          }
+        } catch (error) {
+          console.log("Something went wrong while searching appointments for date")
         }
-      };
+      }
       fetchResults();
     }
   }, [debouncedSearchTerm]);
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-4xl mx-auto p-6 relative">
       <ToastContainer />
 
       <BackButton />
@@ -275,37 +307,24 @@ export default function BookingForm({
                 <div className="space-y-1">
                   <h3 className="font-semibold">{h.hospital_name}</h3>
                   <p className="text-sm text-gray-600">Rs. {h.fees}</p>
-                  {/* <p className="text-sm text-gray-600">
-                                        Available today {h.timein}AM - {h.timeout}PM
-                                    </p> */}
                   <div className="text-sm text-gray-600 space-y-1">
                     <h2 className="text-l font-semibold">Available days</h2>
                     <div>
                       {
                         h.doctors.map((doc, idx) => {
                           return <div key={idx} className="mb-1">
-                            <p className="flex gap-5">
-                              {doc.day}
+                            <div className="flex justify-between gap-5">
+                              <p>{doc.day}</p>
                               <p>{doc.timein}AM - {doc.timeout}PM</p>
-                            </p>
+                            </div>
                           </div>
                         })
                       }
-                      {/* <p className="flex gap-5">
-                                                {h.day}
-                                                <p>{h.timein}AM - {h.timeout}PM</p>
-                                            </p> */}
                     </div>
                   </div>
                   <p className="text-sm text-gray-500">{h.address}</p>
                 </div>
                 {showMaps && selectedOption === h.hospital_name && match?.iframe && (
-                  // <iframe
-                  //     src={h.map}
-                  //     className="w-40 h-28 rounded border"
-                  //     allowFullScreen
-                  //     loading="lazy"
-                  // />
                   match?.iframe
                 )}
               </div>
@@ -317,86 +336,59 @@ export default function BookingForm({
       {mode === "video" && (
         <div className="bg-white border rounded-lg shadow mb-6 p-6">
           <h2 className="text-lg font-semibold mb-4">Book Video Consultation</h2>
-          {/* {
-                        availability.length > 0 ? <p className="text-sm text-gray-500">Available today {availability?.[0]?.timein}AM - {availability?.[0]?.timeout}PM</p> : <p className="text-sm text-gray-500">No video slots available today</p>
-              } */
-          }
-
           {
             availability.length > 0 ? <div className="text-sm text-gray-600 space-y-1">
               <h2 className="text-l font-semibold">Available days</h2>
-              <div>
+              <div className="w-1/2">
                 {
                   availability.map((avail, idx) => {
                     return <div key={idx} className="mb-1">
-                      <p className="flex gap-5">
-                        {avail.day}
-                        <p>{avail.timein}AM - {avail.timeout}PM</p>
-                      </p>
+                      <div className="flex justify-between gap-5">
+                        <p>{avail.day}</p>
+                        <div>
+                          <p>{avail.timein}AM - {avail.timeout}PM</p>
+
+                        </div>
+                      </div>
                     </div>
                   })
                 }
-                {/* <p className="flex gap-5">
-                                                {h.day}
-                                                <p>{h.timein}AM - {h.timeout}PM</p>
-                                            </p> */}
               </div>
+
             </div> : <p className="text-sm text-gray-500">No video slots available today</p>
           }
-          {/* <p className="text-sm text-gray-500">
-                        Select a date and time for your online consultation with{" "}
-                        {availability?.[0]?.doctorName || "Doctor"}.
-                    </p> */}
         </div>
       )}
 
       {/* 🔹 Date & Time */}
-      <form action={formAction} className="bg-white border rounded-lg shadow mb-6 p-6 space-y-4">
+      <form ref={formRef} action={formAction} className="bg-white border rounded-lg shadow mb-6 p-6 space-y-4">
         <h2 className="text-lg font-semibold">Select Date & Time for appointment</h2>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block font-medium mb-1">Phone</label>
+            <input type="text" placeholder="Phone Number" className="p-2 border rounded"
+              value={phone} onChange={(e) => setPhone(e.target.value)} required />
+          </div>
+          <div>
+            <label className="block font-medium mb-1">Name</label>
+            <input type="text" placeholder="Patient Name" name="patientName" className="p-2 border rounded"
+              value={patientName} onChange={(e) => setPatientName(e.target.value)} required />
+
+          </div>
+          {lookingUp && <p className="text-sm text-gray-500">Looking up patient...</p>}
+        </div>
         <div className="grid grid-cols-2 gap-4 items-end">
-          {/* <select name="day" className="p-2 border rounded">
-                        {days.map((d) => (
-                            <option key={d.format("YYYY-MM-DD")} value={d.format("YYYY-MM-DD")}>
-                                {d.format("ddd - DD MMM")}
-                            </option>
-                        ))}
-                    </select> */}
-
-          {/* <select
-                        value={selectedDay}
-                        onChange={(e) => {
-                            setSelectedDay(e.target.value);
-                            setSelectedTime("");
-                        }}
-                        className="w-full p-2 border rounded mb-4 h-fit"
-                    >
-                        <option value="">-- Select Day --</option>
-                        {uniqueDays.map((day) => (
-                            <option key={day} value={day}>
-                                {day}
-                            </option>
-                        ))}
-                    </select> */}
-
           <div className="flex flex-col gap-5">
             <label className="block font-medium mb-1">Select Date</label>
             <input
               type="date"
               min={new Date().toISOString().split("T")[0]} // disable past dates
+              value={selectedDate || ""}
               onChange={handleDateChange}
               className="w-full p-2 border rounded"
-              value={selectedDate}
+              required
             />
           </div>
-
-          {/* <select name="time" className="p-2 border rounded">
-                        {times.map((t) => (
-                            <option key={t.value} value={t.value}>
-                                {t.label}
-                            </option>
-                        ))}
-                    </select> */}
-
 
           {selectedDate && (slotForDay || slotForHosDay) ? (
             <>
@@ -412,16 +404,56 @@ export default function BookingForm({
                   type="time"
                   value={selectedTime}
                   onChange={(e) => {
-                    setAlreadyBooked(false);
-                    console.log("selected time", e.target.value);
-                    setSelectedTime(e.target.value)
+                    // setAlreadyBooked(false);
+                    // console.log("selected time", e.target.value);
+                    // setSelectedTime(e.target.value)
+
+
+                    const now = new Date();
+                    // const currentTime = new Date();
+                    if (selectedDate === now.toISOString().split("T")[0]) {
+                      // current time in "HH:MM"
+                      const currentTime = now.toTimeString().slice(0, 5);
+
+                      console.log("currentTime", currentTime)
+
+                      const picked = e.target.value;
+                      // const picked = new Date(`${selectedDate}T${e.target.value}:00`);
+
+                      console.log("picked", picked)
+
+                      // if picked time is older than now, block it
+                      // if (Number(picked) < Number(currentTime)) {
+                      //   // Option 1: Do nothing
+                      //   // Option 2: Reset
+                      //   console.log("picked is less than current time")
+                      //   toast.error("Time not available")
+                      //   setSelectedTime(currentTime);
+                      //   return;
+                      // }
+                      if (picked < currentTime) {
+                        // Option 1: Do nothing
+                        // Option 2: Reset
+                        console.log("picked is less than current time")
+                        toast.error("Time not available")
+                        setSelectedTime(currentTime);
+                        return;
+                      }
+                      console.log("picked is greater than current time")
+                      setAlreadyBooked(false);
+                      setSelectedTime(picked);
+                    } else {
+                      const picked = e.target.value;
+                      setAlreadyBooked(false);
+                      setSelectedTime(picked);
+                    }
                   }}
                   min={slotForDay?.timein || slotForHosDay?.timein}
                   max={slotForDay?.timeout || slotForHosDay?.timeout}
-                  step="900"
+                  // step="900"
                   className="w-full p-2 border rounded"
+                  required
                 />
-                
               </div>
             </>
           ) : (
@@ -445,32 +477,87 @@ export default function BookingForm({
                   className="w-full p-2 border rounded"
                   // disabled
                   onClick={() => alert("Please select date first")}
+                  required
                 />
-
               </div>
             </>
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <input type="text" placeholder="Phone Number" className="p-2 border rounded"
-            value={phone} onChange={(e) => setPhone(e.target.value)} required />
-          <input type="text" placeholder="Patient Name" name="patientName" className="p-2 border rounded"
-            value={patientName} onChange={(e) => setPatientName(e.target.value)} required />
-          {lookingUp && <p className="text-sm text-gray-500">Looking up patient...</p>}
+        {/* Booked Slots */}
+        <div className="w-full">
+          <h3 className="text-lg font-semibold">Booked Slots</h3>
+          <div className="flex gap-6 w-full flex-wrap">
+            {
+              bookedAppointments.map(appt => (
+                <div className="w-fit">
+                  <p className={patientId === appt.patient && `font-semibold text-red-500`} on>{new Date(appt.bdate).toLocaleString().split(", ")[1]}</p>
+                </div>
+              ))}
+
+          </div>
         </div>
 
         {alreadyBooked && <p className="text-sm text-center text-red-500 mt-1">This slot is already booked. Please choose another time.</p>}
 
-        <button type="submit"
+        <button
+          type="button"
           disabled={isPending}
-          className={`w-full text-white py-2 rounded ${isPending ? "bg-blue-400" : "bg-blue-600"}`}>
+          className={`w-full text-white py-2 rounded ${isPending ? "bg-blue-400" : "bg-blue-600"}`}
+          onClick={() => {
+            if (patientName && phone && selectedDate && selectedTime)
+              setIsOpen(true)
+          }}
+        >
           {isPending ? "Loading..." : "Submit"}
         </button>
       </form>
+      {
+        isOpen &&
+        <>
+          <div
+            className="fixed inset-0 bg-black/30 backdrop-blur-md z-40"
 
-      {/* 🔹 Reviews Section (optional) */}
-      {/* {reviews && (
+          />
+
+          {/* Modal */}
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl shadow-xl relative ">
+              <button className="absolute top-2 right-3 text-gray-500 hover:text-gray-700 cursor-pointer" onClick={() => setIsOpen(false)}>✕</button>
+              <p className="mt-3">Do you want to modify or add the appointment?</p>
+              <div className="flex gap-3 mt-3">
+                <button className="py-1 px-3 rounded text-white cursor-pointer bg-blue-500" onClick={() => {
+                  setActionType("modify")
+                  formRef.current?.requestSubmit()
+                  setIsOpen(false)
+                }}>Modify</button>
+                <button className="py-1 px-3 rounded text-white cursor-pointer bg-blue-500" onClick={() => {
+                  setActionType("add")
+                  formRef.current?.requestSubmit()
+                  setIsOpen(false)
+                }}>Add</button>
+                <button className="py-1 px-3 rounded text-white cursor-pointer bg-blue-500" onClick={() => setIsOpen(false)}>Cancel</button>
+              </div>
+
+            </div>
+          </div>
+        </>
+      }
+      {
+        bookedAppointments.length > 0 && <p className="text-lg font-semibold text-red-500">Your same day appointment in red</p>
+      }
+    </div>
+  );
+}
+
+
+
+
+
+
+
+{/* 🔹 Reviews Section (optional) */ }
+{/* {reviews && (
         <div className="bg-white border rounded-lg shadow p-6 space-y-4">
           <h2 className="text-lg font-semibold">{reviews.total} Reviews</h2>
           <p className="text-xl font-bold">
@@ -479,6 +566,3 @@ export default function BookingForm({
           <button className="w-full border py-2 rounded">View All Reviews</button>
         </div>
       )} */}
-    </div>
-  );
-}

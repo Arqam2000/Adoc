@@ -207,7 +207,13 @@ const DoctorCard = ({
             // console.log("videoTimings", videoTimings)
           }}>Video Consultation</button>
           <button className='px-2 py-1 rounded bg-amber-400 cursor-pointer font-semibold text-white' onClick={() => {
-            navigate("/book-appointment", { state: { availability: grouped, mode: "clinic" } })
+            const patientId = JSON.parse(localStorage.getItem("patientId"));
+
+            if(patientId){
+              navigate("/book-appointment", { state: { availability: grouped, mode: "clinic" } })
+            } else {
+              navigate("/login/patient")
+            }
           }}>Book Appointment</button>
         </div>
 

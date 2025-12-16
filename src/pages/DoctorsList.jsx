@@ -30,6 +30,7 @@ const DoctorsList = () => {
   let filteredByCityAndSpec = [];
   let filterByOnCallDoctor = [];
   let filterByVideoConsultation = [];
+                
 
   if (location.state?.OnCallDoctor) {
     filterByOnCallDoctor = doctors?.filter(doc => doc.appointment_type === "Walk in" || doc.appointment_type === "Both")
@@ -53,6 +54,7 @@ const DoctorsList = () => {
     console.log("filteredByCityAndSpec ", filteredByCityAndSpec)
 
   } 
+
   if (location.state?.city) {
     cityName = location.state?.city;
     filteredByCity = doctors?.filter(doc => doc.city_name === cityName)
@@ -60,13 +62,12 @@ const DoctorsList = () => {
     console.log("filteredByCity ", filteredByCity)
 
   } 
+
   if (location.state?.specialization) {
     specializationName = location.state?.specialization;
     filteredBySpecialization = doctors?.filter(doc => doc.Specialization_name === specializationName)
     console.log("filteredBySpecialization ", filteredBySpecialization)
-
-
-  }
+  } 
 
   useEffect(() => {
 
@@ -95,6 +96,7 @@ const DoctorsList = () => {
       console.log("Error in getting doctors", error)
     }
   }
+
   console.log("doctors from DoctorsList", doctors)
   // console.log("doctorExp from DoctorsList", doctorExp)
   // console.log("doctorExp from DoctorsList", JSON.stringify(doctorExp))
@@ -280,7 +282,7 @@ const DoctorsList = () => {
           ))
         }
 
-        {
+        {/* {
           
           filteredBySpecialization.length === 0 && filteredByCity.length === 0 && filteredByCityAndSpec.length === 0 && filterByOnCallDoctor.length === 0 && filterByVideoConsultation.length === 0 && doctors.map(({ dr, name, phone, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
             <DoctorCard
@@ -302,6 +304,33 @@ const DoctorsList = () => {
             />
           ))
         
+        } */}
+        {
+          
+          filteredBySpecialization.length === 0 && filteredByCity.length === 0 && filteredByCityAndSpec.length === 0 && filterByOnCallDoctor.length === 0 && filterByVideoConsultation.length === 0 && location.state === null && doctors.map(({ dr, name, phone, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (
+            <DoctorCard
+              key={dr}
+              dr={dr}
+              picture={picture}
+              name={name}
+              phone={phone}
+              specialization={Specialization_name}
+              pmdc_verification={pmdc_verification}
+              qualifications={qualifications}
+              // experience={experiences[index]?.experience} 
+              experience={experiences[index]}
+              review={reviews?.[index]}
+              fees={fees}
+              // specializationName={specializationName || ""} 
+              hospitals={hospitals?.[index]?.hospitalDetails}
+              videoTimings={videoTimings?.[index]?.videoDetails}
+            />
+          )) 
+        
+        }
+
+        {
+          filteredBySpecialization.length === 0 && filteredByCity.length === 0 && filteredByCityAndSpec.length === 0 && filterByOnCallDoctor.length === 0 && filterByVideoConsultation.length === 0 && location.state !== null && <p className='text-gray-500'>No doctors found matching the selected criteria.</p>
         }
 
         

@@ -8,7 +8,7 @@ export const Login = () => {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
     const [user, setUser] = useState({
-        email: "",
+        phone: "",
         password: ""
     })
 
@@ -47,7 +47,7 @@ export const Login = () => {
             console.log("response", res.data)
             toast.success(res.data.message)
             localStorage.setItem("patientId", JSON.stringify(res.data.patient.patient))
-            navigate(`/`)
+            navigate(`/dashboard`)
         })
         .catch(err => {
             console.log("Error:", err)
@@ -76,13 +76,13 @@ export const Login = () => {
 
                     <form className="space-y-5" onSubmit={handleSubmit}>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">Email</label>
+                            <label className="block text-gray-700 font-medium mb-2">Phone</label>
                             <input
-                                type="email"
-                                placeholder="Enter your email"
+                                type="text"
+                                placeholder="Enter your phone number"
                                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 value={user.email}
-                                onChange={(e) => setUser({...user, email: e.target.value})}
+                                onChange={(e) => setUser({...user, phone: e.target.value})}
                             />
                         </div>
 

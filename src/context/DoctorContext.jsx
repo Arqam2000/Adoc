@@ -82,7 +82,7 @@ export const DoctorProvider = ({ children }) => {
 
     } catch (error) {
       console.error("Error fetching doctor data:", error);
-      setDoctorData(null);
+      setDoctorData({});
     } finally {
       setLoading(false);
     }

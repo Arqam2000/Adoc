@@ -10,8 +10,9 @@ import { set } from 'date-fns';
 const DropdownMenu = ({ type }) => {
 
   const navigate = useNavigate()
+
   return (
-    <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded border">
+    <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded border z-10">
       {type === "Login" ?
         <>
           <button
@@ -56,6 +57,9 @@ export const Navbar = () => {
   const [patient, setPatient] = useState({});
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [signupdropdownOpen, setSignupDropdownOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
+
+  const isAdmin = true
 
   const logindropdownRef = useRef(null);
   const signupdropdownRef = useRef(null);
@@ -120,6 +124,7 @@ export const Navbar = () => {
         setDoctor({});
         setIsLoggedIn(0);
         toast.success(resp.data.message);
+        setIsOpen(false)
         navigate("/login");
       }
     } catch (error) {
@@ -128,12 +133,17 @@ export const Navbar = () => {
       localStorage.removeItem("patientId");
       setIsLoggedIn(0);
       setPatient({});
+      setIsOpen(false)
       navigate("/login");
     }
   }
 
+  const closeMenu = () => {
+    setIsOpen(false)
+  }
+
   return (
-    <nav className='flex justify-between lg:justify-evenly items-center p-6 shadow bg-white'>
+    <nav className='flex justify-between lg:justify-evenly items-center p-6 shadow bg-white relative'>
       <ToastContainer />
       <div>
         <h1 className='text-2xl font-bold'><Link to="/">Adoc</Link></h1>
@@ -161,7 +171,7 @@ export const Navbar = () => {
           <li><Link to="#">Health Blog</Link> </li>
         </ul>
       </div>
-      <div className='hidden lg:flex items-center gap-4' >
+      <div className=' flex items-center md:gap-4 gap-2' >
         {
           Object.keys(doctor).length === 0 && Object.keys(patient).length === 0 &&
           <>
@@ -172,7 +182,7 @@ export const Navbar = () => {
               }}>Login</button>
 
               {
-                dropdownOpen && <DropdownMenu type="Login" />
+                dropdownOpen && <DropdownMenu type="Login" se />
               }
 
             </div>
@@ -195,13 +205,16 @@ export const Navbar = () => {
           </>
         }
 
-        <button className='bg-white text-[#2f2f82] py-2 px-2 lg:px-5 rounded border border-[#2f2f82]'><Link to="/admin">Admin</Link></button>
+        {isAdmin && <button className='bg-white text-[#2f2f82] py-2 px-2 lg:px-5 rounded border border-[#2f2f82] hidden md:block'><Link to="/admin">Admin</Link></button>}
 
         {
           Object.keys(doctor).length !== 0 ? <div className='relative group'>
             <div className='no-underline text-base mr-5 flex items-center gap-1' onClick={() => setOpen(prev => !prev)}>
               <img src={doctor.picture} alt="doc-pic" className='w-11 rounded-full' />
-              <h3>{doctor.name}</h3>
+              <div className='flex flex-col justify-center'>
+                <h3 className='font-semibold text-lg '>{doctor.name}</h3>
+                <h3>Doctor</h3>
+              </div>
               {
                 open && <div className="absolute left-0 top-6 mt-2 w-40 bg-white text-gray-800 rounded-lg shadow-lg border transition z-20">
                   <Link to={`/view-profile/${doctor.dr}`} className="block px-4 py-2 hover:bg-blue-100">
@@ -222,7 +235,11 @@ export const Navbar = () => {
           </div> : <div className='relative group'>
             <div className='no-underline text-base mr-5 flex items-center gap-1 cursor-pointer' onClick={() => setOpen(prev => !prev)}>
               {/* <img src={doctor.picture} alt="doc-pic" className='w-11 rounded-full' /> */}
-              <h3>{patient.pname}</h3>
+              <div className='flex flex-col justify-center'>
+                <h3 className='font-semibold text-lg '>{patient.pname}</h3>
+                {Object.keys(patient).length !== 0 && <h3 className=''>Patient</h3>}
+
+              </div>
               {
                 open && <div className="absolute left-0 top-6 mt-2 w-40 bg-white text-gray-800 rounded-lg shadow-lg border transition z-20">
                   {/* <Link to={`/view-profile/${doctor.dr}`} className="block px-4 py-2 hover:bg-blue-100">
@@ -245,9 +262,53 @@ export const Navbar = () => {
 
         {/* <img src={doctorData.doctor.picture} alt="doc-pic" className='w-11 rounded-full' /> */}
       </div>
-      <div className='lg:hidden z-10' id="menu">
+      <button className='lg:hidden z-20' id="menu" 
+      onClick={() => {
+        setIsOpen(!isOpen)
+      }
+      }>
         <span className={`text-3xl`}>&equiv;</span>
-      </div>
+      </button>
+
+
+      {
+        isOpen &&
+        <div className='absolute right-0 top-20 bg-white z-10 py-3 w-2xs h-screen'>
+          <ul className='flex items-center gap-7 flex-col'>
+            <li><Link to="/" onClick={closeMenu}>Home</Link></li>
+            <li>
+              <Link to="/doctors" className='flex items-center gap-1' onClick={closeMenu}>Doctors <i className="fa text-[14px]"
+              >&#xf107;</i>
+              </Link>
+              <ul className='hidden'>
+                <li><Link to="#" className='flex items-center gap-1'>Dermatologist
+                </Link></li>
+                <li><Link to="#" className='flex items-center gap-1'>Gynecologist
+                </Link></li>
+                <li><Link to="#" className='flex items-center gap-1'>Urologist
+                </Link></li>
+
+              </ul>
+            </li>
+            <li><Link to="#">Hospitals</Link> </li>
+            <li><Link to="#">Labs and Diagnostics</Link> </li>
+            <li><Link to="#">Surgeries</Link> </li>
+            <li><Link to="#">Health Blog</Link> </li>
+
+            {
+              (Object.keys(doctor).length > 0 || Object.keys(patient).length > 0) &&
+              <>
+                <Link to="/dashboard" className="block px-4 py-2 hover:bg-blue-100" onClick={closeMenu}>
+                  Appointments
+                </Link>
+                <button className="block px-4 py-2 hover:bg-blue-100" onClick={logout}>
+                  logout
+                </button>
+              </>
+            }
+          </ul>
+        </div>
+      }
     </nav>
   )
 }

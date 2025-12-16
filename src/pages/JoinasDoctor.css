@@ -1,0 +1,36 @@
+.PhoneInput input {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.PhoneInput input:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.state-select input {
+  border: none !important;
+  border-color: black;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent;
+}
+
+.state-select input:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+.stdropdown-container{
+  border: none;
+  outline-width: 1px;
+  outline-style: solid;
+  border-radius: 0;
+}
+
+.stdropdown-container input{
+  border: none;
+  outline: none;
+}

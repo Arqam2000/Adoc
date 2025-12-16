@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import useExperience from "../hooks/useExperience";
 import useDoctor from "../context/DoctorContext";
 import BackButton from "../components/BackButton";
+import ReviewsByDoctor from "./ReviewsByDoctor";
 
 export default function ViewDocProfile() {
   const { doctorData, fetchDoctorData } = useDoctor()
@@ -131,11 +132,11 @@ export default function ViewDocProfile() {
           <h2 className="text-xl font-semibold text-gray-800 mb-2">
             Video Consultation
           </h2>
-          <p className="text-gray-600 mb-2">Fee: PKR {doctorData?.doctorvd[0]?.fees}</p>
+          <p className="text-gray-600 mb-2">Fee: PKR {doctorData?.doctorvd?.[0]?.fees}</p>
           <h2 className="text-base font-semibold text-gray-800 mb-2">Available Timings</h2>
           <div className="flex flex-col gap-2">
             {
-              doctorData?.doctorvd.map(docvd => (
+              doctorData?.doctorvd?.map(docvd => (
                 <div key={docvd.doctorvd} className="border-b border-gray-300 py-1">
 
                   <div className="space-y-2 text-gray-700 flex justify-between w-sm ">
@@ -207,7 +208,7 @@ export default function ViewDocProfile() {
         </div>
 
         {/* Rating & Reviews */}
-        <div className="bg-white rounded-2xl shadow p-6">
+        {/* <div className="bg-white rounded-2xl shadow p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
             Patient Reviews
           </h2>
@@ -230,16 +231,18 @@ export default function ViewDocProfile() {
               <span className="text-sm text-gray-400">– Ahmed, Dec 2024</span>
             </div>
           </div>
-        </div>
+        </div> */}
+
+        <ReviewsByDoctor id={id}/>
 
         {/* Similar Doctors */}
         <div className="bg-white rounded-2xl shadow p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Other {doctorData?.doctor.Specialization_name}
+            Other {doctorData?.doctor?.Specialization_name}
           </h2>
           {/* ["Dr. Ali Raza", "Dr. Maria Ahmed", "Dr. Usman Tariq"] */}
           <div className="grid md:grid-cols-3 gap-6">
-            {doctorData?.otherDoctors.map(
+            {doctorData?.otherDoctors?.map(
               (doc, i) => (
 
                 <div

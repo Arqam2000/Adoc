@@ -63,6 +63,7 @@ export const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [videoFees, setVideoFees] = useState("")
   const [docExp, setDocExp] = useState([])
+  const [waitingTime, setWaitingTime] = useState("")
 
   const fileInputRef = useRef(null);
 
@@ -246,8 +247,6 @@ export const Profile = () => {
   }
 
   const saveVDToDB = async () => {
-
-
     try {
       const resp = await axios.post("/api/v1/doctors/edit-doctorvd", {
         dr: doctor.dr,
@@ -352,31 +351,31 @@ export const Profile = () => {
     }
   }
 
-  function hasEmptyProperties(arrayOfObjects) {
-    for (const obj of arrayOfObjects) {
-      for (const key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-          const value = obj[key];
+  // function hasEmptyProperties(arrayOfObjects) {
+  //   for (const obj of arrayOfObjects) {
+  //     for (const key in obj) {
+  //       if (Object.prototype.hasOwnProperty.call(obj, key)) {
+  //         const value = obj[key];
 
-          // Check for various definitions of "empty"
-          if (value === null || value === undefined || value === "") {
-            return true; // Found an empty property
-          }
+  //         // Check for various definitions of "empty"
+  //         if (value === null || value === undefined || value === "") {
+  //           return true; // Found an empty property
+  //         }
 
-          // Check if it's an empty array
-          if (Array.isArray(value) && value.length === 0) {
-            return true; // Found an empty array property
-          }
+  //         // Check if it's an empty array
+  //         if (Array.isArray(value) && value.length === 0) {
+  //           return true; // Found an empty array property
+  //         }
 
-          // Check if it's an empty object (only if it's an object and not null/undefined)
-          if (typeof value === 'object' && value !== null && Object.keys(value).length === 0) {
-            return true; // Found an empty object property
-          }
-        }
-      }
-    }
-    return false; // No empty properties found in any object
-  }
+  //         // Check if it's an empty object (only if it's an object and not null/undefined)
+  //         if (typeof value === 'object' && value !== null && Object.keys(value).length === 0) {
+  //           return true; // Found an empty object property
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return false; // No empty properties found in any object
+  // }
 
   function hasEmptyPropertiesInObj(obj) {
     for (const key in obj) {
@@ -397,8 +396,10 @@ export const Profile = () => {
       await saveVDToDB()
       await saveHDToDB()
       await saveExpToDB()
+      await saveWaitingTime()
 
       toast.success("Saved successfuly")
+      
     } catch (error) {
       toast.error("Cannot save to database")
       console.log("Error while saving the details", error)
@@ -436,8 +437,20 @@ export const Profile = () => {
       );
       // toast.success("Saved Schedule");
     }
+  }
 
+  const saveWaitingTime = async () => {
+    try {
+      const res = await axios.post("/api/v1/doctors/edit-doctorwt", {
+        dr: doctor.dr,
+        waitingTime
+      })
 
+      toast.success("Waiting time saved successfuly")
+
+    } catch (error) {
+      toast.error("Error saving waiting time")
+    }
   }
 
   return (
@@ -645,6 +658,12 @@ export const Profile = () => {
         </section>
 
         <AppointmentTypes />
+
+        <div className="my-2">
+          <h3 className="text-lg font-semibold mb-1">Waiting Time</h3>
+          <input type="text" className="outline-none border border-gray-300 py-1 px-2" onChange={e => setWaitingTime(e.target.value)}/>
+          <button className='bg-blue-500 py-1 px-3 rounded text-white cursor-pointer ml-2' onClick={saveWaitingTime}>Save</button>
+        </div>
 
         {/* Practice Timings */}
         <section className="mb-8">

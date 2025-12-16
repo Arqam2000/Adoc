@@ -15,12 +15,22 @@ import useExperience from "../hooks/useExperience";
 import { toast, ToastContainer } from "react-toastify";
 import BackButton from "../components/BackButton";
 import VideoConsultation from "./VideoConsultation";
+import PatientModal from "../components/PatientModal";
+import PatientHistory from "./PatientHistory";
+import LabTestResult from "../components/LabTestResult";
+import ReviewsByPatient from "./ReviewsByPatient";
 
 export default function Dashboard() {
   const [appointments, setAppointments] = useState([]);
   const [remarks, setRemarks] = useState([]);
   const [patientData, setPatientData] = useState({});
   const [patientsWaiting, setPatientsWaiting] = useState(null);
+  const [open, setOpen] = useState(false)
+  const [apt, setApt] = useState({})
+  const [isPatientHistoryOpen, setIsPatientHistoryOpen] = useState(false);
+  const [isLabResultOpen, setIsLabResultOpen] = useState(false);
+  const [isReviewsOpen, setIsReviewsOpen] = useState(false);
+
 
   const { doctorData, setDoctorData, fetchDoctorData } = useDoctor();
   const navigate = useNavigate();
@@ -29,7 +39,7 @@ export default function Dashboard() {
 
   const inputRefs = useRef([]);
 
-  console.log("Doctor Data on Dashboard:", doctorData);
+  // console.log("Doctor Data on Dashboard:", doctorData);
 
   // console.log("experiences from Dashboard", experiences)
 
@@ -57,7 +67,6 @@ export default function Dashboard() {
     const storedRemarks = JSON.parse(localStorage.getItem("remarks")) || [];
     setRemarks(storedRemarks);
 
-
   }, [])
 
   useEffect(() => {
@@ -82,7 +91,6 @@ export default function Dashboard() {
       //   console.error("Error fetching patient data:", err);
       // })
       axios.post(`/api/v1/appointments/book/patient/${patientId}`, {
-
         date: new Date()
       })
         .then(res => {
@@ -185,6 +193,8 @@ export default function Dashboard() {
             patient: `${apt.pname}`, // replace with actual patient name if available
             // time: format(date, "hh:mm a"),
             doctor: apt.name,
+            dr_phone: apt.phone,
+            patientsWaiting: apt.patients_waiting,
             dr_status: apt.dr_status || "open",
             time: format(date, "PPpp"),
             phone: apt.pmobile,
@@ -195,19 +205,27 @@ export default function Dashboard() {
           });
         } else if (isAfter(date, today)) {
           upcomingVideo.push({
+            bappoint: apt.bappoint,
             patient: `${apt.pname}`, // replace with actual patient name if available
             time: format(date, "PPpp"),
             fees: apt.fees,
+            status: apt.status === null ? "Pending" : apt.status,
           });
         } else {
           videoHistory.push({
+            bappoint: apt.bappoint,
             patient: `${apt.pname}`,
+            phone: apt.pmobile,
             doctor: apt.name,
             time: format(date, "PPpp"),
             fees: apt.fees,
             // status: apt.done === "yes" ? "Completed" : "Missed",
             status: apt.status,
             remarks: apt.drcoment || "",
+            symptoms: apt.symptom,
+            prescriptions: apt.prescription,
+            nextFollowUp: apt.next_follow_up,
+            labTestAdvice: apt.lab_test_advice,
           });
         }
       }
@@ -216,13 +234,17 @@ export default function Dashboard() {
       if (apt.vc === "no" && apt.hospital_code !== "no") {
         if (isToday(date)) {
           todays.push({
+            bappoint: apt.bappoint,
             hospital: `${apt.hospital_name}`, // replace with actual hospital name
+            doctor: apt.name,
             patient: `${apt.pname}`,
+            phone: apt.pmobile,
             time: format(date, "hh:mm a"),
             fees: apt.fees,
           });
         } else if (isAfter(date, today)) {
           coming.push({
+            bappoint: apt.bappoint,
             hospital: `${apt.hospital_name}`,
             patient: `${apt.pname}`,
             time: format(date, "PPpp"),
@@ -232,13 +254,19 @@ export default function Dashboard() {
           });
         } else if (isBefore(date, today)) {
           history.push({
+            bappoint: apt.bappoint,
             hospital: `${apt.hospital_name}`,
             patient: `${apt.pname}`,
+            phone: apt.pmobile,
             doctor: apt.name,
             time: format(date, "PPpp"),
             fees: apt.fees,
             visited: apt.status !== "pending" && apt.status !== "missed" ? "Yes" : "No",
             remarks: apt.drcoment || "",
+            symptoms: apt.symptom,
+            prescriptions: apt.prescription,
+            nextFollowUp: apt.next_follow_up,
+            labTestAdvice: apt.lab_test_advice,
           });
         }
       }
@@ -278,37 +306,99 @@ export default function Dashboard() {
     }
   }
 
+  const handleCall = (phone) => {
+    const formattedPhoneNumber = `+${phone?.replace(/\D/g, '')}`; 
+    window.open(`https://wa.me/${formattedPhoneNumber}`, '_blank');
+  }
+
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100 relative">
       {/* Sidebar */}
       <ToastContainer />
-      <aside className="w-64 bg-white shadow-lg p-6 flex flex-col">
-        <h1 className="text-2xl font-bold text-blue-600 mb-8">Doctor Portal</h1>
+      <aside className="w-64 bg-white shadow-lg p-6 hidden md:flex flex-col ">
+        {
+          Object.keys(doctorData).length > 0 ? (<h1 className="text-2xl font-bold text-blue-600 mb-8">Doctor Portal</h1>) : (<h1 className="text-2xl font-bold text-blue-600 mb-8">Patient Portal</h1>)
+        }
+
         <nav className="flex flex-col gap-4">
-          <a href="#" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+          <a onClick={() => {
+            setIsLabResultOpen(false)
+            setIsPatientHistoryOpen(false)
+            setIsReviewsOpen(false)
+          }} href="#" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
             <Home size={18} /> Dashboard
           </a>
-          <Link to={`/view-profile/${doctorData?.doctor?.dr}`} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
-            <User size={18} /> Profile
-          </Link>
-          <Link to="/profile" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+
+          <Link to="/patient/edit-profile" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
             <User size={18} /> Edit Profile
           </Link>
-          <a href="#appointments" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+
+          {
+            Object.keys(doctorData).length > 0 && <><Link to={`/view-profile/${doctorData?.doctor?.dr}`} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+              <User size={18} /> Profile
+            </Link>
+              <Link to="/profile" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+                <User size={18} /> Edit Profile
+              </Link> </>
+          }
+
+          <a onClick={() => {
+            setIsLabResultOpen(false)
+            setIsPatientHistoryOpen(false)
+            setIsReviewsOpen(false)
+          }} href="#appointments" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
             <Calendar size={18} /> Appointments
           </a>
-          <Link to="/dashboard/video-consultation" state={{ historyVideo, videoConsultations, }} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
-            <Video size={18} /> Video Consultations
+
+          {
+            Object.keys(doctorData).length > 0 && <Link to="/dashboard/patient-portal" state={{ appointments, todaysAppointments, videoConsultations, comingAppointments, upcomingVideoConsultations }} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+              <Calendar size={18} /> Patient Portal
+            </Link>
+          }
+
+          {
+            Object.keys(doctorData).length > 0 && <> <Link onClick={() => setIsPatientHistoryOpen(false)} to="/dashboard/video-consultation" state={{ historyVideo, videoConsultations, }} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+              <Video size={18} /> Video Consultations
+            </Link>
+              <a onClick={() => setIsPatientHistoryOpen(false)} href="#history" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+                <History size={18} /> History
+              </a> </>
+          }
+
+          <button onClick={() => {
+            setIsPatientHistoryOpen(false)
+            setIsReviewsOpen(false)
+            setIsLabResultOpen(true)
+          }} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+            <History size={18} />
+            Lab Test Result
+          </button>
+
+          <button onClick={() => {
+            setIsLabResultOpen(false)
+            setIsReviewsOpen(false)
+            setIsPatientHistoryOpen(true)
+          }} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+            <History size={18} /> Patient History
+          </button>
+
+          <Link to="/patient/change-password" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+            <History size={18} />
+            Change Password
           </Link>
-          <a href="#history" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
-            <History size={18} /> History
-          </a>
-          <a href="#history" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+
+          {Object.keys(doctorData).length > 0 && <a href="#history" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
             <History size={18} /> Doctor Remarks
-          </a>
-          <a href="#reviews" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+          </a>}
+
+          <button onClick={() => {
+            setIsLabResultOpen(false)
+            setIsPatientHistoryOpen(false)
+            setIsReviewsOpen(true)
+          }} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
             <History size={18} /> Reviews
-          </a>
+          </button>
+
           <button className="flex items-center gap-3 text-red-600 hover:text-red-800 mt-auto cursor-pointer" onClick={logout}>
             <LogOut size={18} /> Logout
           </button>
@@ -366,6 +456,8 @@ export default function Dashboard() {
                   <div>
                     <p className="font-medium text-gray-800 text-lg">Name: <span>{patientData?.pname}</span></p>
                     <p className="font-medium text-gray-800 text-lg">Phone: <span className="text-gray-800 text-base">{patientData?.pmobile}</span></p>
+                    <p className="font-medium text-gray-800 text-lg">Gender: <span className="text-gray-800 text-base">{patientData?.gender}</span></p>
+                    <p className="font-medium text-gray-800 text-lg">Blood Group: {patientData?.blood_group}<span className="text-gray-800 text-base"></span></p>
                   </div>
                 </div>
               </div>
@@ -375,86 +467,105 @@ export default function Dashboard() {
 
 
         {/* Appointment Status */}
-        <section id="appointments" className="space-y-6">
-          <h2 className="text-xl font-semibold border-b pb-2">Appointment Status</h2>
+        {
+          isPatientHistoryOpen ? <PatientHistory patientData={patientData} historyAppointments={historyAppointments} historyVideo={historyVideo} inputRefs={inputRefs} remarks={remarks} setRemarks={setRemarks} apt={apt} setApt={setApt} open={open} setOpen={setOpen} PatientModal={PatientModal} appointments={appointments} /> :
+            (
+              isLabResultOpen ? <LabTestResult appointments={appointments} /> :
+                (
+                  isReviewsOpen ? <ReviewsByPatient /> :
+                    <>
+                      <section id="appointments" className="space-y-6">
+                        <h2 className="text-xl font-semibold border-b pb-2">Appointment Status</h2>
 
-          {/* Today's Appointments */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-lg font-semibold mb-4">Today's Appointments</h3>
-            <h3 className="text-lg font-semibold mb-4 ">In Clinic Appointments</h3>
-            {todaysAppointments.length > 0 ? (
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="text-gray-600 border-b">
-                    <th className="pb-2">Hospital</th>
-                    <th className="pb-2">Patient</th>
-                    <th className="pb-2">Time</th>
-                    <th className="pb-2">Fees</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {todaysAppointments.map((apt, idx) => (
-                    <tr key={idx} className="border-b text-sm">
-                      <td className="py-2">{apt.hospital}</td>
-                      <td className="py-2">{apt.patient}</td>
-                      <td className="py-2">{apt.time}</td>
-                      <td className="py-2">{apt.fees}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p className="text-gray-500">No appointments today.</p>
-            )}
+                        {/* Today's Appointments */}
+                        <div className="bg-white rounded-xl shadow p-6">
+                          <h3 className="text-lg font-semibold mb-4">Today's Appointments</h3>
+                          <h3 className="text-lg font-semibold mb-4 ">In Clinic Appointments</h3>
+                          {todaysAppointments.length > 0 ? (
+                            <table className="w-full text-left border-collapse">
+                              <thead>
+                                <tr className="text-gray-600 border-b">
+                                  <th className="pb-2">Hospital</th>
+                                  <th className="pb-2">Doctor</th>
+                                  <th className="pb-2">Patient</th>
+                                  <th className="pb-2">Time</th>
+                                  <th className="pb-2">Fees</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {todaysAppointments.map((apt, idx) => (
+                                  <tr key={idx} className="border-b text-sm">
+                                    <td className="py-2">{apt.hospital}</td>
+                                    <td className="py-2">{apt.doctor}</td>
+                                    <td className="py-2">{apt.patient}</td>
+                                    <td className="py-2">{apt.time}</td>
+                                    <td className="py-2">{apt.fees}</td>
+                                    <td><button className="cursor-pointer" onClick={() => {
+                                      setApt(apt)
+                                      setOpen(true)
+                                    }}>Click here for details</button></td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          ) : (
+                            <p className="text-gray-500">No appointments today.</p>
+                          )}
 
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold mb-4 ">Video Consultations</h3>
-              {videoConsultations.length > 0 ? (
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="text-gray-600 border-b">
-                      <th className="pb-2">Patient</th>
-                      {Object.keys(patientData).length > 0 &&
-                        <>
-                          <th className="pb-2">Doctor</th>
-                          <th className="pb-2">call</th>
-                          <th className="pb-2">Patients in Queue</th>
-                          <th className="pb-2">Doctor Status</th>
-                        </>
-                      }
-                      <th className="pb-2">Time</th>
-                      <th className="pb-2">Fees</th>
-                      <th className="pb-2">status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {videoConsultations.map((vc, idx) => (
-                      <tr key={idx} className="border-b text-sm">
-                        <td className="py-2">{vc.patient}</td>
-                        {
-                          Object.keys(patientData).length > 0 &&
-                          <>
-                          <td className="py-2">{vc.doctor}</td>
-                          <td className="py-2"><button className="bg-blue-500 py-1 px-2 rounded text-white cursor-pointer">Call Doctor</button></td>
-                          <td className="py-2">{patientsWaiting}</td>
-                          <td className="py-2">{vc.dr_status}</td>
-                          </>
-                        }
-                        <td className="py-2">{vc.time}</td>
-                        <td className="py-2">{vc.fees}</td>
-                        <td className="py-2">{vc.status}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p className="text-gray-500">No video consultations today.</p>
-              )}
-            </div>
-          </div>
+                          <div className="mt-6">
+                            <h3 className="text-lg font-semibold mb-4 ">Video Consultations</h3>
+                            {videoConsultations.length > 0 ? (
+                              <table className="w-full text-left border-collapse">
+                                <thead>
+                                  <tr className="text-gray-600 border-b">
+                                    <th className="pb-2">Patient</th>
+                                    {Object.keys(patientData).length > 0 &&
+                                      <>
+                                        <th className="pb-2">Doctor</th>
+                                        <th className="pb-2">call</th>
+                                        <th className="pb-2">Patients in Queue</th>
+                                        <th className="pb-2">Doctor Status</th>
+                                      </>
+                                    }
+                                    <th className="pb-2">Time</th>
+                                    <th className="pb-2">Fees</th>
+                                    <th className="pb-2">status</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {videoConsultations.map((vc, idx) => (
+                                    <tr key={idx} className="border-b text-sm">
+                                      <td className="py-2">{vc.patient}</td>
+                                      {
+                                        Object.keys(patientData).length > 0 &&
+                                        <>
+                                          <td className="py-2">{vc.doctor}</td>
+                                          <td className="py-2"><button className="bg-blue-500 py-1 px-2 rounded text-white cursor-pointer" onClick={() => handleCall(vc.dr_phone)}>Call Doctor</button></td>
+                                          <td className="py-2">{vc.patientsWaiting}</td>
+                                          <td className="py-2">{vc.dr_status}</td>
+                                        </>
+                                      }
+                                      <td className="py-2">{vc.time}</td>
+                                      <td className="py-2">{vc.fees}</td>
+                                      <td className="py-2">{vc.status}</td>
+                                      {/* <td><button className="cursor-pointer" onClick={() => setOpen(true)}>Click here for details</button></td> */}
+                                      <td><button className="cursor-pointer" onClick={() => {
+                                        setApt(vc)
+                                        setOpen(true)
+                                      }}>Click here for details</button></td>
+                                    </tr>
 
-          {/* Video Consultations */}
-          {/* <div id="video" className="bg-white rounded-xl shadow p-6">
+                                  ))}
+                                </tbody>
+                              </table>
+                            ) : (
+                              <p className="text-gray-500">No video consultations today.</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Video Consultations */}
+                        {/* <div id="video" className="bg-white rounded-xl shadow p-6">
             <h3 className="text-lg font-semibold mb-4">Video Consultations</h3>
             {videoConsultations.length > 0 ? (
               <table className="w-full text-left border-collapse">
@@ -480,161 +591,180 @@ export default function Dashboard() {
             )}
           </div> */}
 
-          {/* Coming Days */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-lg font-semibold mb-4">Coming Days Appointments</h3>
-            <h1 className="text-lg font-semibold mb-4">Video Consultations</h1>
+                        {/* Coming Days */}
+                        <div className="bg-white rounded-xl shadow p-6">
+                          <h3 className="text-lg font-semibold mb-4">Coming Days Appointments</h3>
+                          <h1 className="text-lg font-semibold mb-4">Video Consultations</h1>
 
-            {upcomingVideoConsultations.length > 0 ? (
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="text-gray-600 border-b">
-                    <th className="pb-2">Patient</th>
-                    <th className="pb-2">Time</th>
-                    <th className="pb-2">Fees</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {upcomingVideoConsultations.map((apt, idx) => (
-                    <tr key={idx} className="border-b text-sm">
-                      <td className="py-2">{apt.patient}</td>
-                      <td className="py-2">{apt.time}</td>
-                      <td className="py-2">{apt.fees}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p className="text-gray-500">No upcoming appointments.</p>
-            )}
+                          {upcomingVideoConsultations.length > 0 ? (
+                            <table className="w-full text-left border-collapse">
+                              <thead>
+                                <tr className="text-gray-600 border-b">
+                                  <th className="pb-2">Patient</th>
+                                  <th className="pb-2">Time</th>
+                                  <th className="pb-2">Fees</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {upcomingVideoConsultations.map((apt, idx) => (
+                                  <tr key={idx} className="border-b text-sm">
+                                    <td className="py-2">{apt.patient}</td>
+                                    <td className="py-2">{apt.time}</td>
+                                    <td className="py-2">{apt.fees}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          ) : (
+                            <p className="text-gray-500">No upcoming appointments.</p>
+                          )}
 
-            <h1 className="text-lg font-semibold mb-4 mt-6">Hospital Appointments</h1>
+                          <h1 className="text-lg font-semibold mb-4 mt-6">Hospital Appointments</h1>
 
-            {comingAppointments.length > 0 ? (
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="text-gray-600 border-b">
-                    <th className="pb-2">Hospital</th>
-                    <th className="pb-2">Patient</th>
-                    <th className="pb-2">Time</th>
-                    <th className="pb-2">Fees</th>
-                    <th className="pb-2">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {comingAppointments.map((apt, idx) => (
-                    <tr key={idx} className="border-b text-sm">
-                      <td className="py-2">{apt.hospital}</td>
-                      <td className="py-2">{apt.patient}</td>
-                      <td className="py-2">{apt.time}</td>
-                      <td className="py-2">{apt.fees}</td>
-                      <td className="py-2">{apt.status}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p className="text-gray-500">No upcoming appointments.</p>
-            )}
-          </div>
-        </section>
+                          {comingAppointments.length > 0 ? (
+                            <table className="w-full text-left border-collapse">
+                              <thead>
+                                <tr className="text-gray-600 border-b">
+                                  <th className="pb-2">Hospital</th>
+                                  <th className="pb-2">Patient</th>
+                                  <th className="pb-2">Time</th>
+                                  <th className="pb-2">Fees</th>
+                                  <th className="pb-2">Status</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {comingAppointments.map((apt, idx) => (
+                                  <tr key={idx} className="border-b text-sm">
+                                    <td className="py-2">{apt.hospital}</td>
+                                    <td className="py-2">{apt.patient}</td>
+                                    <td className="py-2">{apt.time}</td>
+                                    <td className="py-2">{apt.fees}</td>
+                                    <td className="py-2">{apt.status}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          ) : (
+                            <p className="text-gray-500">No upcoming appointments.</p>
+                          )}
+                        </div>
+                      </section>
 
-        {/* History */}
-        <section id="history" className="space-y-6">
-          <h2 className="text-xl font-semibold border-b pb-2">History</h2>
+        // History
+                      <section id="history" className="space-y-6">
+                        <h2 className="text-xl font-semibold border-b pb-2">History</h2>
 
-          {/* Appointment History */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-lg font-semibold mb-4">In Clinic Appointments</h3>
-            {historyAppointments.length > 0 ? (
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="text-gray-600 border-b">
-                    <th className="pb-2">Hospital</th>
-                    <th className="pb-2">Patient</th>
-                    {Object.keys(patientData).length > 0 && <th className="pb-2">Doctor</th>}
-                    <th className="pb-2">Time</th>
-                    <th className="pb-2">Fees</th>
-                    <th className="pb-2">Visited</th>
-                    <th className="pb-2">Remarks </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {historyAppointments.map((apt, idx) => (
+                        {/* Appointment History */}
+                        <div className="bg-white rounded-xl shadow p-6">
+                          <h3 className="text-lg font-semibold mb-4">In Clinic Appointments</h3>
+                          {historyAppointments.length > 0 ? (
+                            <table className="w-full text-left border-collapse">
+                              <thead>
+                                <tr className="text-gray-600 border-b">
+                                  <th className="pb-2">Hospital</th>
+                                  <th className="pb-2">Patient</th>
+                                  {Object.keys(patientData).length > 0 && <th className="pb-2">Doctor</th>}
+                                  <th className="pb-2">Time</th>
+                                  <th className="pb-2">Fees</th>
+                                  <th className="pb-2">Visited</th>
+                                  <th className="pb-2">Remarks </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {historyAppointments.map((apt, idx) => (
 
-                    <tr key={idx} className="border-b text-sm">
-                      {/* {console.log("historyAppointments", historyAppointments)} */}
-                      <td className="py-2">{apt.hospital}</td>
-                      <td className="py-2">{apt.patient}</td>
-                      {Object.keys(patientData).length > 0 && <td className="py-2">{apt.doctor}</td>}
-                      <td className="py-2">{apt.time}</td>
-                      <td className="py-2">{apt.fees}</td>
-                      <td className="py-2">{apt.visited}</td>
-                      <td className="py-2">
-                        <input type="text" id={idx} value={remarks[idx]?.remarks} disabled ref={(el) => (inputRefs.current[idx] = el)} onChange={(e) => {
-                          const newRemarks = [...remarks];
-                          newRemarks[idx] = { ...newRemarks[idx], remarks: e.target.value };
-                          setRemarks(newRemarks);
+                                  <tr key={idx} className="border-b text-sm">
+                                    {/* {console.log("historyAppointments", historyAppointments)} */}
+                                    <td className="py-2">{apt.hospital}</td>
+                                    <td className="py-2">{apt.patient}</td>
+                                    {Object.keys(patientData).length > 0 && <td className="py-2">{apt.doctor}</td>}
+                                    <td className="py-2">{apt.time}</td>
+                                    <td className="py-2">{apt.fees}</td>
+                                    <td className="py-2">{apt.visited}</td>
+                                    <td className="py-2">
+                                      <input type="text" id={idx} value={remarks[idx]?.remarks} disabled ref={(el) => (inputRefs.current[idx] = el)} onChange={(e) => {
+                                        const newRemarks = [...remarks];
+                                        newRemarks[idx] = { ...newRemarks[idx], remarks: e.target.value };
+                                        setRemarks(newRemarks);
 
-                          localStorage.setItem("remarks", JSON.stringify(newRemarks));
-                        }} />
-                        <i className="fas fa-edit cursor-pointer" onClick={() => {
-                          inputRefs.current[idx].disabled = !(inputRefs.current[idx].disabled);
-                          inputRefs.current[idx].focus();
-                          console.log("ref.current", inputRefs.current[idx]);
-                        }}></i>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p className="text-gray-500">No past appointments.</p>
-            )}
-          </div>
+                                        localStorage.setItem("remarks", JSON.stringify(newRemarks));
+                                      }} />
+                                      <i className="fas fa-edit cursor-pointer" onClick={() => {
+                                        inputRefs.current[idx].disabled = !(inputRefs.current[idx].disabled);
+                                        inputRefs.current[idx].focus();
+                                        console.log("ref.current", inputRefs.current[idx]);
+                                      }}></i>
+                                    </td>
+                                    <td><button className="cursor-pointer" onClick={() => {
+                                      setApt(apt)
+                                      setOpen(true)
+                                    }}>Click here for details</button></td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          ) : (
+                            <p className="text-gray-500">No past appointments.</p>
+                          )}
+                        </div>
 
-          {/* Video History */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-lg font-semibold mb-4">Video Consultations</h3>
-            {historyVideo.length > 0 ? (
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="text-gray-600 border-b">
-                    <th className="pb-2">Patient</th>
-                    {Object.keys(patientData).length > 0 && <th className="pb-2">Doctor</th>}
-                    <th className="pb-2">Time</th>
-                    <th className="pb-2">Fees</th>
-                    <th className="pb-2">Status</th>
-                    <th className="pb-2">Remarks</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {historyVideo.map((vc, idx) => (
-                    <tr key={idx} className="border-b text-sm">
-                      <td className="py-2">{vc.patient}</td>
-                      {Object.keys(patientData).length > 0 && <td className="py-2">{vc.doctor}</td>}
-                      <td className="py-2">{vc.time}</td>
-                      <td className="py-2">{vc.fees}</td>
-                      <td className="py-2">{vc.status}</td>
-                      <td className="py-2">{vc.remarks}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p className="text-gray-500">No past video consultations.</p>
-            )}
-          </div>
+                        {open && <PatientModal setOpen={setOpen} apt={apt} />}
 
-          {/* <VideoConsultation historyVideo={historyVideo} /> */}
-        </section>
+                        {/* Video History */}
+                        <div className="bg-white rounded-xl shadow p-6">
+                          <h3 className="text-lg font-semibold mb-4">Video Consultations</h3>
+                          {historyVideo.length > 0 ? (
+                            <table className="w-full text-left border-collapse">
+                              <thead>
+                                <tr className="text-gray-600 border-b">
+                                  <th className="pb-2">Patient</th>
+                                  {Object.keys(patientData).length > 0 && <th className="pb-2">Doctor</th>}
+                                  <th className="pb-2">Time</th>
+                                  <th className="pb-2">Fees</th>
+                                  <th className="pb-2">Status</th>
+                                  <th className="pb-2">Remarks</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {historyVideo.map((vc, idx) => (
+                                  <tr key={idx} className="border-b text-sm">
+                                    <td className="py-2">{vc.patient}</td>
+                                    {Object.keys(patientData).length > 0 && <td className="py-2">{vc.doctor}</td>}
+                                    <td className="py-2">{vc.time}</td>
+                                    <td className="py-2">{vc.fees}</td>
+                                    <td className="py-2">{vc.status}</td>
+                                    <td className="py-2">{vc.remarks}</td>
+                                    <td>
+                                      <button className="cursor-pointer" onClick={() => {
+                                        setApt(vc)
+                                        setOpen(true)
+                                      }}>Click here for details</button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          ) : (
+                            <p className="text-gray-500">No past video consultations.</p>
+                          )}
+                        </div>
 
-        {/* Reviews Section */}
-        <section id="reviews" className="space-y-6">
-          <h2 className="text-xl font-semibold border-b pb-2">Reviews</h2>
+                        {/* <VideoConsultation historyVideo={historyVideo} /> */}
+                      </section>
 
-          <div className="bg-white rounded-xl shadow p-6">Reviews Section</div>
-        </section>
+        // Reviews Section
+                      <section id="reviews" className="space-y-6">
+                        <h2 className="text-xl font-semibold border-b pb-2">Reviews</h2>
+
+                        <div className="bg-white rounded-xl shadow p-6">Reviews Section</div>
+                      </section>
+                    </>
+                )
+            )
+
+        }
+
+
       </main>
     </div>
   );
