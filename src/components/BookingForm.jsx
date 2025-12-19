@@ -363,7 +363,7 @@ export default function BookingForm({
       {/* 🔹 Date & Time */}
       <form ref={formRef} action={formAction} className="bg-white border rounded-lg shadow mb-6 p-6 space-y-4">
         <h2 className="text-lg font-semibold">Select Date & Time for appointment</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-2 gap-4">
           <div>
             <label className="block font-medium mb-1">Phone</label>
             <input type="text" placeholder="Phone Number" className="p-2 border rounded"

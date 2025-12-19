@@ -32,6 +32,7 @@ import PatientSignup from './pages/PatientSignup.jsx';
 import PatientPortal from './components/patient_portal_react_tailwind.jsx';
 import PatientEditProfile from './pages/PatientEditProfile.jsx';
 import ChangePassword from './pages/ChangePassword.jsx';
+import { AdminLogin } from './pages/AdminLogin.jsx';
 
 
 let router = createBrowserRouter([
@@ -139,6 +140,10 @@ let router = createBrowserRouter([
       {
         path: "/patient/change-password",
         Component: ChangePassword
+      },
+      {
+        path: "/admin/login",
+        Component: AdminLogin
       },
     ]
   }

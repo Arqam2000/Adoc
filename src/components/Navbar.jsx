@@ -59,7 +59,7 @@ export const Navbar = () => {
   const [signupdropdownOpen, setSignupDropdownOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false)
 
-  const isAdmin = true
+  const isAdmin = false
 
   const logindropdownRef = useRef(null);
   const signupdropdownRef = useRef(null);
@@ -131,6 +131,7 @@ export const Navbar = () => {
       console.error("Logout error:", error);
       // toast.error("Logout failed. Please try again.");
       localStorage.removeItem("patientId");
+      localStorage.removeItem("adminId");
       setIsLoggedIn(0);
       setPatient({});
       setIsOpen(false)
@@ -173,7 +174,7 @@ export const Navbar = () => {
       </div>
       <div className=' flex items-center md:gap-4 gap-2' >
         {
-          Object.keys(doctor).length === 0 && Object.keys(patient).length === 0 &&
+          Object.keys(doctor).length === 0 && Object.keys(patient).length === 0 && !localStorage.getItem("adminId") &&
           <>
             <div className='relative' ref={logindropdownRef}>
               <button className='bg-white text-[#2f2f82] py-2 px-2 lg:px-5 rounded border border-[#2f2f82]' onClick={() => {
@@ -205,7 +206,10 @@ export const Navbar = () => {
           </>
         }
 
-        {isAdmin && <button className='bg-white text-[#2f2f82] py-2 px-2 lg:px-5 rounded border border-[#2f2f82] hidden md:block'><Link to="/admin">Admin</Link></button>}
+        {localStorage.getItem("adminId") &&
+          <><button className='bg-white text-[#2f2f82] py-2 px-2 lg:px-5 rounded border border-[#2f2f82] hidden md:block'><Link to="/admin">Admin</Link></button>
+            <button className='bg-white text-[#2f2f82] py-2 px-2 lg:px-5 rounded border border-[#2f2f82] hidden md:block' onClick={logout}>Logout admin</button></>
+        }
 
         {
           Object.keys(doctor).length !== 0 ? <div className='relative group'>
@@ -262,11 +266,11 @@ export const Navbar = () => {
 
         {/* <img src={doctorData.doctor.picture} alt="doc-pic" className='w-11 rounded-full' /> */}
       </div>
-      <button className='lg:hidden z-20' id="menu" 
-      onClick={() => {
-        setIsOpen(!isOpen)
-      }
-      }>
+      <button className='lg:hidden z-20' id="menu"
+        onClick={() => {
+          setIsOpen(!isOpen)
+        }
+        }>
         <span className={`text-3xl`}>&equiv;</span>
       </button>
 
@@ -296,15 +300,22 @@ export const Navbar = () => {
             <li><Link to="#">Health Blog</Link> </li>
 
             {
-              (Object.keys(doctor).length > 0 || Object.keys(patient).length > 0) &&
-              <>
-                <Link to="/dashboard" className="block px-4 py-2 hover:bg-blue-100" onClick={closeMenu}>
-                  Appointments
-                </Link>
-                <button className="block px-4 py-2 hover:bg-blue-100" onClick={logout}>
-                  logout
-                </button>
-              </>
+              (Object.keys(doctor).length > 0 || Object.keys(patient).length > 0) ?
+                <>
+                  <Link to="/dashboard" className="block px-4 py-2 hover:bg-blue-100" onClick={closeMenu}>
+                    Appointments
+                  </Link>
+                  <button className="block px-4 py-2 hover:bg-blue-100" onClick={logout}>
+                    logout
+                  </button>
+                </> : (localStorage.getItem("adminId") && <>
+                  <Link to="/admin" className="block px-4 py-2 hover:bg-blue-100" onClick={closeMenu}>
+                    Admin Dashboard
+                  </Link>
+                  <button className="block px-4 py-2 hover:bg-blue-100" onClick={logout}>
+                    logout
+                  </button>
+                </>)
             }
           </ul>
         </div>
