@@ -19,6 +19,7 @@ import PatientModal from "../components/PatientModal";
 import PatientHistory from "./PatientHistory";
 import LabTestResult from "../components/LabTestResult";
 import ReviewsByPatient from "./ReviewsByPatient";
+import { apiBaseUrl } from "../constants/constants";
 
 export default function Dashboard() {
   const [appointments, setAppointments] = useState([]);
@@ -54,7 +55,7 @@ export default function Dashboard() {
     if (doctorId) {
       fetchDoctorData(doctorId);
     } else {
-      axios.get(`/api/v1/patients/${patientId}`)
+      axios.get(`${apiBaseUrl}/api/v1/patients/${patientId}`)
         .then(res => {
           console.log("Patient data:", res.data.patient);
           setPatientData(res.data.patient);
@@ -73,7 +74,7 @@ export default function Dashboard() {
     console.log(patientId)
 
     if (!patientId) {
-      axios.get(`/api/v1/appointments/book/${doctorData?.doctor?.dr}`)
+      axios.get(`${apiBaseUrl}/api/v1/appointments/book/${doctorData?.doctor?.dr}`)
         .then(res => {
           console.log("Appointments data:", res.data.appointments);
           setAppointments(res.data.appointments);
@@ -90,7 +91,7 @@ export default function Dashboard() {
       // .catch(err => {
       //   console.error("Error fetching patient data:", err);
       // })
-      axios.post(`/api/v1/appointments/book/patient/${patientId}`, {
+      axios.post(`${apiBaseUrl}/api/v1/appointments/book/patient/${patientId}`, {
         date: new Date()
       })
         .then(res => {
@@ -182,7 +183,7 @@ export default function Dashboard() {
     const upcomingVideo = [];
     const videoHistory = [];
 
-    appointments.forEach((apt) => {
+    appointments?.forEach((apt) => {
       const date = parseISO(apt.bdate);
 
       // Video consultation
@@ -329,9 +330,9 @@ export default function Dashboard() {
             <Home size={18} /> Dashboard
           </a>
 
-          <Link to="/patient/edit-profile" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+          {Object.keys(patientData).length > 0 && <Link to="/patient/edit-profile" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
             <User size={18} /> Edit Profile
-          </Link>
+          </Link>}
 
           {
             Object.keys(doctorData).length > 0 && <><Link to={`/view-profile/${doctorData?.doctor?.dr}`} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
@@ -365,14 +366,14 @@ export default function Dashboard() {
               </a> </>
           }
 
-          <button onClick={() => {
+          {Object.keys(patientData).length > 0 && <button onClick={() => {
             setIsPatientHistoryOpen(false)
             setIsReviewsOpen(false)
             setIsLabResultOpen(true)
           }} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
             <History size={18} />
             Lab Test Result
-          </button>
+          </button>}
 
           <button onClick={() => {
             setIsLabResultOpen(false)
@@ -382,10 +383,10 @@ export default function Dashboard() {
             <History size={18} /> Patient History
           </button>
 
-          <Link to="/patient/change-password" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+          {Object.keys(patientData).length > 0 && <Link to="/patient/change-password" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
             <History size={18} />
             Change Password
-          </Link>
+          </Link>}
 
           {Object.keys(doctorData).length > 0 && <a href="#history" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
             <History size={18} /> Doctor Remarks

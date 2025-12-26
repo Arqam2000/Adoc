@@ -49,6 +49,7 @@
 
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
+import { apiBaseUrl } from "../constants/constants";
 
 export const DoctorContext = createContext(null);
 
@@ -59,7 +60,7 @@ export const DoctorProvider = ({ children }) => {
   const fetchDoctorData = async (doctorId, abortController) => {
     try {
       setLoading(true);
-      const response = await axios.post(`/api/v1/doctors/get-doctor/${doctorId}`, {
+      const response = await axios.post(`${apiBaseUrl}/api/v1/doctors/get-doctor/${doctorId}`, {
         signal: abortController?.signal
       });
       const data = response.data;

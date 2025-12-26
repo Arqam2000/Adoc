@@ -6,6 +6,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect } from 'react';
 import { set } from 'date-fns';
+import { apiBaseUrl } from '../constants/constants';
 
 const DropdownMenu = ({ type }) => {
 
@@ -115,7 +116,9 @@ export const Navbar = () => {
 
   const logout = async () => {
     try {
-      const resp = await axios.post("/api/v1/doctors/logout", {})
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/logout`, {}, {
+        withCredentials: true
+      })
 
       if (resp.data.success) {
         localStorage.removeItem("doctor");

@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import ReviewCard from '../components/ReviewCard'
 import axios from 'axios'
+import { apiBaseUrl } from '../constants/constants'
 
 const ReviewsByDoctor = ({id}) => {
   const [reviews,setReviews] = useState([])
   
     const getReviewsByDoctor = async () => {
       try {
-        const res = await axios.get(`/api/v1/reviews/get-reviews-by-doctor/${id}`);
+        const res = await axios.get(`${apiBaseUrl}/api/v1/reviews/get-reviews-by-doctor/${id}`);
 
         if (res.data.success) {
           console.log("Reviews by doctor fetched successfully", res.data.reviews);

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import LabTestForm from './LabTestForm';
 import { toast, ToastContainer } from 'react-toastify';
 import axios from 'axios';
+import { apiBaseUrl } from '../constants/constants';
 
 const LabTestResult = ({ appointments }) => {
   const [file, setFile] = React.useState(null);
@@ -16,7 +17,7 @@ const LabTestResult = ({ appointments }) => {
 
   const getLabTests = async () => {
     try {
-      const res = await axios.get(`/api/v1/labTests/${localStorage.getItem("patientId")}` )
+      const res = await axios.get(`${apiBaseUrl}/api/v1/labTests/${localStorage.getItem("patientId")}` )
 
       console.log(res.data.labTests)
 

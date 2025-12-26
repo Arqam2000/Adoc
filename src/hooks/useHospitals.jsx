@@ -1,6 +1,7 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
+import { apiBaseUrl } from '../constants/constants'
 
 const useHospitals = () => {
   const [hospitals, setHospitals] = useState([])
@@ -10,7 +11,7 @@ const useHospitals = () => {
 
   const getHospitals = async () => {
     try {
-      const res = await axios.get("/api/v1/hospitals/get-hospitals")
+      const res = await axios.get(`${apiBaseUrl}/api/v1/hospitals/get-hospitals`)
 
       setHospitals(res.data.hospitals)
 

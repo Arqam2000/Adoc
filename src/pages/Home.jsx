@@ -7,6 +7,8 @@ import useDoctor from '../context/DoctorContext'
 import useExperience from '../hooks/useExperience'
 import ad from '../assets/lam-aesthetic-ad.png'
 import ErrorModal from '../components/ErrorModal'
+import useSpecializations from '../hooks/useSpecializations'
+import { apiBaseUrl } from '../constants/constants'
 
 export const Home = () => {
   const [doctors, setDoctors] = useState([])
@@ -101,7 +103,10 @@ export const Home = () => {
   console.log("experiences from home", experiences)
 
   const [current, setCurrent] = useState(0);
-  const [specializations, setSpecializations] = useState([])
+  // const [specializations, setSpecializations] = useState([])
+
+  const {specializations} = useSpecializations()
+
   const itemsPerSlide = 3;
 
   const totalSlides = Math.ceil(reviews?.length / itemsPerSlide);
@@ -116,7 +121,7 @@ export const Home = () => {
 
   const getAllDoctors = async () => {
     try {
-      const resp = await axios.get("/api/v1/doctors/get-alldoctors")
+      const resp = await axios.get(`${apiBaseUrl}/api/v1/doctors/get-alldoctors`)
 
       if (resp.data.success) {
         setDoctors(resp.data.data)
@@ -135,13 +140,13 @@ export const Home = () => {
 
     getAllDoctors()
 
-    axios.get("/api/v1/specializations/get-specializations")
-      .then((res) => {
-        setSpecializations(res.data.specializations)
-      })
-      .catch((err) => {
-        console.log("Error fetching specializations", err)
-      })
+    // axios.get("http://localhost:4000/api/v1/specializations/get-specializations")
+    //   .then((res) => {
+    //     setSpecializations(res.data.specializations)
+    //   })
+    //   .catch((err) => {
+    //     console.log("Error fetching specializations", err)
+    //   })
   }, [])
 
   const prevSlide = () => {
@@ -270,7 +275,7 @@ export const Home = () => {
 
         {/* Grid of Specializations */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-6">
-          {specializations.map(({ Specialization_code, Specialization_name, picture }, index) => (
+          {specializations?.map(({ Specialization_code, Specialization_name, picture }, index) => (
             <div key={index} className="flex flex-col items-center cursor-pointer w-fit" onClick={() => navigate('/doctors', { state: { specialization: Specialization_name } })}>
               {/* <Link to='/doctors' > */}
               <div className="w-20 h-20 rounded-full bg-[#e9f2f9] flex items-center justify-center shadow-sm">

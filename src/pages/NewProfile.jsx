@@ -12,6 +12,7 @@ import useSpecializations from "../hooks/useSpecializations";
 import useHospitals from "../hooks/useHospitals";
 import BackButton from "../components/BackButton";
 import AppointmentTypes from "../components/AppointmentTypes";
+import { apiBaseUrl } from "../constants/constants";
 
 export const Profile = () => {
   const [doctor, setDoctor] = useState([]);
@@ -124,9 +125,9 @@ export const Profile = () => {
     try {
       setLoading(true);
       const [degreeRes, instRes, desigRes, docRes] = await Promise.all([
-        axios.get("/api/v1/degrees/get-degrees"),
-        axios.get("/api/v1/institutes/get-institutes"),
-        axios.get("/api/v1/designations/get-designations"),
+        axios.get(`${apiBaseUrl}/api/v1/degrees/get-degrees`),
+        axios.get(`${apiBaseUrl}/api/v1/institutes/get-institutes`),
+        axios.get(`${apiBaseUrl}/api/v1/designations/get-designations`),
         // axios.get(`/api/v1/doctors/get-doctor/${doctor?.dr}`),
       ]);
 
@@ -164,7 +165,7 @@ export const Profile = () => {
         (s) => s.Specialization_name === personalInfo.specialization
       );
 
-      const resp = await axios.post("/api/v1/doctors/edit-doctor", {
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/edit-doctor`, {
         dr: doctor.dr,
         city_code: city?.city_code,
         specialization_code: spec?.Specialization_code,
@@ -183,7 +184,7 @@ export const Profile = () => {
 
   const deleteDocProfile = async () => {
     try {
-      const resp = await axios.post("/api/v1/doctors/delete-doctor", {
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/delete-doctor`, {
         dr: doctor.dr
       })
       if (resp.data.success) {
@@ -217,7 +218,7 @@ export const Profile = () => {
     });
 
     try {
-      const resp = await axios.post("/api/v1/doctors/edit-doctorqd", {
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/edit-doctorqd`, {
         dr: doctor.dr,
         qualifications: newArr
       })
@@ -232,7 +233,7 @@ export const Profile = () => {
 
   const deleteQualifications = async () => {
     try {
-      const resp = await axios.post("/api/v1/doctors/delete-doctorqd", {
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/delete-doctorqd`, {
         dr: doctor.dr
       })
 
@@ -248,7 +249,7 @@ export const Profile = () => {
 
   const saveVDToDB = async () => {
     try {
-      const resp = await axios.post("/api/v1/doctors/edit-doctorvd", {
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/edit-doctorvd`, {
         dr: doctor.dr,
         videoTimings: schedule,
         videoFees,
@@ -277,7 +278,7 @@ export const Profile = () => {
     })
 
     try {
-      const resp = await axios.post("/api/v1/doctors/edit-doctorhd", {
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/edit-doctorhd`, {
         dr: doctor.dr,
         hospitalTimings: newHosBlock,
 
@@ -308,7 +309,7 @@ export const Profile = () => {
     })
 
     try {
-      const resp = await axios.post("/api/v1/doctors/edit-doctorexp", {
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/edit-doctorexp`, {
         dr: doctor.dr,
         experience: newExp,
 
@@ -332,7 +333,7 @@ export const Profile = () => {
 
   const deleteDoctorVD = async () => {
     try {
-      const resp = await axios.post("/api/v1/doctors/delete-doctorvd", {
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/delete-doctorvd`, {
         dr: doctor.dr
       })
 
@@ -441,7 +442,7 @@ export const Profile = () => {
 
   const saveWaitingTime = async () => {
     try {
-      const res = await axios.post("/api/v1/doctors/edit-doctorwt", {
+      const res = await axios.post(`${apiBaseUrl}/api/v1/doctors/edit-doctorwt`, {
         dr: doctor.dr,
         waitingTime
       })
@@ -597,7 +598,7 @@ export const Profile = () => {
                   }}
                 >
                   <option value="">Select Institute</option>
-                  {institutes.map((i) => (
+                  {institutes?.map((i) => (
                     <option key={i.university} value={i.university_name}>
                       {i.university_name}
                     </option>
@@ -616,7 +617,7 @@ export const Profile = () => {
                   }}
                 >
                   <option value="">Select Degree</option>
-                  {qualifications.map((q) => (
+                  {qualifications?.map((q) => (
                     <option key={q.degree_code} value={q.degree_name}>
                       {q.degree_name}
                     </option>

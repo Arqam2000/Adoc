@@ -5,6 +5,7 @@ import axios from 'axios'
 import { calculateExperienceByRange } from '../utils/calculateExperience'
 import useExperience from '../hooks/useExperience'
 import BackButton from '../components/BackButton'
+import { apiBaseUrl } from '../constants/constants'
 
 const DoctorsList = () => {
   const [doctors, setDoctors] = useState([])
@@ -82,7 +83,7 @@ const DoctorsList = () => {
 
   const getAllDoctors = async () => {
     try {
-      const resp = await axios.get("/api/v1/doctors/get-alldoctors")
+      const resp = await axios.get(`${apiBaseUrl}/api/v1/doctors/get-alldoctors`)
 
       if (resp.data.success) {
         setDoctors(resp.data.data)

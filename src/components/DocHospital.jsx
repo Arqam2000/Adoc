@@ -246,7 +246,7 @@ const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hosp
                                     block.designation ? <option value={block.designation}>{block.designation}</option> : <option value="" disabled>Select Designation</option>
                                 }
 
-                                {designations.map((desig) => (
+                                {designations?.map((desig) => (
                                     <option key={desig.Desig} value={desig.DDesig}>
                                         {desig.DDesig}
                                     </option>
