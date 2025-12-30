@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
 import { ConfirmBox } from '../components/ConfirmBox'
+import { apiBaseUrl } from '../constants/constants'
 // import CityManager from '../components/ManageCard'
 
 export const Country = () => {
@@ -24,7 +25,7 @@ export const Country = () => {
     setLoading(true)
     setError(null)
 
-    axios.get("/api/v1/countries/get-countries")
+    axios.get(`${apiBaseUrl}/api/v1/countries/get-countries`)
       .then(res => {
         console.log(res)
         setCountries(res.data.countries)
@@ -41,7 +42,7 @@ export const Country = () => {
     setError(null)
     console.log("Add country")
     try {
-      const resp = await axios.post("/api/v1/countries/add-country", { country })
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/countries/add-country`, { country })
       const newCountry = resp.data.country
       console.log("new country", newCountry)
       setCountries([...countries, { ...newCountry }])
@@ -60,7 +61,7 @@ export const Country = () => {
       setLoading(true)
       setError(null)
       try {
-        const res = await axios.patch(`/api/v1/countries/edit-country/${country_code}`, { country })
+        const res = await axios.patch(`${apiBaseUrl}/api/v1/countries/edit-country/${country_code}`, { country })
 
         console.log(res.data)
 
@@ -89,7 +90,7 @@ export const Country = () => {
       setError(null)
       setIsOpen(true)
       try {
-        const res = await axios.delete(`/api/v1/countries/delete-country/${country_code}`)
+        const res = await axios.delete(`${apiBaseUrl}/api/v1/countries/delete-country/${country_code}`)
 
         const newCountries = countries.filter(country => country.country_code != country_code)
         console.log(newCountries)

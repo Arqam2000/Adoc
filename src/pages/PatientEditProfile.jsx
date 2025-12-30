@@ -3,6 +3,7 @@ import { ToastContainer } from 'react-toastify'
 import BackButton from '../components/BackButton'
 import axios from 'axios'
 import { set } from 'date-fns'
+import { apiBaseUrl } from '../constants/constants'
 
 const PatientEditProfile = () => {
 
@@ -17,7 +18,7 @@ const PatientEditProfile = () => {
   const [isEditBloodGroup, setIsEditBloodGroup] = React.useState(false);
 
   useEffect(() => {
-    axios.get(`/api/v1/patients/${localStorage.getItem("patientId")}`)
+    axios.get(`${apiBaseUrl}/api/v1/patients/${localStorage.getItem("patientId")}`)
       .then((res) => {
         console.log(res.data.patient)
         setPatientData(res.data.patient);
@@ -33,7 +34,7 @@ const PatientEditProfile = () => {
 
   const EditName = async () => {
     try {
-      const res = await axios.put(`/api/v1/patients/edit-name/${localStorage.getItem("patientId")}`, {
+      const res = await axios.put(`${apiBaseUrl}/api/v1/patients/edit-name/${localStorage.getItem("patientId")}`, {
         pname: name
       });
 
@@ -48,7 +49,7 @@ const PatientEditProfile = () => {
 
   const EditEmail = async () => {
     try {
-      const res = await axios.put(`/api/v1/patients/edit-email/${localStorage.getItem("patientId")}`, {
+      const res = await axios.put(`${apiBaseUrl}/api/v1/patients/edit-email/${localStorage.getItem("patientId")}`, {
         pemail: email
       });
 
@@ -64,7 +65,7 @@ const PatientEditProfile = () => {
 
   const EditPhone = async () => {
     try {
-      const res = await axios.put(`/api/v1/patients/edit-phone/${localStorage.getItem("patientId")}`, {
+      const res = await axios.put(`${apiBaseUrl}/api/v1/patients/edit-phone/${localStorage.getItem("patientId")}`, {
         pmobile: phone
       });
 
@@ -79,7 +80,7 @@ const PatientEditProfile = () => {
 
   const EditBloodGroup = async () => {
     try {
-      const res = await axios.put(`/api/v1/patients/edit-blood-group/${localStorage.getItem("patientId")}`, {
+      const res = await axios.put(`${apiBaseUrl}/api/v1/patients/edit-blood-group/${localStorage.getItem("patientId")}`, {
         blood_group: bloodGroup
       });
 

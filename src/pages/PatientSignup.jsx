@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
 import useDoctor from '../context/DoctorContext'
+import { apiBaseUrl } from '../constants/constants'
 
 const PatientSignup = () => {
   const [loading, setLoading] = useState(false)
@@ -29,7 +30,7 @@ const PatientSignup = () => {
     setLoading(true)
     setError(null)
 
-    axios.post("/api/v1/patients/register", { ...user })
+    axios.post(`${apiBaseUrl}/api/v1/patients/register`, { ...user })
       .then(res => {
         console.log("response", res.data)
         toast.success(res.data.message)

@@ -2,6 +2,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
+import { apiBaseUrl } from '../constants/constants'
 
 export const Degree = () => {
     const [degree, setDegree] = useState("")
@@ -22,7 +23,7 @@ export const Degree = () => {
         setLoading(true)
         setError(null)
 
-        axios.get("/api/v1/degrees/get-degrees")
+        axios.get(`${apiBaseUrl}/api/v1/degrees/get-degrees`)
             .then(res => {
                 console.log(res)
                 setDegrees(res.data.degrees)
@@ -39,7 +40,7 @@ export const Degree = () => {
         setError(null)
         console.log("Add degree")
         try {
-            const resp = await axios.post("/api/v1/degrees/add-degree", { degree })
+            const resp = await axios.post(`${apiBaseUrl}/api/v1/degrees/add-degree`, { degree })
             const newDegree = resp.data.degree
             console.log("new degree", newDegree)
             setDegrees([...degrees, { ...newDegree }])
@@ -58,7 +59,7 @@ export const Degree = () => {
             setLoading(true)
             setError(null)
             try {
-                const res = await axios.patch(`/api/v1/degrees/edit-degree/${degree_code}`, { degree })
+                const res = await axios.patch(`${apiBaseUrl}/api/v1/degrees/edit-degree/${degree_code}`, { degree })
 
                 console.log(res.data)
 
@@ -87,7 +88,7 @@ export const Degree = () => {
             setError(null)
             setIsOpen(true)
             try {
-                const res = await axios.delete(`/api/v1/degrees/delete-degree/${degree_code}`)
+                const res = await axios.delete(`${apiBaseUrl}/api/v1/degrees/delete-degree/${degree_code}`)
 
                 const newDegrees = degrees.filter(degree => degree.degree_code != degree_code)
                 console.log(newDegrees)

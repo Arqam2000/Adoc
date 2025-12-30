@@ -8,6 +8,7 @@ import 'react-phone-number-input/style.css'
 import PhoneInput from 'react-phone-number-input'
 import "./JoinasDoctor.css"
 import useSpecializations from '../hooks/useSpecializations';
+import { apiBaseUrl } from '../constants/constants';
 
 export const JoinasDoctor = () => {
   const [doctor, setDoctor] = useState({
@@ -35,7 +36,7 @@ export const JoinasDoctor = () => {
     setError(null)
 
     try {
-      const resp = await axios.post("/api/v1/doctors/register", { ...doctor, country, state: currentState, city: currentCity, mobile: value })
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/register`, { ...doctor, country, state: currentState, city: currentCity, mobile: value })
       console.log("res", resp)
 
       console.log(resp.data.data)

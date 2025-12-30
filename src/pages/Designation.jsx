@@ -2,6 +2,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
+import { apiBaseUrl } from '../constants/constants'
 
 export const Designation = () => {
     const [designation, setDesignation] = useState("")
@@ -22,7 +23,7 @@ export const Designation = () => {
         setLoading(true)
         setError(null)
 
-        axios.get("/api/v1/designations/get-designations")
+        axios.get(`${apiBaseUrl}/api/v1/designations/get-designations`)
             .then(res => {
                 console.log(res)
                 setDesignations(res.data.designations)
@@ -39,7 +40,7 @@ export const Designation = () => {
         setError(null)
         console.log("Add designation")
         try {
-            const resp = await axios.post("/api/v1/designations/add-designation", { designation })
+            const resp = await axios.post(`${apiBaseUrl}/api/v1/designations/add-designation`, { designation })
             const newDesignation = resp.data.designation
             console.log("new designation", newDesignation)
             setDesignations([...designations, { ...newDesignation }])
@@ -58,7 +59,7 @@ export const Designation = () => {
             setLoading(true)
             setError(null)
             try {
-                const res = await axios.patch(`/api/v1/designations/edit-designation/${designation_code}`, { designation })
+                const res = await axios.patch(`${apiBaseUrl}/api/v1/designations/edit-designation/${designation_code}`, { designation })
 
                 console.log(res.data)
 
@@ -87,7 +88,7 @@ export const Designation = () => {
             setError(null)
             setIsOpen(true)
             try {
-                const res = await axios.delete(`/api/v1/designations/delete-designation/${designation_code}`)
+                const res = await axios.delete(`${apiBaseUrl}/api/v1/designations/delete-designation/${designation_code}`)
 
                 const newDesignations = designations.filter(designation => designation.Desig != designation_code)
                 console.log(newDesignations)

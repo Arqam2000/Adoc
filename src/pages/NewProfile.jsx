@@ -498,7 +498,7 @@ export const Profile = () => {
               }
             >
               <option value="">Select City</option>
-              {cities.map((c) => (
+              {cities?.map((c) => (
                 <option key={c.city_code} value={c.city_name}>
                   {c.city_name}
                 </option>

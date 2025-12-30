@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify';
 import delIcon from "../assets/delete.png"
+import { apiBaseUrl } from '../constants/constants';
 
 const DocExperience = ({ hospitals, designations, handleOpenModal, handleRows2fromDocExperience, saveExpToDB, handleFocus, docExperience, dr }) => {
     const [rows2, setRows2] = useState([
@@ -41,7 +42,7 @@ const DocExperience = ({ hospitals, designations, handleOpenModal, handleRows2fr
 
     const deleteDoctorExp = async () => {
         try {
-            const resp = await axios.post("/api/v1/doctors/delete-doctorexp", {
+            const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/delete-doctorexp`, {
                 dr
             })
 
@@ -109,7 +110,7 @@ const DocExperience = ({ hospitals, designations, handleOpenModal, handleRows2fr
 
                 const desigObj = designations.find(desig => desig.DDesig == row.designation)
 
-                const resp = await axios.post(`/api/v1/doctors/delete-doctorexp/${dr}`, {
+                const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/delete-doctorexp/${dr}`, {
                     hospital_code: hosObj.hospital_code,
                     Desig: desigObj.Desig
                 })

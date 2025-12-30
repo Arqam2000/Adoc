@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import BackButton from '../components/BackButton';
+import { apiBaseUrl } from '../constants/constants';
 
 const VideoConsultation = ({ historyVideo }) => {
   const [status, setStatus] = useState([]);
@@ -23,7 +24,7 @@ const VideoConsultation = ({ historyVideo }) => {
 
   const handleQuit = async () => {
     try {
-      const res = await axios.post('/api/v1/appointments/close-appointment', {
+      const res = await axios.post(`${apiBaseUrl}/api/v1/appointments/close-appointment`, {
         dr: JSON.parse(localStorage.getItem('doctor')).dr,
         date: videoConsultations[0].time,
         status: "closed"
@@ -43,7 +44,7 @@ const VideoConsultation = ({ historyVideo }) => {
   const handleSave = async () => {
     try {
       console.log(videoConsultations)
-      const res = await axios.post('/api/v1/appointments/save-appointment-status', {
+      const res = await axios.post(`${apiBaseUrl}/api/v1/appointments/save-appointment-status`, {
         dr: JSON.parse(localStorage.getItem('doctor')).dr,
         appointments: videoConsultations
       })

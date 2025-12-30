@@ -1,6 +1,7 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
+import { apiBaseUrl } from '../constants/constants'
 
 const PatientModal = ({ setOpen, apt }) => {
   const [symptom, setSymptom] = useState("")
@@ -11,7 +12,7 @@ const PatientModal = ({ setOpen, apt }) => {
 
   const handleSave = async () => {
     try {
-      const res = await axios.post("/api/v1/appointments/edit-appointment", {
+      const res = await axios.post(`${apiBaseUrl}/api/v1/appointments/edit-appointment`, {
         bappoint: apt.bappoint,
         symptom,
         prescription,
@@ -29,7 +30,7 @@ const PatientModal = ({ setOpen, apt }) => {
 
   const getAppointment = async () => {
     try {
-      const res = await axios.post("/api/v1/appointments/get-appointment", {
+      const res = await axios.post(`${apiBaseUrl}/api/v1/appointments/get-appointment`, {
         bappoint: apt.bappoint
       })
 

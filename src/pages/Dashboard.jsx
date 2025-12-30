@@ -287,7 +287,9 @@ export default function Dashboard() {
 
   const logout = async () => {
     try {
-      const resp = await axios.post("/api/v1/doctors/logout", {})
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/logout`, {}, {
+        withCredentials: true
+      })
 
       if (resp.data.success) {
         localStorage.removeItem("doctor");

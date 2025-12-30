@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react'
 import { toast } from 'react-toastify';
+import { apiBaseUrl } from '../constants/constants';
 
 const AppointmentTypes = () => {
   const [appointmentType, setAppointmentType] = useState('');
@@ -16,7 +17,7 @@ const AppointmentTypes = () => {
     console.log("Saving Appointment Type:", appointmentType);
     console.log("Saving Available for Free Video Consultation:", availableForFreeVideoConsultation);  
     try {
-      const res = await axios.post('/api/v1/doctors/appointment-type', {
+      const res = await axios.post(`${apiBaseUrl}/api/v1/doctors/appointment-type`, {
         dr: JSON.parse(localStorage.getItem("doctor")).dr,
         appointmentType,
         availableForFreeVideoConsultation

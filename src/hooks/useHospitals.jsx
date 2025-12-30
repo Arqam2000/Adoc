@@ -22,7 +22,7 @@ const useHospitals = () => {
 
   const addHospital = async (hospital, cityCode) => {
     try {
-      const res = await axios.post("/api/v1/hospitals/add-hospital", {hospital, cityCode})
+      const res = await axios.post(`${apiBaseUrl}/api/v1/hospitals/add-hospital`, {hospital, cityCode})
 
       const newHospital = res.data.hospital
 
@@ -42,7 +42,7 @@ const useHospitals = () => {
       // setLoading(true)
       setError(null)
       try {
-        const res = await axios.patch(`/api/v1/hospitals/edit-hospital/${hospitalCode}`, { hospital })
+        const res = await axios.patch(`${apiBaseUrl}/api/v1/hospitals/edit-hospital/${hospitalCode}`, { hospital })
 
         console.log(res.data)
 
@@ -71,7 +71,7 @@ const useHospitals = () => {
       // setLoading(true)
       setError(null)
       try {
-        const res = await axios.delete(`/api/v1/hospitals/delete-hospital/${hospital_code}`)
+        const res = await axios.delete(`${apiBaseUrl}/api/v1/hospitals/delete-hospital/${hospital_code}`)
 
         const newHospitals = hospitals.filter(hospital => hospital.hospital_code != hospital_code)
         console.log(newHospitals)

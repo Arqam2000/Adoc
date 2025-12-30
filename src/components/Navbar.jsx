@@ -74,17 +74,18 @@ export const Navbar = () => {
   const patientId = JSON.parse(localStorage.getItem("patientId"));
 
   useEffect(() => {
-    const doctor = JSON.parse(localStorage.getItem("doctor"));
+    const savedDoctor = JSON.parse(localStorage.getItem("doctor"));
     // console.log("doctor from localStorage in navbar:", doctor);
     console.log("patientId", patientId)
+    console.log("savedDoctor", )
 
-    if (doctor) {
-      setDoctor(doctor);
-      setIsLoggedIn(doctor.isLoggedIn);
+    if (savedDoctor) {
+      setDoctor(savedDoctor || {});
+      setIsLoggedIn(savedDoctor?.isLoggedIn);
 
     } else if (patientId) {
 
-      axios.get(`/api/v1/patients/${patientId}`)
+      axios.get(`${apiBaseUrl}/api/v1/patients/${patientId}`)
         .then(res => {
           // console.log("Patient data:", res.data.patient);
           setPatient(res.data.patient);

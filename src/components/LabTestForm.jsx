@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React from 'react'
 import { toast, ToastContainer } from 'react-toastify';
+import { apiBaseUrl } from '../constants/constants';
 
 const LabTestForm = ({ setLabTestForm, labTestInfo, setLabTestInfo }) => {
   const [addDoctor, setAddDoctor] = React.useState(false);
@@ -16,7 +17,7 @@ const LabTestForm = ({ setLabTestForm, labTestInfo, setLabTestInfo }) => {
       formData.append("labTestFor", labTestInfo.labTestFor);
       formData.append("patientId", localStorage.getItem("patientId"));
 
-      const res = await axios.post("/api/v1/labTests", formData)
+      const res = await axios.post(`${apiBaseUrl}/api/v1/labTests`, formData)
 
       setLabTestForm(false);
       toast.success("Lab Test added successfully");

@@ -6,6 +6,7 @@ import "react-calendar/dist/Calendar.css";
 import { useNavigate } from "react-router-dom";
 import BackButton from "./BackButton";
 import { ConfirmBox } from "./ConfirmBox";
+import { apiBaseUrl } from "../constants/constants";
 
 export default function BookingForm({
   mode = "clinic", // "clinic" or "video"
@@ -33,7 +34,7 @@ export default function BookingForm({
   const patientId = JSON.parse(localStorage.getItem("patientId"));
 
   useEffect(() => {
-    axios.get(`/api/v1/patients/${patientId}`)
+    axios.get(`${apiBaseUrl}/api/v1/patients/${patientId}`)
       .then(res => {
         setPatient(res.data.patient)
         setPatientName(res.data.patient.pname)
@@ -51,7 +52,7 @@ export default function BookingForm({
     const timeout = setTimeout(async () => {
       try {
         setLookingUp(true);
-        const res = await axios.post(`/api/v1/appointments/find-patient`, {
+        const res = await axios.post(`${apiBaseUrl}/api/v1/appointments/find-patient`, {
           signal: controller.signal,
           data: phone
         });
@@ -114,7 +115,7 @@ export default function BookingForm({
         payload.vc = "yes"; // Indicate video consultation
       }
 
-      const res = await axios.post("/api/v1/appointments/book", { ...payload, actionType });
+      const res = await axios.post(`${apiBaseUrl}/api/v1/appointments/book`, { ...payload, actionType });
 
       toast.success("Appointment booked successfully!");
       onBook?.(res.data);
@@ -267,7 +268,7 @@ export default function BookingForm({
     if (debouncedSearchTerm) {
       const fetchResults = async () => {
         try {
-          const response = await axios.post(`/api/v1/appointments/search?query=${selectedDate}:${debouncedSearchTerm}`, {
+          const response = await axios.post(`${apiBaseUrl}/api/v1/appointments/search?query=${selectedDate}:${debouncedSearchTerm}`, {
             dr: availability[0].dr
           });
 

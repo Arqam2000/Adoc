@@ -2,6 +2,7 @@ import axios from 'axios'
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
+import { apiBaseUrl } from '../constants/constants'
 
 export const Specialization = () => {
   const [specialization, setSpecialization] = useState("")
@@ -20,7 +21,7 @@ export const Specialization = () => {
 
 
   useEffect(() => {
-    axios.get("/api/v1/specializations/get-specializations")
+    axios.get(`${apiBaseUrl}/api/v1/specializations/get-specializations`)
       .then(res => setSpecializations(res.data.specializations))
       .catch(err => {
         console.log("error", err)
@@ -37,7 +38,7 @@ export const Specialization = () => {
     formData.append('specialization', specialization)
     console.log(formData.get("image"))
     try {
-      const resp = await axios.post("/api/v1/specializations/add-specialization", formData, {
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/specializations/add-specialization`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -66,7 +67,7 @@ export const Specialization = () => {
       formData.append('specialization', specialization)
       formData.append('specialization_code', specialization_code)
       try {
-        const res = await axios.patch(`/api/v1/specializations/edit-specialization/${specialization_code}`, formData, {
+        const res = await axios.patch(`${apiBaseUrl}/api/v1/specializations/edit-specialization/${specialization_code}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -98,7 +99,7 @@ export const Specialization = () => {
       setLoading(true)
       setError(null)
       try {
-        const res = await axios.delete(`/api/v1/specializations/delete-specialization/${specialization_code}`)
+        const res = await axios.delete(`${apiBaseUrl}/api/v1/specializations/delete-specialization/${specialization_code}`)
 
         const newSpecializations = specializations.filter(specialization => specialization.Specialization_code != specialization_code)
         console.log(newSpecializations)

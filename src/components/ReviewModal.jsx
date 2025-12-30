@@ -1,6 +1,7 @@
 import axios from "axios";
 import React from "react";
 import { toast } from "react-toastify";
+import { apiBaseUrl } from "../constants/constants";
 
 const ReviewModal = ({ isOpen, onClose, appointment }) => {
   if (!isOpen) return null;
@@ -31,7 +32,7 @@ const ReviewModal = ({ isOpen, onClose, appointment }) => {
         remarks,
         postAnonymously)
 
-      await axios.post("/api/v1/reviews/add-review", {
+      await axios.post(`${apiBaseUrl}/api/v1/reviews/add-review`, {
         dr: appointment?.dr,
         patient: JSON.parse(localStorage.getItem("patientId")),
         overallSatisfaction,

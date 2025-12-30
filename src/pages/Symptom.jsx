@@ -2,6 +2,7 @@ import axios from 'axios'
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
+import { apiBaseUrl } from '../constants/constants'
 
 export const Symptom = () => {
     const [symptom, setSymptom] = useState("")
@@ -21,7 +22,7 @@ export const Symptom = () => {
 
 
     useEffect(() => {
-        axios.get("/api/v1/symptoms/get-symptoms")
+        axios.get(`${apiBaseUrl}/api/v1/symptoms/get-symptoms`)
             .then(res => {
                 console.log(res.data.symptoms)
                 setSymptoms(res.data.symptoms)
@@ -41,7 +42,7 @@ export const Symptom = () => {
             
             formData.append("image", image)
         try {
-            const resp = await axios.post("/api/v1/symptoms/add-symptom", formData)
+            const resp = await axios.post(`${apiBaseUrl}/api/v1/symptoms/add-symptom`, formData)
             if (resp.data.success) {
                 const newSymptom = resp.data.symptom
                 console.log("newSymptom", newSymptom)
@@ -68,7 +69,7 @@ export const Symptom = () => {
             
             formData.append("image", image)
             try {
-                const res = await axios.patch(`/api/v1/symptoms/edit-symptom/${symptom_code}`, formData)
+                const res = await axios.patch(`${apiBaseUrl}/api/v1/symptoms/edit-symptom/${symptom_code}`, formData)
 
                 console.log(res.data)
 
@@ -96,7 +97,7 @@ export const Symptom = () => {
             setLoading(true)
             setError(null)
             try {
-                const res = await axios.delete(`/api/v1/symptoms/delete-symptom/${symptom_code}`)
+                const res = await axios.delete(`${apiBaseUrl}/api/v1/symptoms/delete-symptom/${symptom_code}`)
 
                 const newSymptoms = symptoms.filter(symptom => symptom.symptom != symptom_code)
                 console.log(newSymptoms)

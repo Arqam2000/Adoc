@@ -2,6 +2,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
+import { apiBaseUrl } from '../constants/constants'
 
 export const City = () => {
     const [city, setCity] = useState("")
@@ -22,7 +23,7 @@ export const City = () => {
         setLoading(true)
         setError(null)
 
-        axios.get("/api/v1/cities/get-cities")
+        axios.get(`${apiBaseUrl}/api/v1/cities/get-cities`)
             .then(res => {
                 console.log(res)
                 setCities(res.data.cities)
@@ -38,7 +39,7 @@ export const City = () => {
         setLoading(true)
         setError(null)
 
-        axios.get("/api/v1/countries/get-countries")
+        axios.get(`${apiBaseUrl}/api/v1/countries/get-countries`)
             .then(res => {
                 console.log(res)
                 setCountries(res.data.countries)
@@ -54,7 +55,7 @@ export const City = () => {
         setLoading(true)
         setError(null)
         try {
-            const resp = await axios.post("/api/v1/cities/add-city", { city })
+            const resp = await axios.post(`${apiBaseUrl}/api/v1/cities/add-city`, { city })
             const newCity = resp.data.city
             console.log("new city", newCity)
             setCities([...cities, { ...newCity }])
@@ -73,7 +74,7 @@ export const City = () => {
             setLoading(true)
             setError(null)
             try {
-                const res = await axios.patch(`/api/v1/cities/edit-city/${city_code}`, { city })
+                const res = await axios.patch(`${apiBaseUrl}/api/v1/cities/edit-city/${city_code}`, { city })
 
                 console.log(res.data)
 
@@ -101,7 +102,7 @@ export const City = () => {
             setLoading(true)
             setError(null)
             try {
-                const res = await axios.delete(`/api/v1/cities/delete-city/${city_code}`)
+                const res = await axios.delete(`${apiBaseUrl}/api/v1/cities/delete-city/${city_code}`)
 
                 const newCities = cities.filter(city => city.city_code != city_code)
                 console.log(newCities)

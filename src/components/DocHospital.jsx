@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import delIcon from "../assets/delete.png"
+import { apiBaseUrl } from "../constants/constants";
 
 const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hospitalBlocks, setHospitalBlocks, saveHDToDB, handleFocus, dr }) => {
 
@@ -73,7 +74,7 @@ const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hosp
 
     const deleteDoctorHD = async () => {
         try {
-            const resp = await axios.post("/api/v1/doctors/delete-doctorhd", {
+            const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/delete-doctorhd`, {
                 dr
             })
 
@@ -158,7 +159,7 @@ const DoctorTiming = ({ hospitals, designations, setClickedFrom, setIsOpen, hosp
 
                 const desigObj = designations.find(desig => desig.DDesig == block.designation)
 
-                const resp = await axios.post(`/api/v1/doctors/delete-doctorhd/${dr}`, {
+                const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/delete-doctorhd/${dr}`, {
                     hospital_code: hosObj.hospital_code,
                     Desig: desigObj.Desig
                 })

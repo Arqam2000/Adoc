@@ -3,6 +3,7 @@ import React from 'react'
 import { toast, ToastContainer } from 'react-toastify'
 import BackButton from '../components/BackButton';
 import { Link } from 'react-router-dom';
+import { apiBaseUrl } from '../constants/constants';
 
 const ChangePassword = () => {
 
@@ -10,7 +11,7 @@ const ChangePassword = () => {
     e.preventDefault();
     console.log(e.target[0].value, e.target[1].value, e.target[2].value)
     try {
-      const res = await axios.put(`/api/v1/patients/change-password/${localStorage.getItem("patientId")}`, {
+      const res = await axios.put(`${apiBaseUrl}/api/v1/patients/change-password/${localStorage.getItem("patientId")}`, {
         oldPassword: e.target[0].value,
         newPassword: e.target[1].value,
         confirmPassword: e.target[2].value

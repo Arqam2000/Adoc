@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import ReviewCard from '../components/ReviewCard';
 import axios from 'axios';
+import { apiBaseUrl } from '../constants/constants';
 
 const ReviewsByPatient = () => {
   const [reviews,setReviews] = useState([])
 
   const getReviewsByPatient = async () => {
     try {
-      const res = await axios.get(`/api/v1/reviews/get-reviews-by-patient/${localStorage.getItem("patientId")}`);
+      const res = await axios.get(`${apiBaseUrl}/api/v1/reviews/get-reviews-by-patient/${localStorage.getItem("patientId")}`);
 
       if (res.data.success) {
         console.log("Reviews by patient fetched successfully", res.data.reviews);

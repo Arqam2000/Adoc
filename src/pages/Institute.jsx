@@ -2,6 +2,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
+import { apiBaseUrl } from '../constants/constants'
 
 export const Institute = () => {
     const [institute, setInstitute] = useState("")
@@ -24,7 +25,7 @@ export const Institute = () => {
         setLoading(true)
         setError(null)
 
-        axios.get("/api/v1/institutes/get-institutes")
+        axios.get(`${apiBaseUrl}/api/v1/institutes/get-institutes`)
             .then(res => {
                 console.log(res.data)
                 setInstitutes(res.data.institutes)

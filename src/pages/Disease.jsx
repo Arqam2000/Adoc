@@ -2,6 +2,7 @@ import axios from 'axios'
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
+import { apiBaseUrl } from '../constants/constants'
 
 export const Disease = () => {
     const [disease, setDisease] = useState("")
@@ -21,7 +22,7 @@ export const Disease = () => {
 
 
     useEffect(() => {
-        axios.get("/api/v1/diseases/get-diseases")
+        axios.get(`${apiBaseUrl}/api/v1/diseases/get-diseases`)
             .then(res => setDiseases(res.data.diseases))
             .catch(err => {
                 console.log("error", err)
@@ -39,7 +40,7 @@ export const Disease = () => {
             
             formData.append("image", image)
         try {
-            const resp = await axios.post("/api/v1/diseases/add-disease", formData)
+            const resp = await axios.post(`${apiBaseUrl}/api/v1/diseases/add-disease`, formData)
             if (resp.data.success) {
                 const newDisease = resp.data.disease
                 console.log("newDisease", newDisease)
@@ -66,7 +67,7 @@ export const Disease = () => {
             
             formData.append("image", image)
             try {
-                const res = await axios.patch(`/api/v1/diseases/edit-disease/${disease_code}`, formData, {
+                const res = await axios.patch(`${apiBaseUrl}/api/v1/diseases/edit-disease/${disease_code}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -98,7 +99,7 @@ export const Disease = () => {
             setLoading(true)
             setError(null)
             try {
-                const res = await axios.delete(`/api/v1/diseases/delete-disease/${disease_code}`)
+                const res = await axios.delete(`${apiBaseUrl}/api/v1/diseases/delete-disease/${disease_code}`)
 
                 const newDiseases = diseases.filter(disease => disease.disease != disease_code)
                 console.log(newDiseases)

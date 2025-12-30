@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { apiBaseUrl } from "../constants/constants";
 
 export default function CityManager({AddCountry, setLocate}) {
     const params = useParams()
@@ -18,7 +19,7 @@ export default function CityManager({AddCountry, setLocate}) {
         setLoading(true)
         setError(null)
 
-        axios.get(`/api/v1/${params.name.charAt(0).toLowerCase() + params.name.slice(1)}/get-${params.name.charAt(0).toLowerCase() + params.name.slice(1)}`)
+        axios.get(`${apiBaseUrl}/api/v1/${params.name.charAt(0).toLowerCase() + params.name.slice(1)}/get-${params.name.charAt(0).toLowerCase() + params.name.slice(1)}`)
             .then(res => {
                 console.log(res)
                 setData(res.data.countries)
@@ -34,7 +35,7 @@ export default function CityManager({AddCountry, setLocate}) {
         setLoading(true)
             setError(null)
             try {
-              const resp = await axios.post(`/api/v1/${params.name.charAt(0).toLowerCase() + params.name.slice(1)}/add-country`, { inputVal })
+              const resp = await axios.post(`${apiBaseUrl}/api/v1/${params.name.charAt(0).toLowerCase() + params.name.slice(1)}/add-country`, { inputVal })
               const newCountry = resp.data.country
               console.log("new country", newCountry)
               setCountries([...countries, { ...newCountry }])
