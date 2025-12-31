@@ -11,7 +11,7 @@ export const Login = () => {
   const [error, setError] = useState(null)
   const [value, setValue] = useState()
   const [user, setUser] = useState({
-    phone: "",
+    username: "",
     password: ""
   })
 
@@ -28,7 +28,6 @@ export const Login = () => {
 
     setLoading(true)
     setError(null)
-    user.phone = value
 
     if (location.pathname === "/login") {
       axios.post(`${apiBaseUrl}/api/v1/doctors/login`, { ...user })
@@ -80,7 +79,7 @@ export const Login = () => {
 
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
-              <label className="block text-gray-700 font-medium mb-2">Phone</label>
+              <label className="block text-gray-700 font-medium mb-2">Username</label>
               {/* <input
                                 type="text"
                                 placeholder="Enter your phone number"
@@ -88,13 +87,14 @@ export const Login = () => {
                                 value={user.email}
                                 onChange={(e) => setUser({...user, phone: e.target.value})}
                             /> */}
-              <div className='py-3 px-3   outline'>
-                <PhoneInput
-                  placeholder="Enter phone number"
-                  value={value}
-                  onChange={setValue}
-                  international
-                />
+              <div >
+                <input
+                type="text"
+                placeholder="Enter your username"
+                className="w-full px-4 py-3 border border-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={user.username}
+                onChange={(e) => setUser({ ...user, username: e.target.value })}
+              />
               </div>
             </div>
 

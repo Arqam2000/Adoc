@@ -9,6 +9,7 @@ const PatientSignup = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [user, setUser] = useState({
+    username: "",
     name: "",
     email: "",
     phone: "",
@@ -65,6 +66,16 @@ const PatientSignup = () => {
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={user.name}
                 onChange={(e) => setUser({ ...user, name: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">Username</label>
+              <input
+                type="text"
+                placeholder="Enter your username"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={user.username}
+                onChange={(e) => setUser({ ...user, username: e.target.value })}
               />
             </div>
             <div>

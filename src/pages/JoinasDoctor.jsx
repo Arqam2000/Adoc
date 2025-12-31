@@ -12,10 +12,12 @@ import { apiBaseUrl } from '../constants/constants';
 
 export const JoinasDoctor = () => {
   const [doctor, setDoctor] = useState({
+    username: "",
     name: "",
     email: "",
     phone: "",
-    password: ""
+    password: "",
+    gender: ""
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -36,7 +38,7 @@ export const JoinasDoctor = () => {
     setError(null)
 
     try {
-      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/register`, { ...doctor, country, state: currentState, city: currentCity, mobile: value })
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/register`, { ...doctor, country, state: currentState, city: currentCity, mobile: value, specialization })
       console.log("res", resp)
 
       console.log(resp.data.data)
@@ -74,6 +76,7 @@ export const JoinasDoctor = () => {
           <h1 className='text-xl'>Register Now</h1>
           <form className='flex flex-col items-center lg:items-baseline gap-5' onSubmit={handleSubmit}>
             <input type="text" placeholder='Name' className='py-3 px-3 w-[100%] lg:w-[80%] outline' required value={doctor.name} onChange={(e) => setDoctor({ ...doctor, name: e.target.value })} />
+            <input type="text" placeholder='Username' className='py-3 px-3 w-[100%] lg:w-[80%] outline' required value={doctor.username} onChange={(e) => setDoctor({ ...doctor, username: e.target.value })} />
             <input type="email" placeholder='Email' className='py-3 px-3 w-[100%] lg:w-[80%] outline' required value={doctor.email} onChange={(e) => setDoctor({ ...doctor, email: e.target.value })} />
             <CountrySelect
               containerClassName="form-group"
@@ -150,8 +153,8 @@ export const JoinasDoctor = () => {
             <input type="password" placeholder='Password' className='py-3 px-3 w-[100%] lg:w-[80%] outline' required value={doctor.password} onChange={(e) => setDoctor({ ...doctor, password: e.target.value })} />
             <div className='flex gap-3'>
               <label>Gender</label>
-              <label ><input type="radio" name="gender" id="gender" /> Male</label>
-              <label ><input type="radio" name="gender" id="gender" /> Female</label>
+              <label ><input type="radio" name="gender" id="gender" value="Male" onChange={e => setDoctor({...doctor, gender: e.target.value})}/> Male</label>
+              <label ><input type="radio" name="gender" id="gender" value="Female" onChange={e => setDoctor({...doctor, gender: e.target.value})}/> Female</label>
 
             </div>
             {
