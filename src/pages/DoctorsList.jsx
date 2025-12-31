@@ -45,7 +45,7 @@ const DoctorsList = () => {
     console.log("filterByVideoConsultation ", filterByVideoConsultation)
   }
 
-  if (location.state?.city && location.state?.specialization) {
+  else if (location.state?.city && location.state?.specialization) {
     cityName = location.state.city;
     specializationName = location.state.specialization;
 
@@ -56,7 +56,7 @@ const DoctorsList = () => {
 
   } 
 
-  if (location.state?.city) {
+  else if (location.state?.city) {
     cityName = location.state?.city;
     filteredByCity = doctors?.filter(doc => doc.city_name === cityName)
 
@@ -64,7 +64,7 @@ const DoctorsList = () => {
 
   } 
 
-  if (location.state?.specialization) {
+  else if (location.state?.specialization) {
     specializationName = location.state?.specialization;
     filteredBySpecialization = doctors?.filter(doc => doc.Specialization_name === specializationName)
     console.log("filteredBySpecialization ", filteredBySpecialization)

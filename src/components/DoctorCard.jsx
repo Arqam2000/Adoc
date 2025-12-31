@@ -134,7 +134,7 @@ const DoctorCard = ({
             </div>
             <div>
               <h2 className='text-xs font-semibold'>Satisfaction</h2>
-              <h2 className='text-xs'>{review?.satisfaction_percentage.split(".")[0]}%</h2>
+              <h2 className='text-xs'>{review?.satisfaction_percentage?.split(".")[0]}%</h2>
 
             </div>
           </div>

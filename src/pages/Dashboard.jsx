@@ -40,7 +40,7 @@ export default function Dashboard() {
 
   const inputRefs = useRef([]);
 
-  // console.log("Doctor Data on Dashboard:", doctorData);
+  console.log("Doctor Data on Dashboard:", doctorData);
 
   // console.log("experiences from Dashboard", experiences)
 
