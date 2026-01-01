@@ -5,6 +5,7 @@ import { toast, ToastContainer } from 'react-toastify'
 import useDoctor from '../context/DoctorContext'
 import { apiBaseUrl } from '../constants/constants'
 import PhoneInput from 'react-phone-number-input'
+import useLoginName from '../context/LoginContext'
 
 export const Login = () => {
   const [loading, setLoading] = useState(false)
@@ -22,6 +23,7 @@ export const Login = () => {
   console.log("state", location.state)
 
   const { setDoctorData } = useDoctor()
+  const {setLoginName} = useLoginName()
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -35,6 +37,7 @@ export const Login = () => {
           console.log("response", res.data)
           toast.success(res.data.message)
           localStorage.setItem("doctorId", JSON.stringify(res.data.user.dr))
+          setLoginName(res.data.user.name)
           navigate(`/dashboard`)
         })
         .catch(err => {

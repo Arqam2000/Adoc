@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useEffect } from 'react';
 import { set } from 'date-fns';
 import { apiBaseUrl } from '../constants/constants';
+import useLoginName from '../context/LoginContext';
 
 const DropdownMenu = ({ type }) => {
 
@@ -68,6 +69,7 @@ export const Navbar = () => {
   const navigate = useNavigate()
 
   const { doctorData, setDoctorData } = useDoctor();
+  const {LoginName, setLoginName } = useLoginName()
 
   // console.log("doctorData in navbar:", doctorData);
   // console.log("isLoggedIn:", isLoggedIn);
@@ -127,6 +129,7 @@ export const Navbar = () => {
         setDoctorData({});
         setDoctor({});
         setIsLoggedIn(0);
+        setLoginName("");
         toast.success(resp.data.message);
         setIsOpen(false)
         navigate("/login");
@@ -216,11 +219,11 @@ export const Navbar = () => {
         }
 
         {
-          Object.keys(doctor).length !== 0 ? <div className='relative group'>
+          LoginName ? <div className='relative group'>
             <div className='no-underline text-base mr-5 flex items-center gap-1' onClick={() => setOpen(prev => !prev)}>
               <img src={doctor.picture} alt="doc-pic" className='w-11 rounded-full' />
               <div className='flex flex-col justify-center'>
-                <h3 className='font-semibold text-lg '>{doctor.name}</h3>
+                <h3 className='font-semibold text-lg '>{LoginName}</h3>
                 <h3>Doctor</h3>
               </div>
               {
