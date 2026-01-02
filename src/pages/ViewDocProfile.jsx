@@ -7,7 +7,7 @@ import BackButton from "../components/BackButton";
 import ReviewsByDoctor from "./ReviewsByDoctor";
 
 export default function ViewDocProfile() {
-  const { doctorData, fetchDoctorData } = useDoctor()
+  const { doctorData, setDoctorData, fetchDoctorData } = useDoctor()
 
   const [experiences] = useExperience(doctorData?.doctorexp, [doctorData?.doctor])
 
@@ -49,6 +49,10 @@ export default function ViewDocProfile() {
     //   .catch(err => {
     //     console.log("Error:", err)
     //   })
+    if (JSON.parse(localStorage.getItem("doctorId")) === id) {
+      setDoctorData(JSON.parse(localStorage.getItem("doctor")))
+      return
+    }
     const abortController = new AbortController();
     fetchDoctorData(id, abortController);
 
@@ -62,6 +66,7 @@ export default function ViewDocProfile() {
     // }
 
     return () => {
+      setDoctorData({});
       abortController.abort();
     };
   }, [id])

@@ -23,7 +23,7 @@ export const Login = () => {
   console.log("state", location.state)
 
   const { setDoctorData } = useDoctor()
-  const {setLoginName} = useLoginName()
+  const {setLoginName, setPd} = useLoginName()
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -38,6 +38,7 @@ export const Login = () => {
           toast.success(res.data.message)
           localStorage.setItem("doctorId", JSON.stringify(res.data.user.dr))
           setLoginName(res.data.user.name)
+          setPd("d")
           navigate(`/dashboard`)
         })
         .catch(err => {
@@ -53,6 +54,8 @@ export const Login = () => {
           console.log("response", res.data)
           toast.success(res.data.message)
           localStorage.setItem("patientId", JSON.stringify(res.data.patient.patient))
+          setLoginName(res.data.patient.pname)
+          setPd("p")
           navigate(`/dashboard`)
         })
         .catch(err => {

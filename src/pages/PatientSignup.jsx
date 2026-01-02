@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
 import useDoctor from '../context/DoctorContext'
 import { apiBaseUrl } from '../constants/constants'
+import useLoginName from '../context/LoginContext'
 
 const PatientSignup = () => {
   const [loading, setLoading] = useState(false)
@@ -24,6 +25,7 @@ const PatientSignup = () => {
   console.log("path", location.pathname)
 
   const { setDoctorData } = useDoctor()
+  const {setLoginName, setPd} = useLoginName()
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -35,7 +37,11 @@ const PatientSignup = () => {
       .then(res => {
         console.log("response", res.data)
         toast.success(res.data.message)
-        navigate(`/login`, {state: {from: location.pathname}})
+        setLoginName(res.data.patient.pname)
+        setPd("p")
+        localStorage.setItem("patientId", JSON.stringify(res.data.patient.patient))
+        navigate(`/dashboard`)
+        // navigate(`/login/patient`, {state: {from: location.pathname}})
       })
       .catch(err => {
         console.log("Error:", err)
@@ -150,7 +156,7 @@ const PatientSignup = () => {
 
           <p className="mt-6 text-center text-gray-600">
             Already have an account? {" "}
-            <Link to="/login" state={{from: location.pathname}} className="text-blue-600 font-semibold hover:underline">
+            <Link to="/login/patient" state={{from: location.pathname}} className="text-blue-600 font-semibold hover:underline">
               Login
             </Link>
           </p>

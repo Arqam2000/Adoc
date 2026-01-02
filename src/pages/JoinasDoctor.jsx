@@ -9,6 +9,7 @@ import PhoneInput from 'react-phone-number-input'
 import "./JoinasDoctor.css"
 import useSpecializations from '../hooks/useSpecializations';
 import { apiBaseUrl } from '../constants/constants';
+import useLoginName from '../context/LoginContext';
 
 export const JoinasDoctor = () => {
   const [doctor, setDoctor] = useState({
@@ -30,7 +31,9 @@ export const JoinasDoctor = () => {
 
   const navigate = useNavigate()
 
-  const {specializations} = useSpecializations()
+  const {setLoginName, setPd} = useLoginName()
+
+  const { specializations } = useSpecializations()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -42,9 +45,15 @@ export const JoinasDoctor = () => {
       console.log("res", resp)
 
       console.log(resp.data.data)
-      if (resp.data.data) {
+
+      if (resp.data.success) {
         toast.success("Registered Successfuly")
-        navigate("/login")
+        localStorage.setItem("doctorId", JSON.stringify(resp.data.doctor.dr))
+        localStorage.setItem("doctor", JSON.stringify(resp.data.doctor))
+        setLoginName(resp.data.doctor.name)
+        setPd("d")
+        navigate(`/dashboard`)
+        // navigate("/login")
       } else {
         setError("Please provide valid credentials")
       }
@@ -153,8 +162,8 @@ export const JoinasDoctor = () => {
             <input type="password" placeholder='Password' className='py-3 px-3 w-[100%] lg:w-[80%] outline' required value={doctor.password} onChange={(e) => setDoctor({ ...doctor, password: e.target.value })} />
             <div className='flex gap-3'>
               <label>Gender</label>
-              <label ><input type="radio" name="gender" id="gender" value="Male" onChange={e => setDoctor({...doctor, gender: e.target.value})}/> Male</label>
-              <label ><input type="radio" name="gender" id="gender" value="Female" onChange={e => setDoctor({...doctor, gender: e.target.value})}/> Female</label>
+              <label ><input type="radio" name="gender" id="gender" value="Male" onChange={e => setDoctor({ ...doctor, gender: e.target.value })} /> Male</label>
+              <label ><input type="radio" name="gender" id="gender" value="Female" onChange={e => setDoctor({ ...doctor, gender: e.target.value })} /> Female</label>
 
             </div>
             {

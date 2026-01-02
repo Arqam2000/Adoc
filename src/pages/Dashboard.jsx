@@ -20,6 +20,7 @@ import PatientHistory from "./PatientHistory";
 import LabTestResult from "../components/LabTestResult";
 import ReviewsByPatient from "./ReviewsByPatient";
 import { apiBaseUrl } from "../constants/constants";
+import useLoginName from "../context/LoginContext";
 
 export default function Dashboard() {
   const [appointments, setAppointments] = useState([]);
@@ -35,6 +36,8 @@ export default function Dashboard() {
 
   const { doctorData, setDoctorData, fetchDoctorData } = useDoctor();
   const navigate = useNavigate();
+
+  const {setLoginName, setPd} = useLoginName()
 
   const [experiences] = useExperience(doctorData?.doctorexp, [doctorData?.doctor])
 
@@ -59,6 +62,8 @@ export default function Dashboard() {
         .then(res => {
           console.log("Patient data:", res.data.patient);
           setPatientData(res.data.patient);
+          // setLoginName(res.data.patient.pname)
+          // setPd("p")
         })
         .catch(err => {
           console.error("Error fetching patient data:", err);

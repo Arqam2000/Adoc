@@ -69,7 +69,7 @@ export const Navbar = () => {
   const navigate = useNavigate()
 
   const { doctorData, setDoctorData } = useDoctor();
-  const {LoginName, setLoginName } = useLoginName()
+  const { LoginName, setLoginName, pd, setPd } = useLoginName()
 
   // console.log("doctorData in navbar:", doctorData);
   // console.log("isLoggedIn:", isLoggedIn);
@@ -79,11 +79,13 @@ export const Navbar = () => {
     const savedDoctor = JSON.parse(localStorage.getItem("doctor"));
     // console.log("doctor from localStorage in navbar:", doctor);
     console.log("patientId", patientId)
-    console.log("savedDoctor", )
+    console.log("savedDoctor",)
 
     if (savedDoctor) {
       setDoctor(savedDoctor || {});
       setIsLoggedIn(savedDoctor?.isLoggedIn);
+      setLoginName(savedDoctor?.name);
+      setPd("d");
 
     } else if (patientId) {
 
@@ -91,6 +93,8 @@ export const Navbar = () => {
         .then(res => {
           // console.log("Patient data:", res.data.patient);
           setPatient(res.data.patient);
+          setLoginName(res.data.patient.pname);
+          setPd("p");
           setIsLoggedIn(2);
         })
         .catch(err => {
@@ -119,7 +123,9 @@ export const Navbar = () => {
 
   const logout = async () => {
     try {
-      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/logout`, {}, {
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/logout`, {
+        id: JSON.parse(localStorage.getItem("doctorId"))
+      }, {
         withCredentials: true
       })
 
@@ -130,17 +136,32 @@ export const Navbar = () => {
         setDoctor({});
         setIsLoggedIn(0);
         setLoginName("");
+        setPd("");
         toast.success(resp.data.message);
         setIsOpen(false)
         navigate("/login");
       }
     } catch (error) {
-      console.error("Logout error:", error);
+      // console.error("Logout error:", error);
       // toast.error("Logout failed. Please try again.");
+      localStorage.removeItem("doctor");
+      localStorage.removeItem("doctorId");
+      setDoctorData({});
+      setDoctor({});
+      setIsLoggedIn(0);
+      setLoginName("");
+      setPd("");
+      // toast.success("Logged out successfully");
+      setIsOpen(false)
+      // navigate("/login");
+
+
       localStorage.removeItem("patientId");
       localStorage.removeItem("adminId");
       setIsLoggedIn(0);
       setPatient({});
+      setLoginName("");
+      setPd("");
       setIsOpen(false)
       navigate("/login");
     }
@@ -149,6 +170,9 @@ export const Navbar = () => {
   const closeMenu = () => {
     setIsOpen(false)
   }
+
+  console.log("LoginName from navbar", LoginName)
+  console.log("pd from navbar", pd)
 
   return (
     <nav className='flex justify-between lg:justify-evenly items-center p-6 shadow bg-white relative'>
@@ -217,9 +241,14 @@ export const Navbar = () => {
           <><button className='bg-white text-[#2f2f82] py-2 px-2 lg:px-5 rounded border border-[#2f2f82] hidden md:block'><Link to="/admin">Admin</Link></button>
             <button className='bg-white text-[#2f2f82] py-2 px-2 lg:px-5 rounded border border-[#2f2f82] hidden md:block' onClick={logout}>Logout admin</button></>
         }
+        {
+          LoginName && <button className="block px-4 py-2 hover:bg-blue-100" onClick={logout}>
+            logout
+          </button>
+        }
 
         {
-          LoginName ? <div className='relative group'>
+          pd == "d" ? <div className='relative group'>
             <div className='no-underline text-base mr-5 flex items-center gap-1' onClick={() => setOpen(prev => !prev)}>
               <img src={doctor.picture} alt="doc-pic" className='w-11 rounded-full' />
               <div className='flex flex-col justify-center'>
@@ -237,9 +266,9 @@ export const Navbar = () => {
                   <Link to="/dashboard" className="block px-4 py-2 hover:bg-blue-100">
                     Appointments
                   </Link>
-                  <button className="block px-4 py-2 hover:bg-blue-100" onClick={logout}>
+                  {/* <button className="block px-4 py-2 hover:bg-blue-100" onClick={logout}>
                     logout
-                  </button>
+                  </button> */}
                 </div>
               }
             </div>
@@ -247,8 +276,8 @@ export const Navbar = () => {
             <div className='no-underline text-base mr-5 flex items-center gap-1 cursor-pointer' onClick={() => setOpen(prev => !prev)}>
               {/* <img src={doctor.picture} alt="doc-pic" className='w-11 rounded-full' /> */}
               <div className='flex flex-col justify-center'>
-                <h3 className='font-semibold text-lg '>{patient.pname}</h3>
-                {Object.keys(patient).length !== 0 && <h3 className=''>Patient</h3>}
+                <h3 className='font-semibold text-lg '>{LoginName}</h3>
+                {pd === "p" && <h3 className=''>Patient</h3>}
 
               </div>
               {
@@ -262,11 +291,10 @@ export const Navbar = () => {
                   <Link to="/dashboard" className="block px-4 py-2 hover:bg-blue-100">
                     Appointments
                   </Link>
-                  <button className="block px-4 py-2 hover:bg-blue-100" onClick={logout}>
-                    logout
-                  </button>
+
                 </div>
               }
+
             </div>
           </div>
         }
