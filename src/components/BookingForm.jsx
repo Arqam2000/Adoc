@@ -46,35 +46,35 @@ export default function BookingForm({
 
 
   // 🔹 Auto-fetch patient info by phone
-  useEffect(() => {
-    if (!phone || phone.length < 7) return;
-    const controller = new AbortController();
-    const timeout = setTimeout(async () => {
-      try {
-        setLookingUp(true);
-        const res = await axios.post(`${apiBaseUrl}/api/v1/appointments/find-patient`, {
-          signal: controller.signal,
-          data: phone
-        });
+  // useEffect(() => {
+  //   if (!phone || phone.length < 7) return;
+  //   const controller = new AbortController();
+  //   const timeout = setTimeout(async () => {
+  //     try {
+  //       setLookingUp(true);
+  //       const res = await axios.post(`${apiBaseUrl}/api/v1/appointments/find-patient`, {
+  //         signal: controller.signal,
+  //         data: phone
+  //       });
 
-        if (res.data?.patient) {
-          setPatientName(res.data.patient.pname);
-          toast.success("Patient found & autofilled!");
-        } else {
-          setPatientName("");
-        }
-      } catch (err) {
-        if (!axios.isCancel(err)) toast.error("Failed to fetch patient info");
-      } finally {
-        setLookingUp(false);
-      }
-    }, 500);
+  //       if (res.data?.patient) {
+  //         setPatientName(res.data.patient.pname);
+  //         toast.success("Patient found & autofilled!");
+  //       } else {
+  //         setPatientName("");
+  //       }
+  //     } catch (err) {
+  //       if (!axios.isCancel(err)) toast.error("Failed to fetch patient info");
+  //     } finally {
+  //       setLookingUp(false);
+  //     }
+  //   }, 500);
 
-    return () => {
-      clearTimeout(timeout);
-      controller.abort();
-    };
-  }, [phone]);
+  //   return () => {
+  //     clearTimeout(timeout);
+  //     controller.abort();
+  //   };
+  // }, [phone]);
 
   // 🔹 Date & Time slots
   // const days = Array.from({ length: 7 }, (_, i) => dayjs().add(i, "day"));

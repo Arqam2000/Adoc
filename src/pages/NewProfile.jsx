@@ -105,9 +105,15 @@ export const Profile = () => {
     const savedImage = localStorage.getItem("profileImage");
 
     setDoctor(savedDoctor);
+    // setPersonalInfo((prev) => ({
+    //   ...prev,
+    //   ...savedPersonalInfo,
+    //   selectedImage: savedImage || prev.selectedImage,
+    // }));
     setPersonalInfo((prev) => ({
-      ...prev,
-      ...savedPersonalInfo,
+      about: doctor.about,
+      city: doctor.city_name,
+      specialization: doctor.Specialization_name,
       selectedImage: savedImage || prev.selectedImage,
     }));
 
@@ -118,8 +124,16 @@ export const Profile = () => {
       JSON.parse(localStorage.getItem("hospitals_schedules")) || hospitalBlocks
     );
 
+    doctorData?.doctorvd?.map((vd, idx) => {
+      schedule[idx].start = vd.timein;
+      schedule[idx].end = vd.timeout;
+      schedule[idx].day = vd.day;
+    })
+
     fetchInitialData();
   }, []);
+
+  console.log("schedule", schedule)
 
   const fetchInitialData = async () => {
     try {
@@ -492,7 +506,7 @@ export const Profile = () => {
             {/* City */}
             <select
               className="border rounded-lg p-2"
-              value={personalInfo.city}
+              value={doctor.city_name}
               onChange={(e) =>
                 setPersonalInfo({ ...personalInfo, city: e.target.value })
               }
@@ -508,7 +522,7 @@ export const Profile = () => {
             {/* Specialization */}
             <select
               className="border rounded-lg p-2"
-              value={personalInfo.specialization}
+              value={doctor.Specialization_name}
               onChange={(e) =>
                 setPersonalInfo({
                   ...personalInfo,
@@ -530,7 +544,7 @@ export const Profile = () => {
             className="w-full border rounded-lg p-2 mb-3"
             rows="3"
             placeholder="About yourself"
-            value={personalInfo.about}
+            value={doctor.about}
             onChange={(e) =>
               setPersonalInfo({ ...personalInfo, about: e.target.value })
             }

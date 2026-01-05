@@ -13,6 +13,7 @@ const DoctorsList = () => {
   const [reviews, setReviews] = useState()
   const [hospitals, setHospitals] = useState([])
   const [videoTimings, setVideoTimings] = useState([])
+  const [loading, setLoading] = useState(false)
 
   // console.log(doctors)
 
@@ -83,6 +84,7 @@ const DoctorsList = () => {
 
   const getAllDoctors = async () => {
     try {
+      setLoading(true)
       const resp = await axios.get(`${apiBaseUrl}/api/v1/doctors/get-alldoctors`)
 
       if (resp.data.success) {
@@ -95,6 +97,8 @@ const DoctorsList = () => {
 
     } catch (error) {
       console.log("Error in getting doctors", error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -331,7 +335,7 @@ const DoctorsList = () => {
         }
 
         {
-          filteredBySpecialization.length === 0 && filteredByCity.length === 0 && filteredByCityAndSpec.length === 0 && filterByOnCallDoctor.length === 0 && filterByVideoConsultation.length === 0 && location.state !== null && <p className='text-gray-500'>No doctors found matching the selected criteria.</p>
+          loading ? <p className='text-black text-2xl font-bold'>Loading doctors...</p> : filteredBySpecialization.length === 0 && filteredByCity.length === 0 && filteredByCityAndSpec.length === 0 && filterByOnCallDoctor.length === 0 && filterByVideoConsultation.length === 0 && location.state !== null && <p className='text-gray-500'>No doctors found matching the selected criteria.</p>
         }
 
         
