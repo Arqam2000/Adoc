@@ -189,7 +189,9 @@ export default function Dashboard() {
     const videoHistory = [];
 
     appointments?.forEach((apt) => {
-      const date = parseISO(apt.bdate);
+      // const date = parseISO(apt.bdate);
+      const date = apt.bdate;
+
 
       // Video consultation
       if (apt.vc !== "no") {
