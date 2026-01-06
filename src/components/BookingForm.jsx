@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import BackButton from "./BackButton";
 import { ConfirmBox } from "./ConfirmBox";
 import { apiBaseUrl } from "../constants/constants";
+import { formatInTimeZone } from "date-fns-tz";
+import { parseISO } from "date-fns";
 
 export default function BookingForm({
   mode = "clinic", // "clinic" or "video"
@@ -492,7 +494,7 @@ export default function BookingForm({
             {
               bookedAppointments.map(appt => (
                 <div className="w-fit">
-                  <p className={patientId === appt.patient && `font-semibold text-red-500`} on>{new Date(appt.bdate).toLocaleString().split(", ")[1]}</p>
+                  <p className={patientId === appt.patient && `font-semibold text-red-500`} on>{new Date(formatInTimeZone(parseISO(appt.bdate), 'UTC', 'PPpp')).toLocaleTimeString()}</p>
                 </div>
               ))}
 

@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { format, isToday, isAfter, isBefore, parseISO, set } from "date-fns";
+import { format, isToday, isAfter, isBefore, set } from "date-fns";
+import { formatInTimeZone } from 'date-fns-tz';
+import { parseISO } from 'date-fns';
 import {
   Home,
   User,
@@ -190,7 +192,11 @@ export default function Dashboard() {
 
     appointments?.forEach((apt) => {
       // const date = parseISO(apt.bdate);
-      const date = apt.bdate;
+      // const date = apt.bdate;
+      const date = formatInTimeZone(parseISO(apt.bdate), 'UTC', 'PPpp')
+      console.log("date", date)
+
+      // console.log("date", format(date, "PPpp"))
 
 
       // Video consultation
@@ -216,6 +222,7 @@ export default function Dashboard() {
             bappoint: apt.bappoint,
             patient: `${apt.pname}`, // replace with actual patient name if available
             time: format(date, "PPpp"),
+            // time: date,
             fees: apt.fees,
             status: apt.status === null ? "Pending" : apt.status,
           });
