@@ -146,7 +146,17 @@ export default function ViewDocProfile() {
 
                   <div className="space-y-2 text-gray-700 flex justify-between w-sm ">
                     <p className="text-[#004D71] font-semibold">{docvd.day}</p>
-                    <p>{docvd.timein} PM – {docvd.timeout} PM</p>
+                    <p>{new Date(`1970-01-01T${docvd.timein}Z`).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true,
+                      timeZone: 'UTC' // Specify UTC to avoid timezone shifts
+                    })} – {new Date(`1970-01-01T${docvd.timeout}Z`).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true,
+                      timeZone: 'UTC' // Specify UTC to avoid timezone shifts
+                    })}</p>
                     {/* <p>Sat | 12:00 PM – 3:00 PM</p>
                                         <p>Sun | 10:00 AM – 1:00 PM</p> */}
 
@@ -184,7 +194,13 @@ export default function ViewDocProfile() {
 
                           {/* <p className="text-gray-600">Mon - Fri | 5 PM - 8 PM</p> */}
                           <p className="text-[#004D71] font-semibold">{dochd.day}</p>
-                          <p>{dochd.timein} PM - {dochd.timeout} PM</p>
+                          {/* <p>{dochd.timein} PM - {dochd.timeout} PM</p> */}
+                          <p>{dochd.timein} {Number(dochd.timein.split(":")[0]) > 12 ? "PM" : "AM"} – {new Date(`1970-01-01T${dochd.timeout}Z`).toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: true,
+                            timeZone: 'UTC' // Specify UTC to avoid timezone shifts
+                          })}</p>
                         </div>
                       </div>
                     ))
@@ -238,7 +254,7 @@ export default function ViewDocProfile() {
           </div>
         </div> */}
 
-        <ReviewsByDoctor id={id}/>
+        <ReviewsByDoctor id={id} />
 
         {/* Similar Doctors */}
         <div className="bg-white rounded-2xl shadow p-6">

@@ -271,14 +271,16 @@ export default function BookingForm({
       const fetchResults = async () => {
         try {
           const response = await axios.post(`${apiBaseUrl}/api/v1/appointments/search?query=${selectedDate}:${debouncedSearchTerm}`, {
-            dr: availability[0].dr
+            dr: availability[0].dr,
+            mode
           });
 
           if (response.status === 200) {
-
             setAlreadyBooked(true);
+            
           } else if (response.status === 202) {
             setBookedAppointments(response.data.appointments)
+            console.log("booked appointments", res.data.appointments)
           }
         } catch (error) {
           console.log("Something went wrong while searching appointments for date")
@@ -318,7 +320,18 @@ export default function BookingForm({
                           return <div key={idx} className="mb-1">
                             <div className="flex justify-between gap-5">
                               <p>{doc.day}</p>
-                              <p>{doc.timein}AM - {doc.timeout}PM</p>
+                              {/* <p>{doc.timein}AM - {doc.timeout}PM</p> */}
+                              <p>{new Date(`1970-01-01T${doc.timein}Z`).toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: true,
+                            timeZone: 'UTC'
+                          })} - {new Date(`1970-01-01T${doc.timeout}Z`).toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: true,
+                            timeZone: 'UTC'
+                          })}</p>
                             </div>
                           </div>
                         })
@@ -349,7 +362,18 @@ export default function BookingForm({
                       <div className="flex justify-between gap-5">
                         <p>{avail.day}</p>
                         <div>
-                          <p>{avail.timein}AM - {avail.timeout}PM</p>
+                          {/* <p>{avail.timein}AM - {avail.timeout}PM</p> */}
+                          <p>{new Date(`1970-01-01T${avail.timein}Z`).toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: true,
+                            timeZone: 'UTC'
+                          })} - {new Date(`1970-01-01T${avail.timeout}Z`).toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: true,
+                            timeZone: 'UTC'
+                          })}</p>
 
                         </div>
                       </div>
@@ -400,7 +424,18 @@ export default function BookingForm({
                   Select Time ({slotForDay?.day || slotForHosDay?.day})
                 </label>
                 <p className="text-sm text-gray-600 mt-1">
-                  Available: {slotForDay?.timein || slotForHosDay?.timein} – {slotForDay?.timeout || slotForHosDay?.timeout} <br />
+                  {/* Available: {slotForDay?.timein || slotForHosDay?.timein} – {slotForDay?.timeout || slotForHosDay?.timeout} <br /> */}
+                  Available: {(slotForDay?.timein || slotForHosDay?.timein) && new Date(`1970-01-01T${slotForDay?.timein || slotForHosDay.timein}Z`).toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: true,
+                            timeZone: 'UTC'
+                          }) } – {(slotForDay?.timeout || slotForHosDay?.timeout) && new Date(`1970-01-01T${slotForDay?.timeout || slotForHosDay.timeout}Z`).toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: true,
+                            timeZone: 'UTC'
+                          }) } <br />
                   Fees: Rs. {slotForDay?.fees || slotForHosDay?.fees}
                 </p>
                 <input
@@ -467,7 +502,17 @@ export default function BookingForm({
                 </label>
                 {/* <h2 className="block font-medium mb-1">Please select date first</h2> */}
                 <p className="text-sm text-gray-600 mt-1">
-                  Available: {slotForDay?.timein || slotForHosDay?.timein} – {slotForDay?.timeout || slotForHosDay?.timeout} <br />
+                  Available: {(slotForDay?.timein || slotForHosDay?.timein) && new Date(`1970-01-01T${slotForDay.timein || slotForHosDay.timein}Z`).toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: true,
+                            timeZone: 'UTC'
+                          }) } – {(slotForDay?.timeout || slotForHosDay?.timeout) && new Date(`1970-01-01T${slotForDay.timeout || slotForHosDay.timeout}Z`).toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: true,
+                            timeZone: 'UTC'
+                          }) } <br />
                   Fees: Rs. {slotForDay?.fees || slotForHosDay?.fees}
                 </p>
                 <input

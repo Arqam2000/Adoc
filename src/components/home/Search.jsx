@@ -17,7 +17,10 @@ const Search = ({ city, setCity, specialization, setSpecialization }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    navigate('/doctors', { state: { city, specialization, OnCallDoctor: false } })
+    if(city || specialization)
+      navigate('/doctors', { state: { city, specialization, OnCallDoctor: false } })
+    else
+      navigate('/doctors')
   }
 
   return (

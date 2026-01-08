@@ -65,8 +65,20 @@ export const Profile = () => {
   const [videoFees, setVideoFees] = useState("")
   const [docExp, setDocExp] = useState([])
   const [waitingTime, setWaitingTime] = useState("")
+  const [isEditName, setIsEditName] = React.useState(false);
+  const [isEditEmail, setIsEditEmail] = React.useState(false);
+  const [isEditUsername, setIsEditUsername] = React.useState(false);
+  const [isEditPhone, setIsEditPhone] = React.useState(false);
+  const [name, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [username, setUsername] = React.useState("");
+  const [phone, setPhone] = React.useState("");
 
   const fileInputRef = useRef(null);
+  const nameInputRef = useRef(null);
+  const emailInputRef = useRef(null);
+  const phoneInputRef = useRef(null);
+  const usernameInputRef = useRef(null);
 
   const { doctorData, fetchDoctorData, setDoctorData } = useDoctor();
   console.log("doctorData from profile", doctorData)
@@ -105,15 +117,20 @@ export const Profile = () => {
     const savedImage = localStorage.getItem("profileImage");
 
     setDoctor(savedDoctor);
+
+    setName(savedDoctor?.name || "")
+    setEmail(savedDoctor?.email || "")
+    setPhone(savedDoctor?.phone || "")
+    setUsername(savedDoctor?.username || "")
     // setPersonalInfo((prev) => ({
     //   ...prev,
     //   ...savedPersonalInfo,
     //   selectedImage: savedImage || prev.selectedImage,
     // }));
     setPersonalInfo((prev) => ({
-      about: doctor.about,
-      city: doctor.city_name,
-      specialization: doctor.Specialization_name,
+      about: savedDoctor.about,
+      city: savedDoctor.city_name,
+      specialization: savedDoctor.Specialization_name,
       selectedImage: savedImage || prev.selectedImage,
     }));
 
@@ -134,6 +151,26 @@ export const Profile = () => {
   }, []);
 
   console.log("schedule", schedule)
+  console.log("personalInfo", personalInfo)
+
+  // console.log("new hospitals", hospitalBlocks.map((hos, idx) => {
+
+  //   hos.designation = doctorData?.doctorhd?.[idx]?.DDesig || ""
+  //   hos.fees = doctorData?.doctorhd?.[idx]?.fees || ""
+  //   hos.hospital = doctorData?.doctorhd?.[idx]?.hospital_name || ""
+
+
+  //   hos.schedule = doctorData?.doctorhd?.map((hd) => {
+  //     if (hos.schedule[idx]?.day === hd.day) {
+  //       hos.schedule[idx].start = hd.timein
+  //       hos.schedule[idx].end = hd.timeout
+  //       return hos.schedule[idx]
+  //     }
+  //   })
+  //   return hos
+
+  // }))
+
 
   const fetchInitialData = async () => {
     try {
@@ -185,10 +222,21 @@ export const Profile = () => {
         specialization_code: spec?.Specialization_code,
         about: personalInfo.about,
         image: personalInfo.selectedImage,
+        name,
+        email,
+        phone,
+        username,
       });
 
       if (resp.data.success) {
         // toast.success("Profile updated successfully");
+        setDoctorData(prev => ({
+          ...prev,
+          name,
+          email,
+          phone,
+          username
+        }));
       }
 
     } catch (error) {
@@ -414,7 +462,7 @@ export const Profile = () => {
       await saveWaitingTime()
 
       toast.success("Saved successfuly")
-      
+
     } catch (error) {
       toast.error("Cannot save to database")
       console.log("Error while saving the details", error)
@@ -504,9 +552,86 @@ export const Profile = () => {
           <h2 className="text-xl font-semibold mb-3">Personal Information</h2>
           <div className="grid grid-cols-2 lg:gap-4 gap-2 mb-3">
             {/* City */}
+            <div className="w-full">
+              <input ref={nameInputRef} className="w-[75%] mr-2 border py-2 px-2 rounded-md" type="text" placeholder="Enter your name" value={name} disabled={!isEditName} onChange={e => setName(e.target.value)} /><button onClick={() => {
+                setIsEditName(prev => {
+                  const nextState = !prev;
+
+                  // focus ONLY when switching to edit mode
+                  if (nextState) {
+                    setTimeout(() => {
+                      nameInputRef.current?.focus();
+                    }, 0);
+                  }
+
+                  return nextState;
+                });
+              }}>Edit</button>
+              <button className="ml-2" onClick={() => {
+                setName(doctor?.name)
+                setIsEditName(false)
+              }}>Cancel</button>
+            </div>
+            <div className="w-full">
+              <input ref={emailInputRef} className="w-[75%] mr-2 border py-2 px-2 rounded-md" type="text" placeholder="Enter your email" value={email} disabled={!isEditEmail} onChange={e => setEmail(e.target.value)} /><button onClick={() => {
+                setIsEditEmail(prev => {
+                  const nextState = !prev;
+
+                  // focus ONLY when switching to edit mode
+                  if (nextState) {
+                    setTimeout(() => {
+                      emailInputRef.current?.focus();
+                    }, 0);
+                  }
+
+                  return nextState;
+                })
+              }}>Edit</button>
+              <button className="ml-2" onClick={() => {
+                setEmail(doctor?.email)
+                setIsEditEmail(false)
+              }}>Cancel</button>
+            </div>
+            <div className="w-full">
+              <input ref={usernameInputRef} className="w-[75%] mr-2 border py-2 px-2 rounded-md" type="text" placeholder="Enter your username" value={username} disabled={!isEditUsername} onChange={e => setUsername(e.target.value)} /><button onClick={() => setIsEditUsername(prev => {
+                const nextState = !prev;
+
+                // focus ONLY when switching to edit mode
+                if (nextState) {
+                  setTimeout(() => {
+                    usernameInputRef.current?.focus();
+                  }, 0);
+                }
+
+                return nextState;
+              })}>Edit</button>
+              <button className="ml-2" onClick={() => {
+                setUsername(doctor?.username)
+                setIsEditUsername(false)
+              }}>Cancel</button>
+            </div>
+            <div className="w-full">
+              <input ref={phoneInputRef} className="w-[75%] mr-2 border py-2 px-2 rounded-md" type="text" placeholder="Enter your phone" value={phone} disabled={!isEditPhone} onChange={e => setPhone(e.target.value)} /><button onClick={() => setIsEditPhone(prev => {
+                const nextState = !prev;
+
+                // focus ONLY when switching to edit mode
+                if (nextState) {
+                  setTimeout(() => {
+                    phoneInputRef.current?.focus();
+                  }, 0);
+                }
+
+                return nextState;
+              })}>Edit</button>
+              <button className="ml-2" onClick={() => {
+                setPhone(doctor?.phone)
+                setIsEditPhone(false)
+              }}>Cancel</button>
+            </div>
             <select
               className="border rounded-lg p-2"
-              value={doctor.city_name}
+              // value={doctor.city_name}
+              value={personalInfo.city}
               onChange={(e) =>
                 setPersonalInfo({ ...personalInfo, city: e.target.value })
               }
@@ -522,7 +647,8 @@ export const Profile = () => {
             {/* Specialization */}
             <select
               className="border rounded-lg p-2"
-              value={doctor.Specialization_name}
+              // value={doctor.Specialization_name}
+              value={personalInfo.specialization}
               onChange={(e) =>
                 setPersonalInfo({
                   ...personalInfo,
@@ -676,7 +802,7 @@ export const Profile = () => {
 
         <div className="my-2">
           <h3 className="text-lg font-semibold mb-1">Waiting Time</h3>
-          <input type="text" className="outline-none border border-gray-300 py-1 px-2" onChange={e => setWaitingTime(e.target.value)}/>
+          <input type="text" className="outline-none border border-gray-300 py-1 px-2" onChange={e => setWaitingTime(e.target.value)} />
           <button className='bg-blue-500 py-1 px-3 rounded text-white cursor-pointer ml-2' onClick={saveWaitingTime}>Save</button>
         </div>
 

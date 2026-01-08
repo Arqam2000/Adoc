@@ -221,6 +221,7 @@ export default function Dashboard() {
           upcomingVideo.push({
             bappoint: apt.bappoint,
             patient: `${apt.pname}`, // replace with actual patient name if available
+            doctor: apt.name,
             time: format(date, "PPpp"),
             // time: date,
             fees: apt.fees,
@@ -262,6 +263,7 @@ export default function Dashboard() {
             bappoint: apt.bappoint,
             hospital: `${apt.hospital_name}`,
             patient: `${apt.pname}`,
+            doctor: apt.name,
             time: format(date, "PPpp"),
             fees: apt.fees,
             // status: apt.done === "yes" ? "Completed" : (apt.done === null ? "Pending" : "Missed"),
@@ -618,6 +620,7 @@ export default function Dashboard() {
                               <thead>
                                 <tr className="text-gray-600 border-b">
                                   <th className="pb-2">Patient</th>
+                                  {Object.keys(patientData).length > 0 && <th className="pb-2">Doctor</th>}
                                   <th className="pb-2">Time</th>
                                   <th className="pb-2">Fees</th>
                                 </tr>
@@ -626,6 +629,7 @@ export default function Dashboard() {
                                 {upcomingVideoConsultations.map((apt, idx) => (
                                   <tr key={idx} className="border-b text-sm">
                                     <td className="py-2">{apt.patient}</td>
+                                    {Object.keys(patientData).length > 0 && <td className="py-2">{apt.doctor}</td>}
                                     <td className="py-2">{apt.time}</td>
                                     <td className="py-2">{apt.fees}</td>
                                   </tr>
@@ -644,6 +648,7 @@ export default function Dashboard() {
                                 <tr className="text-gray-600 border-b">
                                   <th className="pb-2">Hospital</th>
                                   <th className="pb-2">Patient</th>
+                                  {Object.keys(patientData).length > 0 && <th className="pb-2">Doctor</th>}
                                   <th className="pb-2">Time</th>
                                   <th className="pb-2">Fees</th>
                                   <th className="pb-2">Status</th>
@@ -654,6 +659,7 @@ export default function Dashboard() {
                                   <tr key={idx} className="border-b text-sm">
                                     <td className="py-2">{apt.hospital}</td>
                                     <td className="py-2">{apt.patient}</td>
+                                    {Object.keys(patientData).length > 0 && <td className="py-2">{apt.doctor}</td>}
                                     <td className="py-2">{apt.time}</td>
                                     <td className="py-2">{apt.fees}</td>
                                     <td className="py-2">{apt.status}</td>
