@@ -195,7 +195,12 @@ export default function ViewDocProfile() {
                           {/* <p className="text-gray-600">Mon - Fri | 5 PM - 8 PM</p> */}
                           <p className="text-[#004D71] font-semibold">{dochd.day}</p>
                           {/* <p>{dochd.timein} PM - {dochd.timeout} PM</p> */}
-                          <p>{dochd.timein} {Number(dochd.timein.split(":")[0]) > 12 ? "PM" : "AM"} – {new Date(`1970-01-01T${dochd.timeout}Z`).toLocaleTimeString('en-US', {
+                          <p>{new Date(`1970-01-01T${dochd.timein}Z`).toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: true,
+                            timeZone: 'UTC' // Specify UTC to avoid timezone shifts
+                          })} – {new Date(`1970-01-01T${dochd.timeout}Z`).toLocaleTimeString('en-US', {
                             hour: 'numeric',
                             minute: 'numeric',
                             hour12: true,

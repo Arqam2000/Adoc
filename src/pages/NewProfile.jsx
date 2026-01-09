@@ -13,6 +13,7 @@ import useHospitals from "../hooks/useHospitals";
 import BackButton from "../components/BackButton";
 import AppointmentTypes from "../components/AppointmentTypes";
 import { apiBaseUrl } from "../constants/constants";
+import { set } from "date-fns";
 
 export const Profile = () => {
   const [doctor, setDoctor] = useState([]);
@@ -89,25 +90,140 @@ export const Profile = () => {
   //     return indexA - indexB;
   // })) 
 
-  useEffect(() => {
-    const newSch = schedule.map((slot, idx) => { // slot = { day: "Mon", start: "", end: "" } 
-      // doctorData?.doctorvd[0] = { day: "tue", timein: "10:00", timeout: "14:00" }, { day: "Tue", timein: "10:00", timeout: "14:00" }
+  const setHospitals = () => {
+    const daysTemplate = [
+      { day: "Mon", start: "", end: "" },
+      { day: "Tue", start: "", end: "" },
+      { day: "Wed", start: "", end: "" },
+      { day: "Thu", start: "", end: "" },
+      { day: "Fri", start: "", end: "" },
+      { day: "Sat", start: "", end: "" },
+      { day: "Sun", start: "", end: "" },
+    ];
 
-      if (slot.day == doctorData?.doctorvd?.[idx]?.day) {
-        slot.start = doctorData?.doctorvd?.[idx]?.timein || ""
-        slot.end = doctorData?.doctorvd?.[idx]?.timeout || ""
-        return slot
-      }
-      slot.start = ""
-      slot.end = ""
-      return slot
-    })
+    const result = doctorData?.doctorhd && Object.values(
+      doctorData?.doctorhd?.reduce((acc, item) => {
+        const key = `${item.hospital_name}-${item.DDesig}`;
+
+        // Create new hospital entry if not exists
+        if (!acc[key]) {
+          acc[key] = {
+            hospital: item.hospital_name,
+            designation: item.DDesig,
+            fees: item.fees,
+            schedule: daysTemplate.map(d => ({ ...d })),
+          };
+        }
+
+        // Fill correct day timing
+        const dayObj = acc[key].schedule.find(d => d.day === item.day);
+
+        if (dayObj) {
+          dayObj.start = item.timein;
+          dayObj.end = item.timeout;
+        }
+
+        return acc;
+      }, {})
+    )
+
+    setHospitalBlocks(result || hospitalBlocks)
+
+    console.log("hos result", result)
+  }
+
+  useEffect(() => {
+    // const newSch = schedule.map((slot, idx) => { // slot = { day: "Mon", start: "", end: "" } 
+    //   // doctorData?.doctorvd[0] = { day: "tue", timein: "10:00", timeout: "14:00" }, { day: "Tue", timein: "10:00", timeout: "14:00" }
+
+    //   if (slot.day == doctorData?.doctorvd?.[idx]?.day) {
+    //     slot.start = doctorData?.doctorvd?.[idx]?.timein || ""
+    //     slot.end = doctorData?.doctorvd?.[idx]?.timeout || ""
+    //     return slot
+    //   }
+    //   slot.start = ""
+    //   slot.end = ""
+    //   return slot
+    // })
+
+    const newSch = schedule.map(slot => {
+      const matchedDay = doctorData?.doctorvd?.find(
+        d => d.day?.toLowerCase() === slot.day.toLowerCase()
+      );
+
+      return {
+        ...slot,
+        start: matchedDay?.timein || "",
+        end: matchedDay?.timeout || "",
+      };
+    });
+
     console.log("newSch", newSch)
 
     setSchedule(newSch)
     setVideoFees(doctorData?.doctorvd?.[0]?.fees || "")
-  }, [doctorData])
 
+    // doctorData?.doctorhd && setHospitalBlocks(
+    //   doctorData?.doctorhd?.map(hd => {
+    //     const hosBlock = {
+    //       hospital: hd.hospital_name || "",
+    //       designation: hd.DDesig || "",
+    //       fees: hd.fees || "",
+    //       schedule: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => {
+    //         const daySchedule = doctorData?.doctorhd?.filter(dh => dh.day === day)[0];
+
+    //         return {
+    //           day,
+    //           start: daySchedule ? daySchedule.timein : "",
+    //           end: daySchedule ? daySchedule.timeout : "",
+    //         }
+    //       }),
+    //     }
+    //     return hosBlock
+    //   })
+    // )
+
+    setHospitals()
+
+    setDocExp(doctorData?.doctorexp?.map(exp => {
+      const hospital = hospitals.find(hos => hos.hospital_code == exp.hospital_code)
+      const designation = designations.find(des => des.Desig == exp.Desig)
+      return {
+        hospital: hospital?.hospital_name || "",
+        designation: designation?.DDesig || "",
+        fromDate: exp.FromDate,
+        tillDate: exp.TillDate,
+        comments: exp.comments || "",
+      }
+    }) || [
+      {
+        hospital: "",
+        designation: "",
+        fromDate: "",
+        tillDate: "",
+        comments: ""
+      }
+    ])
+
+    const result = doctorData?.doctor?.qualifications?.split(";").map((item, index) => {
+      const trimmed = item.trim();
+
+      // Extract degree and institute using regex
+      const match = trimmed.match(/^(.+?)\s*\((.+?)\)$/);
+
+      return {
+        id: index,
+        institute: match ? match[2] : "",
+        degree: match ? match[1] : "",
+      };
+    });
+
+    setRows(result || [{ institute: "", degree: "" }]);
+    // console.log("result rows", result)
+
+  }, [doctorData])
+ 
+  // console.log("hosps", hospitals)
 
   // Initial Load
   useEffect(() => {
@@ -115,6 +231,8 @@ export const Profile = () => {
     const savedPersonalInfo =
       JSON.parse(localStorage.getItem("personalInfo")) || {};
     const savedImage = localStorage.getItem("profileImage");
+
+    fetchDoctorData(savedDoctor?.dr);
 
     setDoctor(savedDoctor);
 
@@ -134,12 +252,12 @@ export const Profile = () => {
       selectedImage: savedImage || prev.selectedImage,
     }));
 
-    setRows(JSON.parse(localStorage.getItem("rows")) || [{ institute: "", degree: "" }]);
+    // setRows(JSON.parse(localStorage.getItem("rows")) || [{ institute: "", degree: "" }]);
     setSchedule(JSON.parse(localStorage.getItem("video time")) || schedule);
     setVideoFees(localStorage.getItem("video fees"))
-    setHospitalBlocks(
-      JSON.parse(localStorage.getItem("hospitals_schedules")) || hospitalBlocks
-    );
+    // setHospitalBlocks(
+    //   JSON.parse(localStorage.getItem("hospitals_schedules")) || hospitalBlocks
+    // );
 
     doctorData?.doctorvd?.map((vd, idx) => {
       schedule[idx].start = vd.timein;
@@ -150,8 +268,8 @@ export const Profile = () => {
     fetchInitialData();
   }, []);
 
-  console.log("schedule", schedule)
-  console.log("personalInfo", personalInfo)
+  // console.log("schedule", schedule)
+  // console.log("personalInfo", personalInfo)
 
   // console.log("new hospitals", hospitalBlocks.map((hos, idx) => {
 

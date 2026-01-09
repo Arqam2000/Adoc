@@ -1,9 +1,9 @@
 import axios from "axios";
-import React from "react";
+import React, { useEffect } from "react";
 import { toast } from "react-toastify";
 import { apiBaseUrl } from "../constants/constants";
 
-const ReviewModal = ({ isOpen, onClose, appointment }) => {
+const ReviewModal = ({ isOpen, onClose, appointment, reviewData }) => {
   if (!isOpen) return null;
 
   const [selectedWaitingTime, setSelectedWaitingTime] = React.useState("");
@@ -18,6 +18,26 @@ const ReviewModal = ({ isOpen, onClose, appointment }) => {
   const [postAnonymously, setPostAnonymously] = React.useState(false);
 
   console.log("appointment from reviewModal", appointment)
+  console.log("reviewData from reviewModal", reviewData)
+
+  useEffect(() => {
+    if (reviewData) {
+      setOverallSatisfaction(reviewData.overall_satisfaction === 'Y' ? "Yes" : "No");
+      if(reviewData.waiting_time === 0 || reviewData.waiting_time === "0") {
+        setSelectedWaitingTime("No Waiting Time");
+      } else {
+        setSelectedWaitingTime("Waiting Time");
+        setWaitingTimeMins(reviewData.waiting_time || "");
+      }
+      setConsultationTimeMins(reviewData.consultation_time || "");
+      setRecommend(reviewData.recommend === 'Y' ? "Yes" : "No");
+      setPatientSatisfaction(reviewData.patient_satisfaction === 'Y' ? "Yes" : "No");
+      setStaffBehaviour(reviewData.staff_behaviour || null);
+      setClinicEnvironment(reviewData.clinic_environment || null);
+      setRemarks(reviewData.remarks || "");
+      setPostAnonymously(reviewData.post_anonymously || false);
+    }
+  }, []);
 
   const addReview = async (e) => {
     e.preventDefault();
@@ -56,10 +76,33 @@ const ReviewModal = ({ isOpen, onClose, appointment }) => {
     }
   }
 
+  const updateReview = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.put(`${apiBaseUrl}/api/v1/reviews/update-review/${reviewData.id}`, {
+        overallSatisfaction,
+        waitingTimeMins: waitingTimeMins || "0",
+        consultationTimeMins,
+        recommend,
+        patientSatisfaction,
+        staffBehaviour,
+        clinicEnvironment,
+        remarks,
+        postAnonymously
+      });
+
+      toast.success("Review updated successfully");
+      onClose();
+    } catch (error) {
+      console.error("Error updating review:", error);
+      toast.error("Failed to update review. Please try again.");
+    }
+  }
+
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-2xl rounded-xl shadow-lg p-6">
-        <h2 className="text-xl font-semibold mb-4">Post a review for Dr {appointment?.name}</h2>
+        <h2 className="text-xl font-semibold mb-4">Post a review for Dr {reviewData ? reviewData.dr_name : appointment?.name}</h2>
 
         <form className="space-y-4">
           <p className="text-lg text-center font-semibold">Were you satisfied with your overall experience? <span className="text-xl">*</span></p>
@@ -356,9 +399,9 @@ const ReviewModal = ({ isOpen, onClose, appointment }) => {
             <button
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-              onClick={addReview}
+              onClick={reviewData ? updateReview : addReview}
             >
-              Submit
+              {reviewData ? "Update Review" : "Submit"}
             </button>
           </div>
         </form>
