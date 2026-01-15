@@ -34,6 +34,10 @@ import PatientEditProfile from './pages/PatientEditProfile.jsx';
 import ChangePassword from './pages/ChangePassword.jsx';
 import { AdminLogin } from './pages/AdminLogin.jsx';
 import { LoginProvider } from './context/LoginContext.jsx';
+import ForgotPassword from './pages/ForgotPassword.jsx';
+import ResetPasswordPatient from './pages/ResetPasswordPatient.jsx';
+import ForgotPasswordDoctor from './pages/ForgotPasswordDoctor';
+import ResetPasswordDoctor from './pages/ResetPasswordDoctor.jsx';
 
 
 let router = createBrowserRouter([
@@ -117,6 +121,23 @@ let router = createBrowserRouter([
       {
         path: "register/patient",
         Component: PatientSignup
+      },
+
+      {
+        path: "forgot-password/patient",
+        Component: ForgotPassword
+      },
+      {
+        path: "forgot-password/doctor",
+        Component: ForgotPasswordDoctor
+      },
+      {
+        path: "reset-password/patient",
+        Component: ResetPasswordPatient
+      },
+      {
+        path: "reset-password/doctor",
+        Component: ResetPasswordDoctor
       },
       {
         path: "book-appointment",

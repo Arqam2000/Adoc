@@ -5,8 +5,10 @@ import useExperience from "../hooks/useExperience";
 import useDoctor from "../context/DoctorContext";
 import BackButton from "../components/BackButton";
 import ReviewsByDoctor from "./ReviewsByDoctor";
+import ReviewModal from "../components/ReviewModal";
 
 export default function ViewDocProfile() {
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const { doctorData, setDoctorData, fetchDoctorData } = useDoctor()
 
   const [experiences] = useExperience(doctorData?.doctorexp, [doctorData?.doctor])
@@ -104,6 +106,12 @@ export default function ViewDocProfile() {
             </div>
           </div>
         </div>
+        <button className="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium shadow cursor-pointer" onClick={() => setIsReviewModalOpen(true)}>
+          Post a Review
+        </button>
+        {
+          isReviewModalOpen && <ReviewModal isOpen={isReviewModalOpen} onClose={() => setIsReviewModalOpen(false)} drName={doctorData?.doctor?.name} />
+        }
 
         {/* About */}
         <div className="bg-white rounded-2xl shadow p-6">

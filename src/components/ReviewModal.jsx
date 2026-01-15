@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { toast } from "react-toastify";
 import { apiBaseUrl } from "../constants/constants";
 
-const ReviewModal = ({ isOpen, onClose, appointment, reviewData }) => {
+const ReviewModal = ({ isOpen, onClose, appointment, reviewData, drName }) => {
   if (!isOpen) return null;
 
   const [selectedWaitingTime, setSelectedWaitingTime] = React.useState("");
@@ -100,9 +100,9 @@ const ReviewModal = ({ isOpen, onClose, appointment, reviewData }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 h-full">
       <div className="bg-white w-full max-w-2xl rounded-xl shadow-lg p-6">
-        <h2 className="text-xl font-semibold mb-4">Post a review for Dr {reviewData ? reviewData.dr_name : appointment?.name}</h2>
+        <h2 className="text-xl font-semibold mb-4">Post a review for Dr {reviewData ? reviewData.dr_name : (appointment?.name ? appointment?.name : drName)}</h2>
 
         <form className="space-y-4">
           <p className="text-lg text-center font-semibold">Were you satisfied with your overall experience? <span className="text-xl">*</span></p>

@@ -122,9 +122,9 @@ export const Login = () => {
                 <input type="checkbox" className="rounded" />
                 <span>Remember me</span>
               </label>
-              <a href="#" className="hover:underline text-blue-600">
+              <Link to={`/forgot-password/${location.pathname === "/login" ? "doctor" : "patient"}`} className="hover:underline text-blue-600">
                 Forgot password?
-              </a>
+              </Link>
             </div>
 
 

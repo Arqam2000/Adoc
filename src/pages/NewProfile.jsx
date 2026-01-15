@@ -232,7 +232,7 @@ export const Profile = () => {
       JSON.parse(localStorage.getItem("personalInfo")) || {};
     const savedImage = localStorage.getItem("profileImage");
 
-    fetchDoctorData(savedDoctor?.dr);
+    fetchDoctorData(JSON.parse(localStorage.getItem("doctorId")));
 
     setDoctor(savedDoctor);
 

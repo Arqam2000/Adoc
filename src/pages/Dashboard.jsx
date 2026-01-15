@@ -313,7 +313,7 @@ export default function Dashboard() {
         setDoctorData({});
         // setIsLoggedIn(0);
         toast.success(resp.data.message);
-        navigate("/login");
+        navigate("/login/patient");
       }
     } catch (error) {
       console.error("Logout error:", error);
@@ -321,7 +321,7 @@ export default function Dashboard() {
       localStorage.removeItem("patientId");
       // setIsLoggedIn(0);
       setPatientData({});
-      navigate("/login");
+      navigate("/login/patient");
     }
   }
 
@@ -418,9 +418,9 @@ export default function Dashboard() {
             <History size={18} /> Reviews
           </button>
 
-          <button className="flex items-center gap-3 text-red-600 hover:text-red-800 mt-auto cursor-pointer" onClick={logout}>
+          {/* <button className="flex items-center gap-3 text-red-600 hover:text-red-800 mt-auto cursor-pointer" onClick={logout}>
             <LogOut size={18} /> Logout
-          </button>
+          </button> */}
         </nav>
       </aside>
 
@@ -519,10 +519,13 @@ export default function Dashboard() {
                                     <td className="py-2">{apt.patient}</td>
                                     <td className="py-2">{apt.time}</td>
                                     <td className="py-2">{apt.fees}</td>
-                                    <td><button className="cursor-pointer" onClick={() => {
+                                    <td>
+                                      <button className="cursor-pointer" onClick={() => {
                                       setApt(apt)
                                       setOpen(true)
-                                    }}>Click here for details</button></td>
+                                    }}>Click here for details
+                                      </button>
+                                    </td>
                                   </tr>
                                 ))}
                               </tbody>

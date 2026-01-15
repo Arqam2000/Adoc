@@ -1,8 +1,11 @@
 import React from 'react'
 import ReviewModal from './ReviewModal';
+import useLoginName from '../context/LoginContext';
 
-const ReviewCard = ({ review }) => {
+const ReviewCard = ({ review, docId }) => {
   const [isReviewOpen, setIsReviewOpen] = React.useState(false);
+
+  const {pd} = useLoginName()
 
   if (review.staff_behaviour === 1) {
     review.staff_behaviour = "Unprofessional staff behaviour"
@@ -22,7 +25,7 @@ const ReviewCard = ({ review }) => {
       }
       <div className='flex justify-between'>
         <p className='text-base font-medium'>{review.dr_name}</p>
-        <button className='text-base font-medium cursor-pointer' onClick={() => setIsReviewOpen(true)}>Edit</button>
+        {pd === "p" && !docId && <button className='text-base font-medium cursor-pointer' onClick={() => setIsReviewOpen(true)}>Edit</button>}
 
       </div>
       <p className='text-base font-medium'>Review Date {review.date.split("T")[0]}</p>

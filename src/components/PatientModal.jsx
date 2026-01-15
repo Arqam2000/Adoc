@@ -2,12 +2,15 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
 import { apiBaseUrl } from '../constants/constants'
+import useLoginName from '../context/LoginContext'
 
 const PatientModal = ({ setOpen, apt }) => {
   const [symptom, setSymptom] = useState("")
   const [prescription, setPrescription] = useState("")
   const [nextFollowUp, setNextFollowUp] = useState("")
   const [labTestAdvice, setLabTestAdvice] = useState("")
+
+  const {pd} = useLoginName()
   console.log("apt", apt)
 
   const handleSave = async () => {
@@ -105,14 +108,15 @@ const PatientModal = ({ setOpen, apt }) => {
           </div>
 
           <div className='flex justify-center gap-2 mt-2'>
-            <button
+            {pd === "d" && <><button
               className='py-1 px-2 bg-blue-500 text-white rounded cursor-pointer'
               onClick={handleSave}
             >Save</button>
             <button
               className='py-1 px-2 bg-blue-500 text-white rounded cursor-pointer'
               onClick={() => setOpen(false)}
-            >Cancel</button>
+            >Cancel</button></>
+            }
             <button
               className='py-1 px-2 bg-blue-500 text-white rounded cursor-pointer'
               onClick={() => setOpen(false)}>Close</button>

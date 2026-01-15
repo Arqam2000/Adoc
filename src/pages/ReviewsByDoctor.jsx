@@ -28,7 +28,7 @@ const ReviewsByDoctor = ({id}) => {
       <h1 className='text-2xl font-semibold'>Reviews</h1>
       {
         reviews.map((review, idx) => (
-          <ReviewCard key={review.id} review={review}/>
+          <ReviewCard key={review.id} review={review} docId={id}/>
         ))
       }
     </div>

@@ -139,7 +139,7 @@ export const Navbar = () => {
         setPd("");
         toast.success(resp.data.message);
         setIsOpen(false)
-        navigate("/login");
+        navigate("/login/patient");
       }
     } catch (error) {
       // console.error("Logout error:", error);
@@ -163,7 +163,7 @@ export const Navbar = () => {
       setLoginName("");
       setPd("");
       setIsOpen(false)
-      navigate("/login");
+      navigate("/login/patient");
     }
   }
 
@@ -205,7 +205,7 @@ export const Navbar = () => {
       </div>
       <div className=' flex items-center md:gap-4 gap-2' >
         {
-          Object.keys(doctor).length === 0 && Object.keys(patient).length === 0 && !localStorage.getItem("adminId") &&
+          Object.keys(doctor).length === 0 && Object.keys(patient).length === 0 && !localStorage.getItem("adminId") && !localStorage.getItem("doctorId") && !localStorage.getItem("patientId") &&
           <>
             <div className='relative' ref={logindropdownRef}>
               <button className='bg-white text-[#2f2f82] py-2 px-2 lg:px-5 rounded border border-[#2f2f82]' onClick={() => {
@@ -257,7 +257,7 @@ export const Navbar = () => {
               </div>
               {
                 open && <div className="absolute left-0 top-6 mt-2 w-40 bg-white text-gray-800 rounded-lg shadow-lg border transition z-20">
-                  <Link to={`/view-profile/${doctor.dr}`} className="block px-4 py-2 hover:bg-blue-100">
+                  <Link to={`/view-profile/${localStorage.getItem("doctorId")}`} className="block px-4 py-2 hover:bg-blue-100">
                     View Profile
                   </Link>
                   <Link to="/profile" className="block px-4 py-2 hover:bg-blue-100">
