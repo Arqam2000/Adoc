@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { useState } from 'react'
-import { toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import { apiBaseUrl } from '../constants/constants'
 import PhoneInput from 'react-phone-number-input'
 import { useNavigate } from 'react-router-dom'
@@ -58,6 +58,7 @@ const ForgotPassword = () => {
 
   return (
     <div>
+      <ToastContainer />
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-6">
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">

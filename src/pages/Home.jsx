@@ -121,7 +121,7 @@ export const Home = () => {
 
   const getAllDoctors = async () => {
     try {
-      const resp = await axios.get(`${apiBaseUrl}/api/v1/doctors/get-alldoctors`)
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/get-alldoctors`)
 
       if (resp.data.success) {
         setDoctors(resp.data.data)

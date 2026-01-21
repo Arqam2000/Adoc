@@ -6,6 +6,7 @@ import { calculateExperienceByRange } from '../utils/calculateExperience'
 import useExperience from '../hooks/useExperience'
 import BackButton from '../components/BackButton'
 import { apiBaseUrl } from '../constants/constants'
+import { set } from 'date-fns'
 
 const DoctorsList = () => {
   const [doctors, setDoctors] = useState([])
@@ -131,10 +132,30 @@ const DoctorsList = () => {
       <h1 className='text-2xl font-semibold my-2'>Best {specializationName || "All Doctor"}s </h1>
       <div className='md:flex gap-2 my-4 hidden'>
         <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ' onClick={() => set}>Doctors Near Me</button>
-        <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isMostExperienced ? 'bg-[#000066] text-white' : ''}`} onClick={() => setIsMostExperienced(!isMostExperienced)}>Most Experienced</button>
-        <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isLowestFees ? 'bg-[#000066] text-white' : ''}`} onClick={() => setIsLowestFees(!isLowestFees)}>Lowest Fee</button>
-        <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isHighestRated ? 'bg-[#000066] text-white' : ''}`} onClick={() => setIsHighestRated(!isHighestRated)}>Highest Rated</button>
-        <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isAvailableToday ? 'bg-[#000066] text-white' : ''}`} onClick={() => setIsAvailableToday(!isAvailableToday)}>Available Today</button>
+        <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isMostExperienced ? 'bg-[#000066] text-white' : ''}`} onClick={() => {
+          setIsAvailableToday(false)
+          setIsHighestRated(false)
+          setIsLowestFees(false)
+          setIsMostExperienced(!isMostExperienced)
+          }}>Most Experienced</button>
+        <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isLowestFees ? 'bg-[#000066] text-white' : ''}`} onClick={() => {
+          setIsAvailableToday(false)
+          setIsHighestRated(false)
+          setIsMostExperienced(false)
+          setIsLowestFees(!isLowestFees)
+          }}>Lowest Fee</button>
+        <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isHighestRated ? 'bg-[#000066] text-white' : ''}`} onClick={() => {
+          setIsAvailableToday(false)
+          setIsLowestFees(false)
+          setIsMostExperienced(false)
+          setIsHighestRated(!isHighestRated)
+          }}>Highest Rated</button>
+        <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isAvailableToday ? 'bg-[#000066] text-white' : ''}`} onClick={() => {
+          setIsHighestRated(false)
+          setIsLowestFees(false)
+          setIsMostExperienced(false)
+          setIsAvailableToday(!isAvailableToday)
+          }}>Available Today</button>
         <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ' onClick={() => set}>Discounts</button>
         <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ' onClick={() => set}>Video Consultation</button>
       </div>
