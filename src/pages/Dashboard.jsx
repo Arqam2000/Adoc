@@ -39,7 +39,7 @@ export default function Dashboard() {
   const { doctorData, setDoctorData, fetchDoctorData } = useDoctor();
   const navigate = useNavigate();
 
-  const {setLoginName, setPd} = useLoginName()
+  const {setLoginName, setPd, pd} = useLoginName()
 
   const [experiences] = useExperience(doctorData?.doctorexp, [doctorData?.doctor])
 
@@ -505,7 +505,7 @@ export default function Dashboard() {
                               <thead>
                                 <tr className="text-gray-600 border-b">
                                   <th className="pb-2">Hospital</th>
-                                  <th className="pb-2">Doctor</th>
+                                  {pd === "p" && <th className="pb-2">Doctor</th>}
                                   <th className="pb-2">Patient</th>
                                   <th className="pb-2">Time</th>
                                   <th className="pb-2">Fees</th>
@@ -515,7 +515,7 @@ export default function Dashboard() {
                                 {todaysAppointments.map((apt, idx) => (
                                   <tr key={idx} className="border-b text-sm">
                                     <td className="py-2">{apt.hospital}</td>
-                                    <td className="py-2">{apt.doctor}</td>
+                                    {pd === "p" && <td className="py-2">{apt.doctor}</td>}
                                     <td className="py-2">{apt.patient}</td>
                                     <td className="py-2">{apt.time}</td>
                                     <td className="py-2">{apt.fees}</td>
