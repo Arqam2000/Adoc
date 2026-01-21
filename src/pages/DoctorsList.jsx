@@ -14,12 +14,16 @@ const DoctorsList = () => {
   const [hospitals, setHospitals] = useState([])
   const [videoTimings, setVideoTimings] = useState([])
   const [loading, setLoading] = useState(false)
+  const [isMostExperienced, setIsMostExperienced] = useState(false)
+  const [isLowestFees, setIsLowestFees] = useState(false)
+  const [isHighestRated, setIsHighestRated] = useState(false)
+  const [isAvailableToday, setIsAvailableToday] = useState(false)
 
   // console.log(doctors)
 
   const [experiences] = useExperience(doctorExp, doctors)
 
-  // console.log("experiences from DoctorsList", experiences)
+  console.log("experiences from DoctorsList", experiences)
 
   const location = useLocation()
 
@@ -80,12 +84,19 @@ const DoctorsList = () => {
       left: 0,
       behavior: 'smooth' // Optional: adds a smooth scrolling animation
     });
-  }, [])
+  }, [isHighestRated, isLowestFees, isMostExperienced, isAvailableToday])
+
+
 
   const getAllDoctors = async () => {
     try {
       setLoading(true)
-      const resp = await axios.get(`${apiBaseUrl}/api/v1/doctors/get-alldoctors`)
+      const resp = await axios.post(`${apiBaseUrl}/api/v1/doctors/get-alldoctors`, {
+        isMostExperienced,
+        isLowestFees,
+        isHighestRated,
+        isAvailableToday
+      })
 
       if (resp.data.success) {
         setDoctors(resp.data.data)
@@ -103,6 +114,14 @@ const DoctorsList = () => {
   }
 
   console.log("doctors from DoctorsList", doctors)
+  // console.log("doctors", JSON.stringify([...doctors]))
+  // console.log("hospitals from DoctorsList", JSON.stringify(hospitals))
+  // console.log("doctorExp from DoctorsList", JSON.stringify(doctorExp))
+  // console.log("doctorExp from DoctorsList", doctorExp)
+  // console.log("videoTimings", JSON.stringify(videoTimings))
+  // console.log("videoTimings", videoTimings)
+  // console.log("reviews", JSON.stringify(reviews))
+  // console.log("hospitals from DoctorsList", hospitals)
   // console.log("doctorExp from DoctorsList", doctorExp)
   // console.log("doctorExp from DoctorsList", JSON.stringify(doctorExp))
 
@@ -111,13 +130,13 @@ const DoctorsList = () => {
       <BackButton />
       <h1 className='text-2xl font-semibold my-2'>Best {specializationName || "All Doctor"}s </h1>
       <div className='md:flex gap-2 my-4 hidden'>
-        <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full '>Doctors Near Me</button>
-        <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full '>Most Experienced</button>
-        <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full '>Lowest Fee</button>
-        <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full '>Highest Rated</button>
-        <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full '>Available Today</button>
-        <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full '>Discounts</button>
-        <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full '>Video Consultation</button>
+        <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ' onClick={() => set}>Doctors Near Me</button>
+        <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isMostExperienced ? 'bg-[#000066] text-white' : ''}`} onClick={() => setIsMostExperienced(!isMostExperienced)}>Most Experienced</button>
+        <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isLowestFees ? 'bg-[#000066] text-white' : ''}`} onClick={() => setIsLowestFees(!isLowestFees)}>Lowest Fee</button>
+        <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isHighestRated ? 'bg-[#000066] text-white' : ''}`} onClick={() => setIsHighestRated(!isHighestRated)}>Highest Rated</button>
+        <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isAvailableToday ? 'bg-[#000066] text-white' : ''}`} onClick={() => setIsAvailableToday(!isAvailableToday)}>Available Today</button>
+        <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ' onClick={() => set}>Discounts</button>
+        <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ' onClick={() => set}>Video Consultation</button>
       </div>
 
 
@@ -337,10 +356,6 @@ const DoctorsList = () => {
         {
           loading ? <p className='text-black text-2xl font-bold'>Loading doctors...</p> : filteredBySpecialization.length === 0 && filteredByCity.length === 0 && filteredByCityAndSpec.length === 0 && filterByOnCallDoctor.length === 0 && filterByVideoConsultation.length === 0 && location.state !== null && <p className='text-gray-500'>No doctors found matching the selected criteria.</p>
         }
-
-        
-        
-
       </div>
     </div>
   )

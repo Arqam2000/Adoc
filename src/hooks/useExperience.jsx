@@ -9,7 +9,7 @@ const useExperience = (doctorExp, doctors) => {
   
       const exp = doctors.map(doc => calculateExperienceByRange(doctorExp, doc?.dr, { nowIfNoTill: true }))
   
-      console.log("exp from useExperience", exp)
+      // console.log("exp from useExperience", exp)
   
       setExperiences(exp)
   

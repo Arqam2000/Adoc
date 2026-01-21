@@ -66,6 +66,7 @@ const DoctorCard = ({
   // console.log('videoAvailability', videoAvailability)
   // console.log('hospitals', hospitals)
   // console.log("videoTimings", videoTimings)
+  // console.log("review from DoctorCard", review)
 
   useEffect(() => {
     const grouped = availability.reduce((acc, item) => {
@@ -96,7 +97,8 @@ const DoctorCard = ({
     setGrouped(Object.values(grouped));
   }, [availability])
 
-
+  console.log("grouped", grouped)
+  
   useEffect(() => {
     calculateAvailability()
   }, [hospitals])
