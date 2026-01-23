@@ -19,6 +19,7 @@ const DoctorsList = () => {
   const [isLowestFees, setIsLowestFees] = useState(false)
   const [isHighestRated, setIsHighestRated] = useState(false)
   const [isAvailableToday, setIsAvailableToday] = useState(false)
+  const [isVideoConsultation, setIsVideoConsultation] = useState(false)
 
   // console.log(doctors)
 
@@ -96,7 +97,8 @@ const DoctorsList = () => {
         isMostExperienced,
         isLowestFees,
         isHighestRated,
-        isAvailableToday
+        isAvailableToday,
+        isVideoConsultation
       })
 
       if (resp.data.success) {
@@ -136,28 +138,38 @@ const DoctorsList = () => {
           setIsAvailableToday(false)
           setIsHighestRated(false)
           setIsLowestFees(false)
+          setIsVideoConsultation(false)
           setIsMostExperienced(!isMostExperienced)
           }}>Most Experienced</button>
         <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isLowestFees ? 'bg-[#000066] text-white' : ''}`} onClick={() => {
           setIsAvailableToday(false)
           setIsHighestRated(false)
           setIsMostExperienced(false)
+          setIsVideoConsultation(false)
           setIsLowestFees(!isLowestFees)
           }}>Lowest Fee</button>
         <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isHighestRated ? 'bg-[#000066] text-white' : ''}`} onClick={() => {
           setIsAvailableToday(false)
           setIsLowestFees(false)
           setIsMostExperienced(false)
+          setIsVideoConsultation(false)
           setIsHighestRated(!isHighestRated)
           }}>Highest Rated</button>
         <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isAvailableToday ? 'bg-[#000066] text-white' : ''}`} onClick={() => {
           setIsHighestRated(false)
           setIsLowestFees(false)
           setIsMostExperienced(false)
+          setIsVideoConsultation(false)
           setIsAvailableToday(!isAvailableToday)
           }}>Available Today</button>
         <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ' onClick={() => set}>Discounts</button>
-        <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ' onClick={() => set}>Video Consultation</button>
+        <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isVideoConsultation ? 'bg-[#000066] text-white' : ''}`} onClick={() => {
+          setIsHighestRated(false)
+          setIsLowestFees(false)
+          setIsMostExperienced(false)
+          setIsAvailableToday(false)
+          setIsVideoConsultation(!isVideoConsultation)
+          }}>Video Consultation</button>
       </div>
 
 

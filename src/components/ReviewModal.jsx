@@ -101,7 +101,7 @@ const ReviewModal = ({ isOpen, onClose, appointment, reviewData, drName }) => {
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 h-full">
-      <div className="bg-white w-full max-w-2xl rounded-xl shadow-lg p-6">
+      <div className="bg-white w-full max-w-2xl rounded-xl shadow-lg p-6 h-full overflow-auto">
         <h2 className="text-xl font-semibold mb-4">Post a review for Dr {reviewData ? reviewData.dr_name : (appointment?.name ? appointment?.name : drName)}</h2>
 
         <form className="space-y-4">

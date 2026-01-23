@@ -56,7 +56,7 @@ export const Login = () => {
           localStorage.setItem("patientId", JSON.stringify(res.data.patient.patient))
           setLoginName(res.data.patient.pname)
           setPd("p")
-          navigate(`/dashboard`)
+          navigate(`/`)
         })
         .catch(err => {
           console.log("Error:", err)

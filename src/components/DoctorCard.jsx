@@ -97,8 +97,8 @@ const DoctorCard = ({
     setGrouped(Object.values(grouped));
   }, [availability])
 
-  console.log("grouped", grouped)
-  
+  // console.log("grouped", grouped)
+
   useEffect(() => {
     calculateAvailability()
   }, [hospitals])
