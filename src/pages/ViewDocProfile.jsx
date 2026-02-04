@@ -152,7 +152,7 @@ export default function ViewDocProfile() {
               doctorData?.doctorvd?.map(docvd => (
                 <div key={docvd.doctorvd} className="border-b border-gray-300 py-1">
 
-                  <div className="space-y-2 text-gray-700 flex justify-between w-sm ">
+                  <div className="space-y-2 text-gray-700 flex justify-between sm:w-sm w-full">
                     <p className="text-[#004D71] font-semibold">{docvd.day}</p>
                     <p>{new Date(`1970-01-01T${docvd.timein}Z`).toLocaleTimeString('en-US', {
                       hour: 'numeric',
@@ -198,7 +198,7 @@ export default function ViewDocProfile() {
                   {
                     doctors.map(dochd => (
                       <div className="border-b border-gray-300 py-1">
-                        <div key={dochd.doctorhd} className=" flex justify-between w-sm  ">
+                        <div key={dochd.doctorhd} className=" flex justify-between sm:w-sm w-full ">
 
                           {/* <p className="text-gray-600">Mon - Fri | 5 PM - 8 PM</p> */}
                           <p className="text-[#004D71] font-semibold">{dochd.day}</p>

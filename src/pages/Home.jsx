@@ -163,9 +163,9 @@ export const Home = () => {
       <Search city={city} setCity={setCity} specialization={specialization} setSpecialization={setSpecialization}/>
 
       {/* How can we help you today? */}
-      <div className='md:w-7xl mx-auto'>
+      <div className='xl:w-7xl mx-auto'>
         <h1 className='text-lg text-[#3A3A3A] font-bold '>How can we help you today?</h1>
-        <div className='flex flex-wrap md:flex-nowrap justify-center gap-3 md:w-6xl mx-auto my-8 cursor-pointer'>
+        <div className='flex flex-wrap md:flex-nowrap justify-center gap-3 xl:w-6xl mx-auto my-8 cursor-pointer'>
           <button className='w-1/3 shadow-md p-2 rounded-lg bg-[#DFEFEB] pl-5 flex flex-col justify-center items-center' onClick={() => navigate('/doctors', { state: { city, specialization, OnCallDoctor: true } })}>
             {/* <div className='w-40'>
               <img src={instantDoctor} alt="instant-doctorlogo.png" />
@@ -219,7 +219,7 @@ export const Home = () => {
       </div>
 
       {/* Consult Doctors World Wide Free of Cost */}
-      <div className="bg-[#f0f8fa] p-4 rounded-lg md:w-7xl mx-auto my-5">
+      <div className="bg-[#f0f8fa] p-4 rounded-lg xl:w-7xl mx-auto my-5">
         <h1 className='text-lg text-[#3A3A3A] font-bold '>Consult Doctors World Wide Free of Cost</h1>
         {/* grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 */}
         <div className="flex flex-wrap md:flex-nowrap gap-4 my-4 lg:overflow-x-scroll overflow-y-visible scroll-smooth">
@@ -263,7 +263,7 @@ export const Home = () => {
       </div>
 
       {/* Consult Doctors by Specialization */}
-      <div className="p-6 md:w-7xl mx-auto">
+      <div className="p-6 xl:w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           {/* <h2 className="text-lg font-semibold">Consult best doctors online</h2> */}
@@ -372,7 +372,7 @@ export const Home = () => {
         </div>
       </div>
 
-      <div className='flex flex-col items-center justify-center text-xl py-2 md:w-5xl mx-auto mb-4 gap-2'>
+      <div className='flex flex-col items-center justify-center text-xl py-2 xl:w-5xl mx-auto mb-4 gap-2'>
         <h3>Advertisement</h3>
         <Link to="https://lamaesthetic.co.uk" target='_blank'><img src={ad} alt="ad" className='h-72'/></Link> 
       </div>

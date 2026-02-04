@@ -129,7 +129,7 @@ const DoctorsList = () => {
   // console.log("doctorExp from DoctorsList", JSON.stringify(doctorExp))
 
   return (
-    <div className='w-7xl mx-auto mt-4'>
+    <div className='xl:w-7xl w-full mx-auto mt-4'>
       <BackButton />
       <h1 className='text-2xl font-semibold my-2'>Best {specializationName || "All Doctor"}s </h1>
       <div className='md:flex gap-2 my-4 hidden'>
@@ -173,7 +173,7 @@ const DoctorsList = () => {
       </div>
 
 
-      <div className='grid lg:grid-cols-3 grid-cols-1 gap-2 mx-auto p-2 my-2'>
+      <div className='grid xl:grid-cols-3 grid-cols-1 gap-2 mx-auto p-2 my-2'>
         {/* {
           filteredByCityAndSpec.length > 0 ? 
             filteredByCityAndSpec.map(({ dr, name, Specialization_name, qualifications, experience, rating, fees, picture, pmdc_verification }, index) => (

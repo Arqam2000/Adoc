@@ -110,7 +110,7 @@ const DoctorCard = ({
   }
 
   return (
-    <div className='p-2 rounded-md bg-white w-sm text-black shadow-md flex flex-col justify-center'>
+    <div className='p-2 rounded-md bg-white md:w-sm w-full text-black shadow-md flex flex-col justify-center'>
       <div className='flex gap-3'>
         <div>
           <img
