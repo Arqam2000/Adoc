@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { toast } from "react-toastify";
 import { apiBaseUrl } from "../constants/constants";
 
-const ReviewModal = ({ isOpen, onClose, appointment, reviewData, drName }) => {
+const ReviewModal = ({ isOpen, onClose, appointment, reviewData, drName, id }) => {
   if (!isOpen) return null;
 
   const [selectedWaitingTime, setSelectedWaitingTime] = React.useState("");
@@ -42,7 +42,10 @@ const ReviewModal = ({ isOpen, onClose, appointment, reviewData, drName }) => {
   const addReview = async (e) => {
     e.preventDefault();
     try {
-      console.log("submitted data", overallSatisfaction,
+      console.log("submitted data", 
+        appointment?.dr || id,
+        JSON.parse(localStorage.getItem("patientId")),
+        overallSatisfaction,
         waitingTimeMins,
         consultationTimeMins,
         recommend,
@@ -53,7 +56,7 @@ const ReviewModal = ({ isOpen, onClose, appointment, reviewData, drName }) => {
         postAnonymously)
 
       await axios.post(`${apiBaseUrl}/api/v1/reviews/add-review`, {
-        dr: appointment?.dr,
+        dr: appointment?.dr || id,
         patient: JSON.parse(localStorage.getItem("patientId")),
         overallSatisfaction,
         waitingTimeMins: waitingTimeMins || "0",
@@ -72,7 +75,7 @@ const ReviewModal = ({ isOpen, onClose, appointment, reviewData, drName }) => {
       onClose();
     } catch (error) {
       console.error("Error adding review:", error);
-      toast.error("Failed to add review. Please try again.");
+      toast.error(error.response?.data?.message || "Failed to add review. Please try again.");
     }
   }
 

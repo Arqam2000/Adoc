@@ -110,7 +110,7 @@ export default function ViewDocProfile() {
           Post a Review
         </button>
         {
-          isReviewModalOpen && <ReviewModal isOpen={isReviewModalOpen} onClose={() => setIsReviewModalOpen(false)} drName={doctorData?.doctor?.name} />
+          isReviewModalOpen && <ReviewModal isOpen={isReviewModalOpen} onClose={() => setIsReviewModalOpen(false)} drName={doctorData?.doctor?.name} id={id}/>
         }
 
         {/* About */}

@@ -30,6 +30,8 @@ const PatientSignup = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
 
+    console.log("user", user)
+
     setLoading(true)
     setError(null)
 
@@ -45,8 +47,8 @@ const PatientSignup = () => {
       })
       .catch(err => {
         console.log("Error:", err)
-        toast.error(err.response.data.message)
-        setError(err.response.data.message)
+        toast.error(err.response.data.error.message)
+        setError(err.response.data.error.message)
       })
       .finally(() => setLoading(false))
   }
@@ -97,7 +99,7 @@ const PatientSignup = () => {
             <div>
               <label className="block text-gray-700 font-medium mb-2">Phone</label>
               <input
-                type="number"
+                type="text"
                 placeholder="Enter your phone"
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={user.phone}
@@ -118,13 +120,30 @@ const PatientSignup = () => {
             </div>
             <div>
               <label className="block text-gray-700 font-medium mb-2">Blood Group</label>
-              <input
+              {/* <input
                 type="text"
                 placeholder="Enter your blood group"
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={user.bloodGroup}
                 onChange={(e) => setUser({ ...user, bloodGroup: e.target.value })}
-              />
+              /> */}
+              <select
+                type="text"
+                placeholder="Select your blood group"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={user.bloodGroup}
+                onChange={(e) => setUser({ ...user, bloodGroup: e.target.value })}
+              >
+                <option value="">Select Blood Group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
             </div>
 
             <div className='flex gap-3'>

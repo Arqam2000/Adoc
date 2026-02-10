@@ -20,6 +20,7 @@ const DoctorsList = () => {
   const [isHighestRated, setIsHighestRated] = useState(false)
   const [isAvailableToday, setIsAvailableToday] = useState(false)
   const [isVideoConsultation, setIsVideoConsultation] = useState(false)
+  const [isAvailableTodayForVideoConsultation, setIsAvailableTodayForVideoConsultation] = useState(false)
 
   // console.log(doctors)
 
@@ -86,7 +87,7 @@ const DoctorsList = () => {
       left: 0,
       behavior: 'smooth' // Optional: adds a smooth scrolling animation
     });
-  }, [isHighestRated, isLowestFees, isMostExperienced, isAvailableToday])
+  }, [isHighestRated, isLowestFees, isMostExperienced, isAvailableToday, isAvailableTodayForVideoConsultation])
 
 
 
@@ -98,7 +99,8 @@ const DoctorsList = () => {
         isLowestFees,
         isHighestRated,
         isAvailableToday,
-        isVideoConsultation
+        isVideoConsultation,
+        isAvailableTodayForVideoConsultation
       })
 
       if (resp.data.success) {
@@ -139,6 +141,7 @@ const DoctorsList = () => {
           setIsHighestRated(false)
           setIsLowestFees(false)
           setIsVideoConsultation(false)
+          setIsAvailableTodayForVideoConsultation(false)
           setIsMostExperienced(!isMostExperienced)
           }}>Most Experienced</button>
         <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isLowestFees ? 'bg-[#000066] text-white' : ''}`} onClick={() => {
@@ -146,6 +149,7 @@ const DoctorsList = () => {
           setIsHighestRated(false)
           setIsMostExperienced(false)
           setIsVideoConsultation(false)
+          setIsAvailableTodayForVideoConsultation(false)
           setIsLowestFees(!isLowestFees)
           }}>Lowest Fee</button>
         <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isHighestRated ? 'bg-[#000066] text-white' : ''}`} onClick={() => {
@@ -153,6 +157,7 @@ const DoctorsList = () => {
           setIsLowestFees(false)
           setIsMostExperienced(false)
           setIsVideoConsultation(false)
+          setIsAvailableTodayForVideoConsultation(false)
           setIsHighestRated(!isHighestRated)
           }}>Highest Rated</button>
         <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isAvailableToday ? 'bg-[#000066] text-white' : ''}`} onClick={() => {
@@ -160,16 +165,26 @@ const DoctorsList = () => {
           setIsLowestFees(false)
           setIsMostExperienced(false)
           setIsVideoConsultation(false)
+          setIsAvailableTodayForVideoConsultation(false)
           setIsAvailableToday(!isAvailableToday)
           }}>Available Today</button>
         <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ' onClick={() => set}>Discounts</button>
-        <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isVideoConsultation ? 'bg-[#000066] text-white' : ''}`} onClick={() => {
+        {/* <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isVideoConsultation ? 'bg-[#000066] text-white' : ''}`} onClick={() => {
           setIsHighestRated(false)
           setIsLowestFees(false)
           setIsMostExperienced(false)
           setIsAvailableToday(false)
+          setIsAvailableTodayForVideoConsultation(false)
           setIsVideoConsultation(!isVideoConsultation)
-          }}>Video Consultation</button>
+          }}>Video Consultation</button> */}
+        <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isAvailableTodayForVideoConsultation ? 'bg-[#000066] text-white' : ''}`} onClick={() => {
+          setIsHighestRated(false)
+          setIsLowestFees(false)
+          setIsMostExperienced(false)
+          setIsAvailableToday(false)
+          setIsVideoConsultation(false)
+          setIsAvailableTodayForVideoConsultation(!isAvailableTodayForVideoConsultation)
+          }}>Available Today for Video Consultation</button>
       </div>
 
 
