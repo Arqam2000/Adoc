@@ -131,10 +131,10 @@ const DoctorsList = () => {
   // console.log("doctorExp from DoctorsList", JSON.stringify(doctorExp))
 
   return (
-    <div className='xl:w-7xl w-full mx-auto mt-4'>
+    <div className='xl:w-7xl w-11/12 mx-auto mt-4'>
       <BackButton />
       <h1 className='text-2xl font-semibold my-2'>Best {specializationName || "All Doctor"}s </h1>
-      <div className='md:flex gap-2 my-4 hidden'>
+      <div className='flex flex-wrap gap-2 my-4 '>
         <button className='py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ' onClick={() => set}>Doctors Near Me</button>
         <button className={`py-1 px-3 border border-[#000066] text-[#000066] rounded-full cursor-pointer ${isMostExperienced ? 'bg-[#000066] text-white' : ''}`} onClick={() => {
           setIsAvailableToday(false)

@@ -497,7 +497,7 @@ export default function Dashboard() {
                         <h2 className="text-xl font-semibold border-b pb-2">Appointment Status</h2>
 
                         {/* Today's Appointments */}
-                        <div className="bg-white rounded-xl shadow p-6">
+                        <div className="bg-white rounded-xl shadow p-6 overflow-scroll">
                           <h3 className="text-lg font-semibold mb-4">Today's Appointments</h3>
                           <h3 className="text-lg font-semibold mb-4 ">In Clinic Appointments</h3>
                           {todaysAppointments.length > 0 ? (
@@ -681,7 +681,7 @@ export default function Dashboard() {
                         <h2 className="text-xl font-semibold border-b pb-2">History</h2>
 
                         {/* Appointment History */}
-                        <div className="bg-white rounded-xl shadow p-6">
+                        <div className="bg-white rounded-xl shadow p-6 overflow-scroll">
                           <h3 className="text-lg font-semibold mb-4">In Clinic Appointments</h3>
                           {historyAppointments.length > 0 ? (
                             <table className="w-full text-left border-collapse">
@@ -737,7 +737,7 @@ export default function Dashboard() {
                         {open && <PatientModal setOpen={setOpen} apt={apt} />}
 
                         {/* Video History */}
-                        <div className="bg-white rounded-xl shadow p-6">
+                        <div className="bg-white rounded-xl shadow p-6 overflow-scroll">
                           <h3 className="text-lg font-semibold mb-4">Video Consultations</h3>
                           {historyVideo.length > 0 ? (
                             <table className="w-full text-left border-collapse">

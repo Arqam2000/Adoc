@@ -118,6 +118,18 @@ export const Navbar = () => {
     return () => document.removeEventListener("click", handler);
   }, []);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset'; // Or "" to remove the inline style
+    }
+    // Cleanup function to restore original style
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
 
   console.log("patient", patient)
 
