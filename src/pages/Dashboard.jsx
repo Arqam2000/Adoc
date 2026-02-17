@@ -23,6 +23,8 @@ import LabTestResult from "../components/LabTestResult";
 import ReviewsByPatient from "./ReviewsByPatient";
 import { apiBaseUrl } from "../constants/constants";
 import useLoginName from "../context/LoginContext";
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export default function Dashboard() {
   const [appointments, setAppointments] = useState([]);
@@ -34,12 +36,13 @@ export default function Dashboard() {
   const [isPatientHistoryOpen, setIsPatientHistoryOpen] = useState(false);
   const [isLabResultOpen, setIsLabResultOpen] = useState(false);
   const [isReviewsOpen, setIsReviewsOpen] = useState(false);
+  const [isDashboardOpen, setIsDashboardOpen] = useState(false);
 
 
   const { doctorData, setDoctorData, fetchDoctorData } = useDoctor();
   const navigate = useNavigate();
 
-  const {setLoginName, setPd, pd} = useLoginName()
+  const { setLoginName, setPd, pd } = useLoginName()
 
   const [experiences] = useExperience(doctorData?.doctorexp, [doctorData?.doctor])
 
@@ -326,7 +329,7 @@ export default function Dashboard() {
   }
 
   const handleCall = (phone) => {
-    const formattedPhoneNumber = `+${phone?.replace(/\D/g, '')}`; 
+    const formattedPhoneNumber = `+${phone?.replace(/\D/g, '')}`;
     window.open(`https://wa.me/${formattedPhoneNumber}`, '_blank');
   }
 
@@ -424,9 +427,120 @@ export default function Dashboard() {
         </nav>
       </aside>
 
+      {
+        isDashboardOpen && <aside className="w-64 bg-white shadow-lg p-6 absolute top-0 left-0 h-full z-10 animate-slide-in">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-blue-600 mb-8">Menu</h1>
+            <button onClick={() => setIsDashboardOpen(!isDashboardOpen)} className="bg-blue-500  rounded py-1 px-2 text-white text-base cursor-pointer">
+              {isDashboardOpen ? <ArrowBackIcon size={18} /> : <ArrowForwardIcon size={18} />}
+              Menu
+            </button>
+          </div>
+          <nav className="flex flex-col gap-4">
+            <a onClick={() => {
+              setIsLabResultOpen(false)
+              setIsPatientHistoryOpen(false)
+              setIsReviewsOpen(false)
+              setIsDashboardOpen(false)
+            }} href="#" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+              <Home size={18} /> Dashboard
+            </a>
+
+            {Object.keys(patientData).length > 0 && <Link to="/patient/edit-profile" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+              <User size={18} /> Edit Profile
+            </Link>}
+
+            {
+              Object.keys(doctorData).length > 0 && <><Link to={`/view-profile/${doctorData?.doctor?.dr}`} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+                <User size={18} /> Profile
+              </Link>
+                <Link to="/profile" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+                  <User size={18} /> Edit Profile
+                </Link> </>
+            }
+
+            <a onClick={() => {
+              setIsLabResultOpen(false)
+              setIsPatientHistoryOpen(false)
+              setIsReviewsOpen(false)
+              setIsDashboardOpen(false)
+            }} href="#appointments" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+              <Calendar size={18} /> Appointments
+            </a>
+
+            {
+              Object.keys(doctorData).length > 0 && <Link to="/dashboard/patient-portal" state={{ appointments, todaysAppointments, videoConsultations, comingAppointments, upcomingVideoConsultations }} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+                <Calendar size={18} /> Patient Portal
+              </Link>
+            }
+
+            {
+              Object.keys(doctorData).length > 0 && <> <Link onClick={() => setIsPatientHistoryOpen(false)} to="/dashboard/video-consultation" state={{ historyVideo, videoConsultations, }} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+                <Video size={18} /> Video Consultations
+              </Link>
+                <a onClick={() => {
+                  setIsPatientHistoryOpen(false)
+                  setIsDashboardOpen(false)
+                  }} href="#history" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+                  <History size={18} /> History
+                </a> </>
+            }
+
+            {Object.keys(patientData).length > 0 && <button onClick={() => {
+              setIsPatientHistoryOpen(false)
+              setIsReviewsOpen(false)
+              setIsLabResultOpen(true)
+              setIsDashboardOpen(false)
+            }} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+              <History size={18} />
+              Lab Test Result
+            </button>}
+
+            <button onClick={() => {
+              setIsLabResultOpen(false)
+              setIsReviewsOpen(false)
+              setIsPatientHistoryOpen(true)
+              setIsDashboardOpen(false)
+            }} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+              <History size={18} /> Patient History
+            </button>
+
+            {Object.keys(patientData).length > 0 && <Link to="/patient/change-password" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+              <History size={18} />
+              Change Password
+            </Link>}
+
+            {Object.keys(doctorData).length > 0 && <a onClick={() => setIsDashboardOpen(false)} href="#history" className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+              <History size={18} /> Doctor Remarks
+            </a>}
+
+            <button onClick={() => {
+              setIsLabResultOpen(false)
+              setIsPatientHistoryOpen(false)
+              setIsReviewsOpen(true)
+              setIsDashboardOpen(false)
+            }} className="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+              <History size={18} /> Reviews
+            </button>
+
+            {/* <button className="flex items-center gap-3 text-red-600 hover:text-red-800 mt-auto cursor-pointer" onClick={logout}>
+            <LogOut size={18} /> Logout
+          </button> */}
+          </nav>
+
+        </aside>
+
+      }
+
       {/* Main Content */}
       <main className="flex-1 p-8 space-y-8 overflow-y-auto">
         {/* Profile Card */}
+        <div className="relative">
+          <button onClick={() => setIsDashboardOpen(!isDashboardOpen)} className="bg-blue-500 p-1 rounded text-white text-base cursor-pointer px-2 z-10">
+            {isDashboardOpen ? <ArrowBackIcon size={18} /> : <ArrowForwardIcon size={18} />}
+            Menu
+          </button>
+        </div>
         <BackButton />
         {
           Object.keys(doctorData).length > 0 ? (
@@ -521,9 +635,9 @@ export default function Dashboard() {
                                     <td className="py-2">{apt.fees}</td>
                                     <td>
                                       <button className="cursor-pointer" onClick={() => {
-                                      setApt(apt)
-                                      setOpen(true)
-                                    }}>Click here for details
+                                        setApt(apt)
+                                        setOpen(true)
+                                      }}>Click here for details
                                       </button>
                                     </td>
                                   </tr>
